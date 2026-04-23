@@ -1,38 +1,39 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Login() {
+export default function Register() {
   const [user, setUser] = useState("");
   const [pass, setPass] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleRegister = (e) => {
     e.preventDefault();
 
-    if (user === "admin" && pass === "admin123") {
-      localStorage.setItem("auth", "admin");
-      navigate("/dashboard");
+    if (!user || !pass) {
+      alert("Completa todos los campos");
       return;
     }
 
     const users = JSON.parse(localStorage.getItem("users")) || [];
 
-    const found = users.find(
-      (u) => u.user === user && u.pass === pass
-    );
-
-    if (found) {
-      localStorage.setItem("auth", user);
-      navigate("/dashboard");
-    } else {
-      alert("Credenciales incorrectas");
+    const exists = users.find((u) => u.user === user);
+    if (exists) {
+      alert("El usuario ya existe");
+      return;
     }
+
+    const newUser = { user, pass };
+    users.push(newUser);
+
+    localStorage.setItem("users", JSON.stringify(users));
+
+    navigate("/login");
   };
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form onSubmit={handleLogin} className="bg-white p-6 shadow w-80">
-        <h2 className="text-xl mb-4 font-bold">Login</h2>
+      <form onSubmit={handleRegister} className="bg-white p-6 shadow w-80">
+        <h2 className="text-xl mb-4 font-bold">Registro</h2>
 
         <input
           className="border p-2 w-full mb-3"
@@ -41,26 +42,26 @@ export default function Login() {
         />
 
         <input
-          className="border p-2 w-full mb-3"
           type="password"
+          className="border p-2 w-full mb-3"
           placeholder="Contraseña"
           onChange={(e) => setPass(e.target.value)}
         />
 
         <button
           type="submit"
-          className="text-white bg-blue-500 hover:bg-blue-600 text-sm px-4 py-2 rounded w-full"
+          className="bg-green-500 text-white w-full py-2 rounded"
         >
-          Entrar
+          Registrarse
         </button>
 
         <p className="text-sm mt-4 text-center">
-          ¿No tienes una cuenta?{" "}
+          ¿Ya tienes cuenta?{" "}
           <span
             className="text-blue-500 cursor-pointer hover:underline"
-            onClick={() => navigate("/register")}
+            onClick={() => navigate("/login")}
           >
-            Regístrate
+            Inicia sesión
           </span>
         </p>
       </form>
