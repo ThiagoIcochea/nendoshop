@@ -15,7 +15,7 @@ export default function Navbar() {
 
       <div className="space-x-4">
         <Link to="/">Inicio</Link>
-        <Link to="/about">Sobre Nosotros</Link>
+        <Link to="/about">Nosotros</Link>
         <Link to="/catalog">Catálogo</Link>
 
         {!auth ? (
