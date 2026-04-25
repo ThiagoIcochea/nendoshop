@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ParticlesBackground from "../components/ParticlesBackground";
 
 export default function Login() {
   const [user, setUser] = useState("");
@@ -30,40 +31,54 @@ export default function Login() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form onSubmit={handleLogin} className="bg-white p-6 shadow w-80">
-        <h2 className="text-xl mb-4 font-bold">Login</h2>
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
 
-        <input
-          className="border p-2 w-full mb-3"
-          placeholder="Usuario"
-          onChange={(e) => setUser(e.target.value)}
-        />
+    
+      <ParticlesBackground />
 
-        <input
-          className="border p-2 w-full mb-3"
-          type="password"
-          placeholder="Contraseña"
-          onChange={(e) => setPass(e.target.value)}
-        />
+      
+      <div className="relative z-10">
 
-        <button
-          type="submit"
-          className="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300 shadow-md hover:shadow-lg"
+        <form
+          onSubmit={handleLogin}
+          className="bg-white p-6 shadow-lg w-80 rounded-xl"
         >
-          Entrar
-        </button>
+          <h2 className="text-xl mb-4 font-bold text-center">
+            Login
+          </h2>
 
-        <p className="text-sm mt-4 text-center">
-          ¿No tienes una cuenta?{" "}
-          <span
-            className="text-blue-500 cursor-pointer hover:underline"
-            onClick={() => navigate("/register")}
+          <input
+            className="border p-2 w-full mb-3 rounded"
+            placeholder="Usuario"
+            onChange={(e) => setUser(e.target.value)}
+          />
+
+          <input
+            className="border p-2 w-full mb-3 rounded"
+            type="password"
+            placeholder="Contraseña"
+            onChange={(e) => setPass(e.target.value)}
+          />
+
+          <button
+            type="submit"
+            className="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 px-4 rounded-lg transition"
           >
-            Regístrate
-          </span>
-        </p>
-      </form>
+            Entrar
+          </button>
+
+          <p className="text-sm mt-4 text-center">
+            ¿No tienes una cuenta?{" "}
+            <span
+              className="text-blue-500 cursor-pointer hover:underline"
+              onClick={() => navigate("/register")}
+            >
+              Regístrate
+            </span>
+          </p>
+        </form>
+
+      </div>
     </div>
   );
 }

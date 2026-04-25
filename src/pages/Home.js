@@ -1,12 +1,17 @@
 import { Filter, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import products from "../data/products";
+import Card from "../components/Card";
+import ParticlesBackground from "../components/ParticlesBackground";
 
 export default function Home() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background pb-12">
+    
+    <div className="relative min-h-screen pb-12 overflow-hidden bg-background">
+      <ParticlesBackground />
+      <div className="relative z-10">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         
         <section className="mb-12 relative rounded-2xl overflow-hidden border border-brand bg-white shadow-sm">
@@ -34,7 +39,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="flex justify-between items-center mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+        <section className="flex justify-between items-center mb-6 bg-white p-4 rounded-lg shadow-sm border border-brand">
           <div className="flex items-center gap-2 cursor-pointer group">
             <Filter className="h-5 w-5 text-brand group-hover:text-brand-dark transition-colors" />
             <span className="text-brand font-semibold group-hover:text-brand-dark transition-colors">
@@ -57,39 +62,14 @@ export default function Home() {
 
         <section>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.slice(0, 4).map((product) => (
-              <div 
-                key={product.id} 
-                className="bg-white rounded-xl overflow-hidden border border-brand flex flex-col hover:shadow-lg transition-shadow duration-300 group"
-              >
-                <div className="h-64 overflow-hidden bg-gray-50 relative p-4 flex items-center justify-center">
-                  <img 
-                    src={product.image} 
-                    alt={product.name} 
-                    className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                
-                <div className="p-5 flex-1 flex flex-col justify-between border-t border-gray-100">
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900 leading-tight mb-2">
-                      {product.name}
-                    </h3>
-                    <p className="text-xl font-black text-brand mb-4">
-                      S/. {product.price.toFixed(2)}
-                    </p>
-                  </div>
-                  
-                  <button className="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300 shadow-md hover:shadow-lg">
-                    Comprar
-                  </button>
-                </div>
-              </div>
+            {products.slice(0, 4).map((p) => (
+              <Card key={p.id} {...p} />
             ))}
           </div>
         </section>
 
       </main>
+      </div>
     </div>
   );
 }
