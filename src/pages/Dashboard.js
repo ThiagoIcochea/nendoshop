@@ -1,16 +1,10 @@
-import { useEffect } from "react";
+
 import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const auth = localStorage.getItem("auth");
 
-    if (!auth) {
-      navigate("/login");
-    }
-  }, []);
 
   const logout = () => {
     localStorage.removeItem("auth");
