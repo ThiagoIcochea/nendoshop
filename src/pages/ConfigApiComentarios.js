@@ -1,13 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function ApiComentarios() {
 
   const navigate = useNavigate();
+  const auth = localStorage.getItem("auth");
 
   const [url, setUrl] = useState(
     localStorage.getItem("api_comentarios") || ""
   );
+
+  useEffect(() => {
+    if (auth !== "admin") {
+      navigate("/dashboard");
+    }
+  }, [auth, navigate]);
 
   const save = () => {
     localStorage.setItem("api_comentarios", url);
