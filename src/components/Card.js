@@ -1,8 +1,12 @@
-export default function Card({ name, price, image }) {
+import { useNavigate } from "react-router-dom";
+
+export default function Card({ id, name, price, image }) {
+
+  const navigate = useNavigate();
+
   return (
     <div className="bg-white rounded-xl overflow-hidden border border-brand flex flex-col hover:shadow-lg transition-shadow duration-300 group">
 
-      
       <div className="h-64 overflow-hidden bg-gray-50 relative p-4 flex items-center justify-center">
         <img
           src={image}
@@ -11,7 +15,6 @@ export default function Card({ name, price, image }) {
         />
       </div>
 
-      
       <div className="p-5 flex-1 flex flex-col justify-between border-t border-gray-100">
         <div>
           <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -23,7 +26,10 @@ export default function Card({ name, price, image }) {
           </p>
         </div>
 
-        <button className="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 rounded-lg transition">
+        <button
+          onClick={() => navigate(`/product/${id}`)}
+          className="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 rounded-lg transition"
+        >
           Comprar
         </button>
       </div>

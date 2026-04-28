@@ -10,7 +10,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
-
+import ProductDetail from "./pages/ProductDetail"
+import Cart from "./pages/Cart";
+import ApiComentarios from "./pages/ConfigApiComentarios";
 
 function App() {
   return (
@@ -28,6 +30,9 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/api-comentarios" element={<ApiComentarios />} />
+            <Route path="/cart" element={<Cart />} />
             <Route
               path="/dashboard"
               element={

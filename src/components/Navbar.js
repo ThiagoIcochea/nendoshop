@@ -1,10 +1,28 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Search, ShoppingCart, User, LogOut } from "lucide-react";
+import { useEffect, useState } from "react";
 import logo from "./Assets/logo.png";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const auth = localStorage.getItem("auth");
+
+  const [cartCount, setCartCount] = useState(0);
+
+  const updateCartCount = () => {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const total = cart.reduce((acc, item) => acc + item.quantity, 0);
+    setCartCount(total);
+  };
+
+  useEffect(() => {
+    updateCartCount();
+
+    const handleStorage = () => updateCartCount();
+    window.addEventListener("storage", handleStorage);
+
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("auth");
@@ -36,7 +54,7 @@ export default function Navbar() {
               </div>
               <input
                 type="text"
-                className="block w-full pl-10 pr-3 py-2 border border-brand rounded-full leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-brand focus:border-brand sm:text-sm transition-colors"
+                className="block w-full pl-10 pr-3 py-2 border border-brand rounded-full leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-brand focus:border-brand sm:text-sm"
                 placeholder="Buscar productos..."
               />
             </div>
@@ -44,33 +62,39 @@ export default function Navbar() {
 
           <div className="flex items-center gap-4">
             {!auth ? (
-              <div className="flex items-center gap-4">
-                <Link to="/login" className="flex items-center gap-2 text-brand hover:text-brand-dark transition-colors font-medium">
-                  <User className="h-5 w-5" />
-                  <span className="hidden lg:inline">Login</span>
-                </Link>
-              </div>
+              <Link to="/login" className="flex items-center gap-2 text-brand hover:text-brand-dark font-medium">
+                <User className="h-5 w-5" />
+                <span className="hidden lg:inline">Login</span>
+              </Link>
             ) : (
-              <div className="flex items-center gap-4">
-                <Link to="/dashboard" className="flex items-center gap-2 text-brand hover:text-brand-dark transition-colors font-medium">
+              <>
+                <Link to="/dashboard" className="flex items-center gap-2 text-brand hover:text-brand-dark font-medium">
                   <User className="h-5 w-5" />
                   <span className="hidden lg:inline">Dashboard</span>
                 </Link>
-                <button onClick={handleLogout} className="flex items-center gap-2 text-red-500 hover:text-red-700 transition-colors font-medium cursor-pointer">
+
+                <button onClick={handleLogout} className="flex items-center gap-2 text-red-500 hover:text-red-700 font-medium">
                   <LogOut className="h-5 w-5" />
                   <span className="hidden lg:inline">Logout</span>
                 </button>
-              </div>
+              </>
             )}
 
-            <button className="flex items-center gap-2 text-brand hover:text-brand-dark transition-colors relative group ml-2">
-              <div className="p-2 bg-brand/10 rounded-full group-hover:bg-brand/20 transition-colors">
+            <button
+              onClick={() => navigate("/cart")}
+              className="flex items-center gap-2 text-brand hover:text-brand-dark relative group ml-2"
+            >
+              <div className="p-2 bg-brand/10 rounded-full group-hover:bg-brand/20">
                 <ShoppingCart className="h-5 w-5" />
               </div>
-              <span className="absolute top-0 right-0 -mt-1 -mr-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[10px] font-bold text-white">
-                0
-              </span>
+
+              {cartCount > 0 && (
+                <span className="absolute top-0 right-0 -mt-1 -mr-1 flex h-5 w-5 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">
+                  {cartCount}
+                </span>
+              )}
             </button>
+
           </div>
         </div>
       </div>

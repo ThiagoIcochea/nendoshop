@@ -14,8 +14,15 @@ export default function Footer() {
           </div>
 
           <p className="mb-4">⌖ Av. Arequipa 265, Lima - Perú</p>
-          <p className="mb-4">☏ +51 901 234 567</p>
-          <p>✉ contacto@nendoshop.pe</p>
+           <a 
+            href="https://wa.link/zf9b9q" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="mb-4 block"
+            >
+           ☏ +51 968 085 026
+           </a>
+          <a href="mailto:ticochearodriguez@gmail.com?subject=Consulta%20sobre%20servicios&body=Hola%20%F0%9F%91%8B%2C%250D%250A%250D%250AMe%20gustar%C3%ADa%20realizar%20una%20consulta%20sobre%20sus%20servicios.%20%250D%250A%C2%BFPodr%C3%ADan%20brindarme%20m%C3%A1s%20informaci%C3%B3n%2C%20por%20favor%3F%250D%250A%250D%250AQuedo%20atento(a)%20a%20su%20respuesta.%250D%250A%250D%250ASaludos%20cordiales."> ✉ contacto@nendoshop.pe</a>
         </div>
 
 
