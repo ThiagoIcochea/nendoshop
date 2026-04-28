@@ -57,7 +57,7 @@ export default function Cart() {
 
       <div className="relative z-10 max-w-6xl mx-auto bg-white p-6 rounded-xl shadow">
 
-        <h1 className="text-3xl font-bold mb-6">Carrito 🛒</h1>
+        <h1 className="text-3xl font-bold mb-6">Carrito</h1>
 
         {cart.length === 0 ? (
           <div className="text-center py-20">

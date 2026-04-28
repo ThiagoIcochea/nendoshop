@@ -34,10 +34,10 @@ export default function Register() {
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
 
-      {/* 🌌 PARTICULAS */}
+      
       <ParticlesBackground />
 
-      {/* CONTENIDO ENCIMA */}
+     
       <div className="relative z-10">
 
         <form
