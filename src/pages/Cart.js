@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ParticlesBackground from "../components/ParticlesBackground";
+import Pagos from "./Pagos";
 
 export default function Cart() {
 
@@ -159,8 +160,8 @@ export default function Cart() {
                   </button>
 
                   <button
-                    onClick={() => alert("Proceso de compra 🧾")}
-                    className="bg-brand text-white px-6 py-2 rounded-lg"
+                    onClick={() => navigate("/pagos")}
+                    className="bg-brand text-white px-6 py-2 shadow-md hover:bg-brand/90 transition-colors rounded-lg"
                   >
                     Continuar compra
                   </button>

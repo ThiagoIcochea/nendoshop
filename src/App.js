@@ -13,6 +13,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ProductDetail from "./pages/ProductDetail"
 import Cart from "./pages/Cart";
 import ApiComentarios from "./pages/ConfigApiComentarios";
+import Pagos from "./pages/Pagos";
 
 function App() {
   return (
@@ -32,7 +33,10 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/api-comentarios" element={<ProtectedRoute><ApiComentarios /></ProtectedRoute>} />
+           
             <Route path="/cart" element={<Cart />} />
+            <Route path="/pagos" element={<ProtectedRoute><Pagos/></ProtectedRoute>}/>
+            
             <Route
               path="/dashboard"
               element={
