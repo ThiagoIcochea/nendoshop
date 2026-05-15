@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 export default function Pagos() {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
-  const [isProcessing, setIsProcessing] = useState(false);
+  //const [isProcessing, setIsProcessing] = useState(false);
 
   // 1. El Guardián de la Ruta
   useEffect(() => {
@@ -24,25 +24,61 @@ export default function Pagos() {
 
   // 2. Simulador del Procesamiento
   const [paymentStatus, setPaymentStatus] = useState("inactivo");
-  
   const handlePayment = (e) => {
-    e.preventDefault(); 
-    setPaymentStatus("procesando"); 
-    
-    setTimeout(() => {
-      setPaymentStatus("exito");  
-      localStorage.removeItem("cart");
-      window.dispatchEvent(new Event("storage"));
-      
-      setTimeout(() => {
-        navigate("/", { replace: true }); 
-      }, 1500);  
 
-    }, 2500);
-  };
+  e.preventDefault();
+
+  setPaymentStatus("procesando");
+
+  setTimeout(() => {
+
+    // Obtener pagos guardados
+    const pagosGuardados =
+      JSON.parse(localStorage.getItem("pagos")) || [];
+
+    // Crear nuevo pago
+    const auth = JSON.parse(localStorage.getItem("auth"));
+    const nuevoPago = {
+      id: Date.now(),
+      //cliente: "Usuario Demo",
+      cliente: auth.user,
+      producto: cart.map(p => p.name).join(", "),
+      total: total,
+      estado: "Pagado",
+      fecha: new Date().toLocaleDateString("es-ES")
+    };
+
+    // Agregar nuevo pago
+    pagosGuardados.push(nuevoPago);
+
+    // Guardar en localStorage
+    localStorage.setItem(
+      "pagos",
+      JSON.stringify(pagosGuardados)
+    );
+
+    // Mostrar éxito
+    setPaymentStatus("exito");
+
+    // Vaciar carrito
+    localStorage.removeItem("cart");
+
+    // Actualizar carrito global
+    window.dispatchEvent(new Event("storage"));
+
+    // Redirigir
+    setTimeout(() => {
+
+      navigate("/", { replace: true });
+
+    }, 1500);
+
+  }, 2500);
+
+};
 
   return (
-    <div className="relative min-h-screen bg-gray-50 p-4 md:p-10 relative">
+    <div className="relative min-h-screen bg-gray-50 p-4 md:p-10">
       
     {paymentStatus !== "inactivo" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">

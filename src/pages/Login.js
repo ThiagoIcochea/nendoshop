@@ -10,10 +10,20 @@ export default function Login() {
   const handleLogin = (e) => {
     e.preventDefault();
 
-    if (user === "admin" && pass === "admin123") {
-      localStorage.setItem("auth", "admin");
-      navigate("/dashboard");
-      return;
+  if (user === "admin" && pass === "admin123") {
+
+  const adminUser = {
+    user: "admin",
+    role: "admin"
+  };
+
+  localStorage.setItem(
+    "auth",
+    JSON.stringify(adminUser)
+  );
+
+  navigate("/dashboard");
+  return;
     }
 
     const users = JSON.parse(localStorage.getItem("users")) || [];
@@ -22,9 +32,13 @@ export default function Login() {
       (u) => u.user === user && u.pass === pass
     );
 
-    if (found) {
+    /*if (found) {
       localStorage.setItem("auth", user);
-      navigate("/dashboard");
+      navigate("/dashboard");*/
+
+     if (found) {
+     localStorage.setItem("auth", JSON.stringify(found));
+     navigate("/dashboard");
     } else {
       alert("Credenciales incorrectas");
     }

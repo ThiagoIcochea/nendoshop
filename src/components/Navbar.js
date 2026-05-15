@@ -70,7 +70,7 @@ export default function Navbar() {
               <>
                 <Link to="/dashboard" className="flex items-center gap-2 text-brand hover:text-brand-dark font-medium">
                   <User className="h-5 w-5" />
-                  <span className="hidden lg:inline">Dashboard</span>
+                  <span className="hidden lg:inline"></span>
                 </Link>
 
                 <button onClick={handleLogout} className="flex items-center gap-2 text-red-500 hover:text-red-700 font-medium">
