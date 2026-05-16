@@ -4,14 +4,14 @@ import { useNavigate } from "react-router-dom";
 export default function ApiComentarios() {
 
   const navigate = useNavigate();
-  const auth = localStorage.getItem("auth");
+  const auth = JSON.parse(localStorage.getItem("auth"));
 
   const [url, setUrl] = useState(
     localStorage.getItem("api_comentarios") || ""
   );
 
   useEffect(() => {
-    if (auth !== "admin") {
+    if (auth.role !== "admin") {
       navigate("/dashboard");
     }
   }, [auth, navigate]);

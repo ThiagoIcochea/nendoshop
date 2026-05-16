@@ -8,7 +8,7 @@ export default function Dashboard() {
  // Se verifica autenticación y permisos del usuario
   useEffect(() => {
 
-    //Obtener usuario autenticado desde localStorage
+    
     const auth = JSON.parse(localStorage.getItem("auth"));
 
     if (!auth) {
@@ -16,7 +16,7 @@ export default function Dashboard() {
       return;
     }
 
-    // Si el usuario no tiene rol de admin, redirigir al inicio
+   
 
     if (auth.role !== "admin") {
       navigate("/");
@@ -127,7 +127,7 @@ export default function Dashboard() {
             <table className="w-full">
               <thead>
                 <tr className="border-b text-left text-gray-500">
-                  <th className="pb-4">Cliente</th>
+                  <th className="pb-4">Usuario</th>
                   <th className="pb-4">Producto</th>
                   <th className="pb-4">Fecha</th>
                   <th className="pb-4">Total</th>

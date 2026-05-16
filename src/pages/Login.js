@@ -13,7 +13,8 @@ export default function Login() {
   if (user === "admin" && pass === "admin123") {
 
   const adminUser = {
-    user: "admin",
+    email: "admin",
+    pass: "admin123",
     role: "admin"
   };
 
@@ -29,7 +30,7 @@ export default function Login() {
     const users = JSON.parse(localStorage.getItem("users")) || [];
 
     const found = users.find(
-      (u) => u.user === user && u.pass === pass
+      (u) => u.email === user && u.password === pass
     );
 
     /*if (found) {
@@ -38,7 +39,7 @@ export default function Login() {
 
      if (found) {
      localStorage.setItem("auth", JSON.stringify(found));
-     navigate("/dashboard");
+     navigate("/");
     } else {
       alert("Credenciales incorrectas");
     }
