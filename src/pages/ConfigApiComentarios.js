@@ -52,7 +52,7 @@ export default function ApiComentarios() {
 
   }, [auth, navigate]);
 
-  // ✔ SOLO UNA FUNCIÓN SAVE (ARREGLADA)
+  
   const save = async () => {
     try {
 
