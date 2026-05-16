@@ -11,7 +11,7 @@ export default function Home() {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   useEffect(() => {
-    fetch("http://localhost:4000/api/products",{
+    fetch("https://backendproyectodf.onrender.com/api/products",{
       credentials: "include"
     })
       .then(res => res.json())

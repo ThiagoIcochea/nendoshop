@@ -36,7 +36,7 @@ export default function About() {
         
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 mb-16">
 
-          {/* MISIÓN */}
+         
           <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition border border-brand">
             <div className="w-16 h-16 bg-brand/10 rounded-full flex items-center justify-center mb-4">
               <img
@@ -55,7 +55,7 @@ export default function About() {
             </p>
           </div>
 
-          {/* VISIÓN */}
+         
           <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition border border-brand">
             <div className="w-16 h-16 bg-brand/10 rounded-full flex items-center justify-center mb-4">
               <img

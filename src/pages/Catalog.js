@@ -9,7 +9,7 @@ export default function Catalog() {
   const [products, setProducts] = useState([]);
 
 useEffect(() => {
-  fetch("http://localhost:4000/api/products",{
+  fetch("https://backendproyectodf.onrender.com/api/products",{
     credentials: "include"
   })
     .then(res => res.json())

@@ -21,7 +21,7 @@ export default function Profile() {
  useEffect(() => {
   const loadUser = async () => {
     try {
-      const res = await fetch("http://localhost:4000/api/users/profile", {
+      const res = await fetch("https://backendproyectodf.onrender.com/api/users/profile", {
         method: "GET",
         credentials: "include"
       });
@@ -41,6 +41,7 @@ export default function Profile() {
         city: data.city || "",
         birthdate: data.birthdate ? data.birthdate.split("T")[0] : "",
         sex: data.sex || "",
+        cardName:data.paymentmethod?.nombretarjeta || "",
         cardNumber: data.paymentmethod?.numerotarjeta || "",
         cardCVV: data.paymentmethod?.cvv || "",
         cardType: data.paymentmethod?.tipo || "visa",
@@ -82,7 +83,7 @@ export default function Profile() {
 
  const saveProfile = async () => {
   try {
-    const res = await fetch("http://localhost:4000/api/users/profile", {
+    const res = await fetch("https://backendproyectodf.onrender.com/api/users/profile", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
@@ -99,6 +100,7 @@ export default function Profile() {
         profileImg: form.avatar,
 
         paymentmethod: {
+          nombretarjeta: form.cardName,
           numerotarjeta: form.cardNumber,
           cvv: form.cardCVV,
           tipo: form.cardType
@@ -124,10 +126,10 @@ export default function Profile() {
   return (
     <div className="max-w-4xl mx-auto p-6">
 
-      {/* HEADER PERFIL */}
+     
       <div className="flex items-center gap-6 mb-6">
 
-        {/* AVATAR */}
+      
         <div className="w-20 h-20 rounded-full overflow-hidden bg-brand flex items-center justify-center text-white font-bold text-xl">
           {form.avatar ? (
             <img
@@ -149,7 +151,7 @@ export default function Profile() {
 
       </div>
 
-      {/* UPLOAD FOTO */}
+     
       <div className="mb-6">
         <input
           type="file"
@@ -159,7 +161,7 @@ export default function Profile() {
         />
       </div>
 
-      {/* FORM */}
+    
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
         <input name="name" value={form.name} onChange={handleChange} placeholder="Nombre" className="border p-2 rounded" />
@@ -183,7 +185,7 @@ export default function Profile() {
           <option value="otro">Otro</option>
         </select>
 
-      
+      <input name="cardName" value={form.cardName} onChange={handleChange} placeholder="Nombre de la tarjeta" className="border p-2 rounded" />
         <input name="cardNumber" value={form.cardNumber} onChange={handleChange} placeholder="Número de tarjeta" className="border p-2 rounded" />
 
         <input name="cardCVV" value={form.cardCVV} onChange={handleChange} placeholder="CVV" className="border p-2 rounded" />

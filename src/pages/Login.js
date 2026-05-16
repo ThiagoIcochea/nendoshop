@@ -11,7 +11,7 @@ export default function Login() {
   e.preventDefault();
 
   try {
-    const res = await fetch("http://localhost:4000/api/auth/login", {
+    const res = await fetch("https://backendproyectodf.onrender.com/api/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -32,7 +32,12 @@ export default function Login() {
 
     localStorage.setItem("auth", JSON.stringify(data.user));
 
-    navigate("/dashboard");
+    if(data.user.role ==="user"){
+      navigate("/");
+    }
+    else{
+      navigate("/dashboard");
+    }
 
   } catch (error) {
     console.error(error);

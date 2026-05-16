@@ -16,7 +16,7 @@ export default function Register() {
 
   const navigate = useNavigate();
 
-  // REGEX
+  
   const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,40}$/;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const phoneRegex = /^9\d{8}$/;
@@ -43,7 +43,7 @@ export default function Register() {
   }
 
   try {
-    const res = await fetch("http://localhost:4000/api/auth/register", {
+    const res = await fetch("https://backendproyectodf.onrender.com/api/auth/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -135,14 +135,14 @@ export default function Register() {
             onChange={(e) => setCity(e.target.value)}
           />
 
-          {/* 📅 FECHA DE NACIMIENTO */}
+          
           <input
             type="date"
             className="border p-2 w-full mb-3 rounded"
             onChange={(e) => setBirthdate(e.target.value)}
           />
 
-          {/* ⚧ SEXO */}
+          
           <select
             className="border p-2 w-full mb-3 rounded"
             onChange={(e) => setSex(e.target.value)}
