@@ -7,43 +7,38 @@ export default function Login() {
   const [pass, setPass] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+ const handleLogin = async (e) => {
+  e.preventDefault();
 
-  if (user === "admin" && pass === "admin123") {
+  try {
+    const res = await fetch("http://localhost:4000/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        email: user,
+        password: pass
+      })
+    });
 
-  const adminUser = {
-    email: "admin",
-    pass: "admin123",
-    role: "admin"
-  };
+    const data = await res.json();
 
-  localStorage.setItem(
-    "auth",
-    JSON.stringify(adminUser)
-  );
-
-  navigate("/dashboard");
-  return;
+    if (!res.ok) {
+      
+      return alert(data.message);
     }
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
+    localStorage.setItem("auth", JSON.stringify(data.user));
 
-    const found = users.find(
-      (u) => u.email === user && u.password === pass
-    );
+    navigate("/dashboard");
 
-    /*if (found) {
-      localStorage.setItem("auth", user);
-      navigate("/dashboard");*/
-
-     if (found) {
-     localStorage.setItem("auth", JSON.stringify(found));
-     navigate("/");
-    } else {
-      alert("Credenciales incorrectas");
-    }
-  };
+  } catch (error) {
+    console.error(error);
+    alert("Error en login");
+  }
+};
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">

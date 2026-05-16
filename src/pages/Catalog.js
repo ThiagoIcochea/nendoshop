@@ -1,11 +1,22 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import products from "../data/products";
 import Card from "../components/Card";
 import ParticlesBackground from "../components/ParticlesBackground";
 import { FilterX } from "lucide-react";
 
 export default function Catalog() {
+
+  const [products, setProducts] = useState([]);
+
+useEffect(() => {
+  fetch("http://localhost:4000/api/products",{
+    credentials: "include"
+  })
+    .then(res => res.json())
+    .then(data => {
+      setProducts(Array.isArray(data) ? data : data.products || []);
+    });
+}, []);
 
   const location = useLocation();
 
@@ -201,7 +212,7 @@ export default function Catalog() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {currentProducts.map((p) => (
-            <Card key={p.id} {...p} />
+            <Card key={p._id} {...p} />
           ))}
         </div>
 

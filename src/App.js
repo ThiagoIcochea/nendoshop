@@ -32,7 +32,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/product/:_id" element={<ProductDetail />} />
             <Route path="/api-comentarios" element={<ProtectedRoute><ApiComentarios /></ProtectedRoute>} />
             <Route path="/profile" element = {<Profile />} />
             <Route path="/cart" element={<Cart />} />

@@ -1,21 +1,52 @@
 import { useParams } from "react-router-dom";
-import { useState } from "react";
-import products from "../data/products";
+import { useState,useEffect } from "react";
 import ParticlesBackground from "../components/ParticlesBackground";
 
 export default function ProductDetail() {
 
-  const { id } = useParams();
-  const product = products.find(p => p.id === parseInt(id));
+  const { _id } = useParams();
+  const [products, setProducts] = useState([]);
+  const [product, setProduct] = useState(null);
+ 
 
   const auth = localStorage.getItem("auth");
-
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("desc");
-  const [selectedImage, setSelectedImage] = useState(product?.image);
+  const [selectedImage, setSelectedImage] = useState("");
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
-  const [comments, setComments] = useState(product?.comments || []);
+  const [comments, setComments] = useState( []);
+
+    useEffect(() => {
+    fetch("http://localhost:4000/api/products", {
+      credentials: "include"
+    })
+      .then(res => res.json())
+      .then(data => {
+        const list = Array.isArray(data) ? data : data.products || [];
+
+        setProducts(list);
+
+        const found = list.find(p => p._id === _id);
+
+        setProduct(found || null);
+
+        if (found) {
+          setSelectedImage(found.image);
+          setComments(found.comments || []);
+        }
+
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [_id]);
+
+  
+  if (loading) {
+    return <h1 className="p-6">Cargando producto...</h1>;
+  }
+
 
   if (!product) return <h1>Producto no encontrado</h1>;
 
@@ -25,7 +56,7 @@ export default function ProductDetail() {
 
   const handleAddToCart = () => {
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const exist = cart.find(p => p.id === product.id);
+    const exist = cart.find(p => p._id === product._id);
 
     if (exist) {
       exist.quantity += quantity;

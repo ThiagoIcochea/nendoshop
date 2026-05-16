@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-export default function Card({ id, name, price, image }) {
+export default function Card({ _id, name, price, image }) {
 
   const navigate = useNavigate();
 
@@ -27,7 +27,7 @@ export default function Card({ id, name, price, image }) {
         </div>
 
         <button
-          onClick={() => navigate(`/product/${id}`)}
+          onClick={() => navigate(`/product/${_id}`)}
           className="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 rounded-lg transition"
         >
           Comprar

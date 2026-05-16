@@ -22,50 +22,59 @@ export default function Register() {
   const phoneRegex = /^9\d{8}$/;
   const passRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
 
-  const handleRegister = (e) => {
-    e.preventDefault();
+  const handleRegister = async (e) => {
+  e.preventDefault();
 
-    const today = new Date();
+  const today = new Date();
 
-    if (!nameRegex.test(name)) return alert("Nombre inválido");
-    if (!nameRegex.test(lastname)) return alert("Apellido inválido");
-    if (!emailRegex.test(email)) return alert("Email inválido");
-    if (!passRegex.test(pass)) return alert("Password inválida");
-    if (!phoneRegex.test(phone)) return alert("Teléfono inválido");
-    if (!address || !city) return alert("Completa dirección y ciudad");
-    if (!sex) return alert("Selecciona tu sexo");
-    if (!birthdate) return alert("Selecciona tu fecha de nacimiento");
+  if (!nameRegex.test(name)) return alert("Nombre inválido");
+  if (!nameRegex.test(lastname)) return alert("Apellido inválido");
+  if (!emailRegex.test(email)) return alert("Email inválido");
+  if (!passRegex.test(pass)) return alert("Password inválida");
+  if (!phoneRegex.test(phone)) return alert("Teléfono inválido");
+  if (!address || !city) return alert("Completa dirección y ciudad");
+  if (!sex) return alert("Selecciona tu sexo");
+  if (!birthdate) return alert("Selecciona tu fecha de nacimiento");
 
-    const birth = new Date(birthdate);
+  const birth = new Date(birthdate);
 
-    
-    if (birth > today) {
-      return alert("Fecha de nacimiento inválida");
+  if (birth > today) {
+    return alert("Fecha inválida");
+  }
+
+  try {
+    const res = await fetch("http://localhost:4000/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name,
+        lastname,
+        email,
+        password: pass,
+        phone,
+        address,
+        city,
+        birthdate,
+        sex
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return alert(data.message);
     }
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-
-    const exists = users.find((u) => u.email === email);
-    if (exists) return alert("El email ya existe");
-
-    const newUser = {
-      name,
-      lastname,
-      email,
-      password: pass,
-      phone,
-      address,
-      city,
-      birthdate,
-      sex,
-      role: "user"
-    };
-
-    users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
-
+    alert("Registro exitoso");
     navigate("/login");
-  };
+
+  } catch (error) {
+    console.error(error);
+    alert("Error en registro");
+  }
+};
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">

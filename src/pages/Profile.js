@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 export default function Profile() {
 
-  const [auth, setAuth] = useState(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -19,32 +18,42 @@ export default function Profile() {
     avatar: ""
   });
 
-  useEffect(() => {
-    const authData = JSON.parse(localStorage.getItem("auth"));
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-
-    if (!authData) return;
-
-    const currentUser = users.find(u => u.email === authData.email);
-
-    if (currentUser) {
-      setAuth(currentUser);
-      setForm({
-        name: currentUser.name || "",
-        lastname: currentUser.lastname || "",
-        email: currentUser.email || "",
-        phone: currentUser.phone || "",
-        address: currentUser.address || "",
-        city: currentUser.city || "",
-        birthdate: currentUser.birthdate || "",
-        sex: currentUser.sex || "",
-        cardNumber: currentUser.cardNumber || "",
-        cardCVV: currentUser.cardCVV || "",
-        cardType: currentUser.cardType || "visa",
-        avatar: currentUser.avatar || ""
+ useEffect(() => {
+  const loadUser = async () => {
+    try {
+      const res = await fetch("http://localhost:4000/api/users/profile", {
+        method: "GET",
+        credentials: "include"
       });
+
+      const data = await res.json();
+
+      if (!res.ok) return;
+
+      
+
+      setForm({
+        name: data.name || "",
+        lastname: data.lastname || "",
+        email: data.email || "",
+        phone: data.phone || "",
+        address: data.address || "",
+        city: data.city || "",
+        birthdate: data.birthdate ? data.birthdate.split("T")[0] : "",
+        sex: data.sex || "",
+        cardNumber: data.paymentmethod?.numerotarjeta || "",
+        cardCVV: data.paymentmethod?.cvv || "",
+        cardType: data.paymentmethod?.tipo || "visa",
+        avatar: data.profileImg || ""
+      });
+
+    } catch (err) {
+      console.log(err);
     }
-  }, []);
+  };
+
+  loadUser();
+}, []);
 
   const handleChange = (e) => {
     setForm({
@@ -71,24 +80,42 @@ export default function Profile() {
     }
   };
 
-  const saveProfile = () => {
-    const users = JSON.parse(localStorage.getItem("users")) || [];
+ const saveProfile = async () => {
+  try {
+    const res = await fetch("http://localhost:4000/api/users/profile", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        name: form.name,
+        lastname: form.lastname,
+        phone: form.phone,
+        address: form.address,
+        city: form.city,
+        birthdate: form.birthdate,
+        sex: form.sex,
+        profileImg: form.avatar,
 
-    const updatedUsers = users.map(u => {
-      if (u.email === form.email) {
-        return { ...u, ...form };
-      }
-      return u;
+        paymentmethod: {
+          numerotarjeta: form.cardNumber,
+          cvv: form.cardCVV,
+          tipo: form.cardType
+        }
+      })
     });
 
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
+    const data = await res.json();
 
-    localStorage.setItem("auth", JSON.stringify({
-      ...form
-    }));
+    if (!res.ok) return alert(data.message);
 
-    alert("Perfil actualizado correctamente ✅");
-  };
+    alert("Perfil actualizado correctamente");
+
+  } catch (err) {
+    console.log(err);
+  }
+};
 
   const getInitials = () => {
     return (form.name?.[0] || "") + (form.lastname?.[0] || "");
@@ -156,7 +183,7 @@ export default function Profile() {
           <option value="otro">Otro</option>
         </select>
 
-        {/* TARJETA */}
+      
         <input name="cardNumber" value={form.cardNumber} onChange={handleChange} placeholder="Número de tarjeta" className="border p-2 rounded" />
 
         <input name="cardCVV" value={form.cardCVV} onChange={handleChange} placeholder="CVV" className="border p-2 rounded" />

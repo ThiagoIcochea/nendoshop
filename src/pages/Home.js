@@ -1,13 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Filter, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import products from "../data/products";
+
+
 import Card from "../components/Card";
 import ParticlesBackground from "../components/ParticlesBackground";
 
 export default function Home() {
 
   const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
+  useEffect(() => {
+    fetch("http://localhost:4000/api/products",{
+      credentials: "include"
+    })
+      .then(res => res.json())
+      .then(data => {
+        setProducts(Array.isArray(data) ? data : data.products || []);
+      });
+  }, []);
 
   const [sort, setSort] = useState("best");
 
@@ -109,7 +120,7 @@ export default function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
               {filteredProducts.slice(0, 4).map((p) => (
-                <Card key={p.id} {...p} />
+                <Card key={p._id} {...p} />
               ))}
 
             </div>
