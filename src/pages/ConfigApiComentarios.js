@@ -4,11 +4,13 @@ import { useNavigate } from "react-router-dom";
 export default function ApiComentarios() {
 
   const navigate = useNavigate();
-  const auth = JSON.parse(localStorage.getItem("auth"));
+
+  const auth = JSON.parse(localStorage.getItem("auth")) || null;
 
   const [url, setUrl] = useState("");
 
   useEffect(() => {
+
     if (!auth) {
       navigate("/login");
       return;
@@ -22,20 +24,24 @@ export default function ApiComentarios() {
     const loadConfig = async () => {
       try {
 
-    const res = await fetch("https://backendproyectodf.onrender.com/api/configs/apiComentarios", {
-  method: "GET",
-  credentials: "include"
-});
+        const res = await fetch(
+          "https://backendproyectodf.onrender.com/api/configs/apiComentarios",
+          {
+            method: "GET",
+            credentials: "include"
+          }
+        );
 
-const data = await res.json();
+        const data = await res.json();
 
-if (!res.ok) return;
+        if (!res.ok) {
+          console.log("Error al cargar config");
+          return;
+        }
 
-if (data) {
-  setUrl(data.value);
-}
-
-      
+        if (data) {
+          setUrl(data.value);
+        }
 
       } catch (err) {
         console.log(err);
@@ -44,8 +50,9 @@ if (data) {
 
     loadConfig();
 
-  }, []);
+  }, [auth, navigate]);
 
+  // ✔ SOLO UNA FUNCIÓN SAVE (ARREGLADA)
   const save = async () => {
     try {
 
@@ -76,6 +83,10 @@ if (data) {
     } catch (err) {
       console.log(err);
       alert("Error de servidor");
+    }
+
+    if (!auth || auth.role !== "admin") {
+      navigate("/dashboard");
     }
   };
 
