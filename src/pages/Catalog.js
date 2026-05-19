@@ -126,7 +126,7 @@ useEffect(() => {
   );
 
   return (
-    <div className="relative min-h-screen px-6 py-6 overflow-hidden bg-transparent">
+    <div className="relative min-h-screen px-4 sm:px-6 py-4 sm:py-6 overflow-hidden bg-transparent">
 
       <ParticlesBackground />
 
@@ -136,7 +136,7 @@ useEffect(() => {
           Catálogo de Nendoroids
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
 
           <select
             name="category"
@@ -195,7 +195,7 @@ useEffect(() => {
             </option>
           </select>
 
-          <div className="flex justify-start mb-6">
+          <div className="flex justify-start sm:justify-end mb-6 lg:col-span-5">
 
   <button
     onClick={clearFilters}
@@ -210,24 +210,24 @@ useEffect(() => {
 
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {currentProducts.map((p) => (
             <Card key={p._id} {...p} />
           ))}
         </div>
 
         {currentProducts.length === 0 && (
-          <div className="text-center mt-10 text-gray-500 text-lg">
+          <div className="text-center mt-10 text-gray-500 text-base sm:text-lg px-4">
             No se encontraron productos
           </div>
         )}
 
-        <div className="flex justify-center mt-8 gap-2">
+        <div className="flex flex-wrap justify-center mt-6 sm:mt-8 gap-2">
 
           <button
             onClick={() => setCurrentPage(currentPage - 1)}
             disabled={currentPage === 1}
-            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+            className="px-3 sm:px-4 py-2 text-sm sm:text-base bg-gray-200 rounded disabled:opacity-50"
           >
             Anterior
           </button>

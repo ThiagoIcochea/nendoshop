@@ -15,10 +15,7 @@ import logo from "./Assets/logo.png";
 export default function Navbar() {
 
   const navigate = useNavigate();
-
   const { auth, setAuth } = useContext(AuthContext);
-
-  console.log(auth);
 
   const [cartCount, setCartCount] = useState(0);
 
@@ -38,7 +35,6 @@ export default function Navbar() {
   };
 
   useEffect(() => {
-
     updateCartCount();
 
     const handleStorage = () => updateCartCount();
@@ -56,18 +52,9 @@ export default function Navbar() {
   };
 
   const handleSearch = (e) => {
-
     if (e.key === "Enter") {
-
-      localStorage.setItem(
-        "productSearch",
-        search
-      );
-
-      
-     
+      localStorage.setItem("productSearch", search);
       navigate("/catalog");
-      
     }
   };
 
@@ -76,14 +63,14 @@ export default function Navbar() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div className="flex justify-between items-center h-20">
+        {/* HEADER */}
+        <div className="flex flex-col sm:flex-row justify-between items-center h-auto sm:h-20 gap-2 sm:gap-0 py-2">
 
-          <div className="flex-shrink-0 flex items-center gap-6">
+          {/* LOGO + NAV */}
+          <div className="flex-shrink-0 flex items-center gap-3 sm:gap-6 w-full sm:w-auto justify-between sm:justify-start sm:items-center">
 
-            <Link
-              to="/"
-              className="flex items-center gap-3"
-            >
+            <Link to="/" className="flex items-center gap-3">
+
               <img
                 src={logo}
                 alt="Nendoshop Logo"
@@ -93,62 +80,46 @@ export default function Navbar() {
               <span className="font-bold text-xl tracking-tight text-gray-900 hidden sm:block">
                 Nendoshop
               </span>
+
             </Link>
 
-            <nav className="hidden md:flex items-center gap-6 border-l border-gray-200 pl-6">
+            <nav className="hidden md:flex items-center gap-4 lg:gap-6 border-l border-gray-200 pl-4 lg:pl-6">
 
-              <Link
-                to="/"
-                className="text-gray-600 hover:text-brand font-medium transition-colors"
-              >
+              <Link to="/" className="text-gray-600 hover:text-brand font-medium transition-colors">
                 Inicio
               </Link>
 
-              <Link
-                to="/about"
-                className="text-gray-600 hover:text-brand font-medium transition-colors"
-              >
+              <Link to="/about" className="text-gray-600 hover:text-brand font-medium transition-colors">
                 Nosotros
               </Link>
 
-              <Link
-                to="/catalog"
-                className="text-gray-600 hover:text-brand font-medium transition-colors"
-              >
+              <Link to="/catalog" className="text-gray-600 hover:text-brand font-medium transition-colors">
                 Catálogo
               </Link>
 
-              {
-            auth && auth.role === "admin" ? (
-                  <Link
-                    to="/dashboard"
-                    className="text-gray-600 hover:text-brand font-medium transition-colors"
-                  >
-                    Dashboard
-                  </Link>
-                ) : null
-              }
+              {auth && auth.role === "admin" ? (
+                <Link to="/dashboard" className="text-gray-600 hover:text-brand font-medium transition-colors">
+                  Dashboard
+                </Link>
+              ) : null}
 
             </nav>
 
           </div>
 
-          <div className="flex-1 max-w-lg mx-4 lg:mx-8 hidden sm:block">
+          {/* SEARCH */}
+          <div className="flex-1 max-w-full sm:max-w-lg mx-2 sm:mx-4 lg:mx-8 hidden sm:block">
 
             <div className="relative">
 
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-
                 <Search className="h-5 w-5 text-brand" />
-
               </div>
 
               <input
                 type="text"
                 value={search}
-                onChange={(e) =>
-                  setSearch(e.target.value)
-                }
+                onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={handleSearch}
                 className="block w-full pl-10 pr-3 py-2 border border-brand rounded-full leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-brand focus:border-brand sm:text-sm"
                 placeholder="Buscar productos..."
@@ -158,20 +129,16 @@ export default function Navbar() {
 
           </div>
 
-          <div className="flex items-center gap-4">
+          {/* RIGHT SIDE BUTTONS */}
+          <div className="flex items-center gap-2 sm:gap-4 flex-wrap sm:flex-nowrap justify-end">
 
             {!auth ? (
 
-              <Link
-                to="/login"
-                className="flex items-center gap-2 text-brand hover:text-brand-dark font-medium"
-              >
+              <Link to="/login" className="flex items-center gap-2 text-brand hover:text-brand-dark font-medium">
 
                 <User className="h-5 w-5" />
 
-                <span className="hidden lg:inline">
-                  Login
-                </span>
+                <span className="hidden lg:inline">Login</span>
 
               </Link>
 
@@ -184,18 +151,13 @@ export default function Navbar() {
                   <div className="w-10 h-10 rounded-full overflow-hidden bg-brand flex items-center justify-center text-white font-bold text-sm cursor-pointer hover:opacity-80 transition">
 
                     {auth.profileImg ? (
-
                       <img
                         src={auth.profileImg}
                         alt="avatar"
                         className="w-full h-full object-cover scale-90"
                       />
-
                     ) : (auth.name || auth.lastname) ? (
-
-                      (auth.name?.[0] || "") +
-                      (auth.lastname?.[0] || "")
-
+                      (auth.name?.[0] || "") + (auth.lastname?.[0] || "")
                     ) : (
                       "U"
                     )}
@@ -211,9 +173,7 @@ export default function Navbar() {
 
                   <LogOut className="h-5 w-5" />
 
-                  <span className="hidden lg:inline">
-                    Logout
-                  </span>
+                  <span className="hidden lg:inline">Logout</span>
 
                 </button>
 
@@ -221,29 +181,25 @@ export default function Navbar() {
 
             )}
 
+            {/* CART */}
             <button
               onClick={() => navigate("/cart")}
-              className="flex items-center gap-2 text-brand hover:text-brand-dark relative group ml-2"
+              className="flex items-center gap-2 text-brand hover:text-brand-dark relative group ml-1 sm:ml-2"
             >
 
               <div className="p-2 bg-brand/10 rounded-full group-hover:bg-brand/20">
-
                 <ShoppingCart className="h-5 w-5" />
-
               </div>
 
               {cartCount > 0 && (
-
                 <span className="absolute top-0 right-0 -mt-1 -mr-1 flex h-5 w-5 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">
-
                   {cartCount}
-
                 </span>
-
               )}
 
             </button>
 
+            {/* SETTINGS ADMIN */}
             {auth && auth.role === "admin" && (
 
               <Link
@@ -253,9 +209,7 @@ export default function Navbar() {
 
                 <Settings className="h-5 w-5" />
 
-                <span className="hidden lg:inline">
-                  Settings
-                </span>
+                <span className="hidden lg:inline">Settings</span>
 
               </Link>
 

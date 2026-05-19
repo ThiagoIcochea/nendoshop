@@ -4,16 +4,16 @@ import { Link } from "react-router-dom";
 export default function Footer() {
   return (
     <footer className="bg-purple-700 text-white mt-12">
-      <div className="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-3 gap-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-10">
 
-        <div>
+        <div className="text-center sm:text-left">
           <div className="mb-5">
-            <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full flex items-center justify-center shadow-lg mx-auto sm:mx-0">
               <img src={logo} alt="NendoShop" className="w-14 h-14 object-contain" />
             </div>
           </div>
 
-          <p className="mb-4">⌖ Av. Arequipa 265, Lima - Perú</p>
+    <p className="mb-3 sm:mb-4 text-sm sm:text-base">⌖ Av. Arequipa 265, Lima - Perú</p>
            <a 
             href="https://wa.link/zf9b9q" 
             target="_blank" 
@@ -27,8 +27,8 @@ export default function Footer() {
 
 
         <div>
-          <h3 className="text-xl font-bold mb-5 text-cyan-300">Información</h3>
-          <ul className="space-y-3">
+          <h3 className="flex items-center gap-2 hover:text-cyan-300 transition py-1 sm:py-0">Información</h3>
+          <ul className="space-y-2 sm:space-y-3">
             <li>
               <Link to="/About" className="flex items-center gap-2 hover:text-cyan-300 transition">
               <span>⌂</span>
@@ -68,10 +68,10 @@ export default function Footer() {
         </div>
 
         <div>
-          <h3 className="text-xl font-bold mb-5 text-cyan-300">
+          <h3 className="flex items-center gap-2 hover:text-cyan-300 transition py-1 sm:py-0">
             Ayuda
           </h3>
-          <ul className="space-y-3">
+          <ul className="space-y-2 sm:space-y-3"><span className="text-sm sm:text-base"></span>
             <li>
               <Link to="" className= "flex items-center gap-2 hover:text-cyan-300 transition">
               <span>⛨</span>
@@ -110,7 +110,7 @@ export default function Footer() {
           </ul>
         </div>
       </div>
-      <div className="border-t border-white/20 py-4 text-center text-sm">
+      <div className="border-t border-white/20 py-3 sm:py-4 text-center text-xs sm:text-sm">
         © 2026 NendoShop - Todos los derechos reservados
       </div>
     </footer>

@@ -6,7 +6,7 @@ export default function ProductDetail() {
 
   const { _id } = useParams();
 
-  const [products, setProducts] = useState([]);
+  const [, setProducts] = useState([]);
   const [product, setProduct] = useState(null);
 
   const auth = (() => {
@@ -174,6 +174,7 @@ export default function ProductDetail() {
                 <img
                   key={i}
                   src={img}
+                  alt=""
                   onClick={() => setSelectedImage(img)}
                   className="w-20 h-20 object-cover rounded cursor-pointer border hover:border-brand"
                 />
@@ -183,6 +184,7 @@ export default function ProductDetail() {
             <div className="flex-1 overflow-hidden rounded-lg">
               <img
                 src={selectedImage}
+                alt=""
                 className="w-full h-full object-contain hover:scale-110 transition duration-500"
               />
             </div>
