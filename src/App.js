@@ -15,6 +15,7 @@ import Cart from "./pages/Cart";
 import ApiComentarios from "./pages/ConfigApiComentarios";
 import Pagos from "./pages/Pagos";
 import Profile from "./pages/Profile";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -51,6 +52,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
 

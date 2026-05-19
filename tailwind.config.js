@@ -13,6 +13,13 @@ module.exports = {
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
+      },
+
+      backgroundImage: {
+        'puntos': 'radial-gradient(#b0b3b8 14%, transparent 18%)',
+      },
+      backgroundSize: {
+        'puntos-sm': '10px 10px',
       }
     },
   },
