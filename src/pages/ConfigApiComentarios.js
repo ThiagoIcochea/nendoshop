@@ -50,7 +50,7 @@ export default function ApiComentarios() {
 
     loadConfig();
 
-  }, [navigate]);
+  }, [navigate, auth]);
 
   
   const save = async () => {

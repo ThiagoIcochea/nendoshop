@@ -8,15 +8,15 @@ export default function Catalog() {
 
   const [products, setProducts] = useState([]);
 
-useEffect(() => {
-  fetch("https://backendproyectodf.onrender.com/api/products",{
-    credentials: "include"
-  })
-    .then(res => res.json())
-    .then(data => {
-      setProducts(Array.isArray(data) ? data : data.products || []);
-    });
-}, []);
+  useEffect(() => {
+    fetch("https://backendproyectodf.onrender.com/api/products", {
+      credentials: "include"
+    })
+      .then(res => res.json())
+      .then(data => {
+        setProducts(Array.isArray(data) ? data : data.products || []);
+      });
+  }, []);
 
   const location = useLocation();
 
@@ -36,13 +36,13 @@ useEffect(() => {
 
   const clearFilters = () => {
 
-   setFilters({
-    category: "",
-    brand: "",
-    stock: "",
-    discount: "",
-    sort: ""
-   })
+    setFilters({
+      category: "",
+      brand: "",
+      stock: "",
+      discount: "",
+      sort: ""
+    })
 
     localStorage.removeItem("productSearch");
 
@@ -197,16 +197,16 @@ useEffect(() => {
 
           <div className="flex justify-start sm:justify-end mb-6 lg:col-span-5">
 
-  <button
-    onClick={clearFilters}
-      
-    className="flex items-center gap-2 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition"
-  >
-    <FilterX className="w-5 h-5" />
-    Limpiar filtros
-  </button>
+            <button
+              onClick={clearFilters}
 
-</div>
+              className="flex items-center gap-2 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition"
+            >
+              <FilterX className="w-5 h-5" />
+              Limpiar filtros
+            </button>
+
+          </div>
 
         </div>
 
@@ -236,11 +236,10 @@ useEffect(() => {
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`px-4 py-2 rounded ${
-                currentPage === i + 1
-                  ? "bg-brand text-white"
-                  : "bg-gray-200"
-              }`}
+              className={`px-4 py-2 rounded ${currentPage === i + 1
+                ? "bg-brand text-white"
+                : "bg-gray-200"
+                }`}
             >
               {i + 1}
             </button>
