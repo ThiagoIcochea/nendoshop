@@ -25,11 +25,11 @@ export default function Pagos() {
   });
 
   const [card, setCard] = useState({
-    cardName: "",
-    cardNumber: "",
-    cardCVV: "",
-    cardType: "visa"
-  });
+  cardName: "",
+  cardNumber: "",
+  cardCVV: "",
+  cardType: "visa"
+});
 
   // Guardián del carrito
   useEffect(() => {
@@ -58,6 +58,21 @@ export default function Pagos() {
     };
     loadUser();
   }, []);
+
+  useEffect(() => {
+
+  if (user?.paymentmethod) {
+
+    setCard({
+      cardName: user.paymentmethod.nombretarjeta || "",
+      cardNumber: user.paymentmethod.numerotarjeta || "",
+      cardCVV: user.paymentmethod.cvv || "",
+      cardType: user.paymentmethod.tipo || "visa"
+    });
+
+  }
+
+}, [user]);
 
   const total = cart.reduce((acc, p) => {
     const price = p.discount > 0 ? p.price * (1 - p.discount) : p.price;

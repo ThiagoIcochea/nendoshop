@@ -8,13 +8,17 @@ import {
 } from "lucide-react";
 
 import { useEffect, useState } from "react";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import logo from "./Assets/logo.png";
 
 export default function Navbar() {
 
   const navigate = useNavigate();
 
-  const auth = JSON.parse(localStorage.getItem("auth"));
+  const { auth, setAuth } = useContext(AuthContext);
+
+  console.log(auth);
 
   const [cartCount, setCartCount] = useState(0);
 
@@ -47,7 +51,7 @@ export default function Navbar() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("auth");
+    setAuth();
     navigate("/login");
   };
 
@@ -115,7 +119,7 @@ export default function Navbar() {
               </Link>
 
               {
-                auth && auth.role === "admin" ? (
+            auth && auth.role === "admin" ? (
                   <Link
                     to="/dashboard"
                     className="text-gray-600 hover:text-brand font-medium transition-colors"
@@ -179,10 +183,10 @@ export default function Navbar() {
 
                   <div className="w-10 h-10 rounded-full overflow-hidden bg-brand flex items-center justify-center text-white font-bold text-sm cursor-pointer hover:opacity-80 transition">
 
-                    {auth.avatar ? (
+                    {auth.profileImg ? (
 
                       <img
-                        src={auth.avatar}
+                        src={auth.profileImg}
                         alt="avatar"
                         className="w-full h-full object-cover scale-90"
                       />

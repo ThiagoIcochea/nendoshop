@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ParticlesBackground from "../components/ParticlesBackground";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Login() {
   const [user, setUser] = useState("");
   const [pass, setPass] = useState("");
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const { setAuth } = useContext(AuthContext);
 
  const handleLogin = async (e) => {
   e.preventDefault();
@@ -30,7 +33,7 @@ export default function Login() {
       return alert(data.message);
     }
 
-    localStorage.setItem("auth", JSON.stringify(data.user));
+    setAuth(data.user);
 
     if(data.user.role ==="user"){
       navigate("/");

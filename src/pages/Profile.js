@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Profile() {
 
+  const { setAuth } = useContext(AuthContext);
 
   const [form, setForm] = useState({
     name: "",
@@ -61,24 +64,23 @@ export default function Profile() {
       ...form,
       [e.target.name]: e.target.value
     });
+    let auth = JSON.parse(localStorage.getItem("auth"));
+    auth.profileImg= e.target.value;
+    setAuth(auth);
   };
 
  
   const handleImage = (e) => {
-    const file = e.target.files[0];
-
-    if (file) {
-      const reader = new FileReader();
-
-      reader.onloadend = () => {
+   
+   console.log(e.target.value);
+   
         setForm({
           ...form,
-          avatar: reader.result
+          avatar: e.target.value
         });
-      };
-
-      reader.readAsDataURL(file);
-    }
+    let auth = JSON.parse(localStorage.getItem("auth"));
+    auth.profileImg= e.target.value;
+    setAuth(auth);
   };
 
  const saveProfile = async () => {
@@ -154,10 +156,12 @@ export default function Profile() {
      
       <div className="mb-6">
         <input
-          type="file"
-          accept="image/*"
+        name="avatar"
+          type="text"
+          value={form.avatar}
+          placeholder="Ingresa la URL de la imagen"
           onChange={handleImage}
-          className="text-sm"
+          className="border  p-2 rounded w-full"
         />
       </div>
 
