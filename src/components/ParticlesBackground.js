@@ -1,96 +1,19 @@
-import { useCallback } from "react";
-import Particles from "react-tsparticles";
-import { loadFull } from "tsparticles";
-
 export default function ParticlesBackground() {
-
-  const particlesInit = useCallback(async (engine) => {
-    await loadFull(engine);
-  }, []);
-
   return (
-    <Particles
-      init={particlesInit}
-      options={{
-        fullScreen: {
-          enable: false
-        },
-
-        background: {
-          color: "transparent"
-        },
-
-        particles: {
-          number: {
-            value: 70,
-            density: {
-              enable: true,
-              area: 800
-            }
-          },
-
-          color: {
-            value: ["#38bdf8", "#a855f7", "#22c55e"]
-          },
-
-          shape: {
-            type: "circle"
-          },
-
-          opacity: {
-            value: 0.7,
-            random: true
-          },
-
-          size: {
-            value: { min: 2, max: 6 },
-            random: true
-          },
-
-          links: {
-            enable: true,
-            color: "#60a5fa",
-            distance: 140,
-            opacity: 0.35,
-            width: 1
-          },
-
-          move: {
-            enable: true,
-            speed: 1.2,
-            direction: "none",
-            outModes: {
-              default: "out"
-            }
-          }
-        },
-
-        interactivity: {
-          events: {
-            onHover: {
-              enable: true,
-              mode: "grab"
-            },
-            onClick: {
-              enable: true,
-              mode: "push"
-            }
-          },
-          modes: {
-            grab: {
-              distance: 160,
-              links: {
-                opacity: 0.5
-              }
-            },
-            push: {
-              quantity: 3
-            }
-          }
-        }
-      }}
-
-      className="absolute inset-0 z-0"
-    />
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-white to-purple-100 opacity-80" />
+      <div className="absolute -left-8 top-10 h-24 w-24 rounded-full bg-purple-200 opacity-40 blur-2xl" />
+      <div className="absolute right-10 top-1/4 h-28 w-28 rounded-full bg-purple-300 opacity-20 blur-3xl" />
+      <div className="absolute left-1/4 bottom-16 h-16 w-16 rounded-full bg-purple-200 opacity-30 blur-2xl" />
+      <div className="absolute right-16 bottom-24 h-12 w-12 rounded-full bg-purple-300 opacity-25 blur-2xl" />
+      <div className="absolute inset-0 grid grid-cols-8 gap-8 p-12">
+        {Array.from({ length: 20 }).map((_, index) => (
+          <span
+            key={index}
+            className="block h-1 w-1 rounded-full bg-purple-300 opacity-40"
+          />
+        ))}
+      </div>
+    </div>
   );
 }
