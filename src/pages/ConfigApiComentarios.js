@@ -50,7 +50,7 @@ export default function ApiComentarios() {
 
     loadConfig();
 
-  }, [auth, navigate]);
+  }, [navigate]);
 
   
   const save = async () => {
@@ -97,7 +97,7 @@ export default function ApiComentarios() {
         API de Comentarios
       </h1>
 
-      <input
+      <input type="text"
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         placeholder="https://tu-ngrok/ia"
