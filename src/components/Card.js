@@ -14,7 +14,7 @@ export default function Card({
 
   return (
 
-    <div className="bg-white rounded-xl overflow-hidden border border-brand flex flex-col hover:shadow-lg transition-shadow duration-300 group h-full">
+    <div className="bg-white rounded-xl overflow-hidden border border-brand flex flex-col hover:shadow-lg transition-shadow duration-300 group h-full animate__animated animate__fadeInUp">
 
       <div className="h-48 sm:h-56 md:h-64 overflow-hidden bg-gray-50 relative p-3 sm:p-4 flex items-center justify-center">
 
@@ -55,7 +55,7 @@ export default function Card({
               </h3>
 
               <p className="text-lg sm:text-xl font-black text-brand mb-3 sm:mb-4">
-                S/. {price.toFixed(2)}
+                S/. {(price || 0).toFixed(2)}
               </p>
             </>
           )}
