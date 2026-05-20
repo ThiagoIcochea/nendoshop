@@ -81,7 +81,7 @@ export default function Register() {
 
       <ParticlesBackground />
 
-      <div className="relative z-10">
+      <div className="relative z-10 animate__animated animate__fadeInUp">
 
         <form
           onSubmit={handleRegister}

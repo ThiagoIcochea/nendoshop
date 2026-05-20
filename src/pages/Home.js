@@ -52,7 +52,7 @@ export default function Home() {
 
           <section className="mb-12 relative rounded-2xl overflow-hidden border border-brand bg-white shadow-sm">
 
-            <div className="absolute inset-0 bg-gradient-to-r from-white/90 to-transparent z-10 flex flex-col justify-center px-12">
+            <div className="animate__animated animate__fadeInLeft absolute inset-0 bg-gradient-to-r from-white/90 to-transparent z-10 flex flex-col justify-center px-12">
 
               <h2 className="text-5xl font-black text-gray-900 tracking-tight mb-4 drop-shadow-sm">
                 Nendoshop
@@ -119,9 +119,19 @@ export default function Home() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
-              {filteredProducts.slice(0, 4).map((p) => (
-                <Card key={p._id} {...p} />
-              ))}
+              {products.length === 0
+  ? Array.from({ length: 4 }).map((_, i) => (
+      <Card key={i} loading={true} />
+    ))
+  : filteredProducts.slice(0, 4).map((p,i) => (
+      <div
+  className="animate__animated animate__fadeInUp"
+  style={{ animationDelay: `${i * 0.1}s` }}
+>
+  <Card key={p._id} {...p} />
+</div>
+    ))
+}
 
             </div>
 

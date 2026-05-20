@@ -1,19 +1,67 @@
 export default function ParticlesBackground() {
+
+  const particles = Array.from({ length: 55 }).map((_, i) => ({
+    id: i,
+    size: Math.random() * 5 + 4,
+    top: Math.random() * 100,
+    left: Math.random() * 100,
+    delay: Math.random() * 2,
+    color: [
+      "#8b5cf6",
+      "#22d3ee",
+      "#84cc16",
+      "#a855f7",
+      "#06b6d4"
+    ][Math.floor(Math.random() * 5)]
+  }));
+
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-white to-purple-100 opacity-80" />
-      <div className="absolute -left-8 top-10 h-24 w-24 rounded-full bg-purple-200 opacity-40 blur-2xl" />
-      <div className="absolute right-10 top-1/4 h-28 w-28 rounded-full bg-purple-300 opacity-20 blur-3xl" />
-      <div className="absolute left-1/4 bottom-16 h-16 w-16 rounded-full bg-purple-200 opacity-30 blur-2xl" />
-      <div className="absolute right-16 bottom-24 h-12 w-12 rounded-full bg-purple-300 opacity-25 blur-2xl" />
-      <div className="absolute inset-0 grid grid-cols-8 gap-8 p-12">
-        {Array.from({ length: 20 }).map((_, index) => (
-          <span
-            key={index}
-            className="block h-1 w-1 rounded-full bg-purple-300 opacity-40"
-          />
-        ))}
-      </div>
+    <div className="pointer-events-none absolute inset-0 overflow-hidden bg-white">
+
+      <style>
+        {`
+          @keyframes floatParticle {
+            0% {
+              transform: translate3d(0px, 0px, 0px);
+            }
+
+            25% {
+              transform: translate3d(18px, -18px, 0px);
+            }
+
+            50% {
+              transform: translate3d(-18px, -35px, 0px);
+            }
+
+            75% {
+              transform: translate3d(20px, 10px, 0px);
+            }
+
+            100% {
+              transform: translate3d(0px, 0px, 0px);
+            }
+          }
+        `}
+      </style>
+
+      {particles.map((p) => (
+        <span
+          key={p.id}
+          className="absolute rounded-full will-change-transform"
+          style={{
+            width: `${p.size}px`,
+            height: `${p.size}px`,
+            top: `${p.top}%`,
+            left: `${p.left}%`,
+            backgroundColor: p.color,
+            opacity: 0.85,
+            animation: `floatParticle 4.5s linear infinite`,
+            animationDelay: `${p.delay}s`,
+            transform: "translate3d(0,0,0)"
+          }}
+        />
+      ))}
+
     </div>
   );
 }

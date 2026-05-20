@@ -221,7 +221,7 @@ export default function Pagos() {
             
             {/* PASO 1: FACTURACIÓN Y ENVÍO */}
             {paso === 1 && (
-              <form onSubmit={avanzarPaso} className="animate-fade-in space-y-8">
+              <form onSubmit={avanzarPaso} className="animate__animated animate__fadeIn space-y-8">
                 <div className="flex items-center gap-3 border-b pb-2">
                   <div className="bg-brand text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">1</div>
                   <h2 className="text-xl font-bold text-gray-800">Datos de Facturación y Envío</h2>
@@ -322,7 +322,7 @@ export default function Pagos() {
 
             {/* PASO 2: TARJETA DE CRÉDITO */}
             {paso === 2 && (
-              <form onSubmit={handlePayment} className="animate-fade-in">
+              <form onSubmit={handlePayment} className="animate__animated animate__fadeIn">
                 <div className="flex items-center justify-between mb-6 border-b pb-2">
                   <div className="flex items-center gap-3">
                     <div className="bg-brand text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">2</div>

@@ -7,15 +7,23 @@ import { FilterX } from "lucide-react";
 export default function Catalog() {
 
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
 useEffect(() => {
-  fetch("https://backendproyectodf.onrender.com/api/products",{
+
+  setLoading(true);
+
+  fetch("https://backendproyectodf.onrender.com/api/products", {
     credentials: "include"
   })
     .then(res => res.json())
     .then(data => {
       setProducts(Array.isArray(data) ? data : data.products || []);
+    })
+    .finally(() => {
+      setLoading(false);
     });
+
 }, []);
 
   const location = useLocation();
@@ -210,11 +218,22 @@ useEffect(() => {
 
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {currentProducts.map((p) => (
-            <Card key={p._id} {...p} />
-          ))}
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+  {loading
+    ? Array.from({ length: 8 }).map((_, i) => (
+        <Card key={i} loading={true} />
+      ))
+    : currentProducts.map((p,i) => (
+        <div
+  className="animate__animated animate__fadeInUp"
+  style={{ animationDelay: `${i * 0.08}s` }}
+>
+  <Card key={p._id} {...p} />
+</div>
+      ))}
+
+</div>
 
         {currentProducts.length === 0 && (
           <div className="text-center mt-10 text-gray-500 text-lg">

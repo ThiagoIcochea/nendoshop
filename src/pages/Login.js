@@ -55,7 +55,7 @@ export default function Login() {
       <ParticlesBackground />
 
       
-      <div className="relative z-10">
+      <div className="relative z-10 animate__animated animate__zoomIn">
 
         <form
           onSubmit={handleLogin}
@@ -80,7 +80,7 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 px-4 rounded-lg transition"
+           className="w-full bg-brand hover:bg-brand-dark text-white font-bold py-3 px-4 rounded-lg transition hover:animate__animated hover:animate__pulse"
           >
             Entrar
           </button>

@@ -48,7 +48,7 @@ export default function NotFound() {
               to="/"
               className="inline-block px-8 sm:px-12 py-4 text-brand hover:text-brand-dark font-medium transition-colors underline self-center lg:self-auto"
             >
-              O regresa a inicio
+              O regresa al inicio
             </Link>
           </div>
         </div>

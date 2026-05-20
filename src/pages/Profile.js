@@ -126,7 +126,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+   <div className="max-w-4xl mx-auto p-6 animate__animated animate__fadeIn">
 
      
       <div className="flex items-center gap-6 mb-6">

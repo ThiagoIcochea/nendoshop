@@ -81,7 +81,10 @@ export default function Cart() {
                   : product.price;
 
                 return (
-                  <div key={product.id} className="flex items-center gap-6 border-b pb-4">
+                 <div
+  key={product.id}
+  className="flex items-center gap-6 border-b pb-4 animate__animated animate__fadeInUp"
+>
 
                     <img
                       src={product.image}

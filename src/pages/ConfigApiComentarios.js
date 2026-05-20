@@ -91,7 +91,7 @@ export default function ApiComentarios() {
   };
 
   return (
-    <div className="p-6 max-w-xl mx-auto">
+    <div className="p-6 max-w-xl mx-auto animate__animated animate__fadeIn">
 
       <h1 className="text-2xl font-bold mb-6">
         API de Comentarios

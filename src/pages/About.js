@@ -11,7 +11,7 @@ export default function About() {
       <div className="relative z-10">
 
         
-        <div className="text-center mb-16">
+        <div className="text-center mb-16 animate__animated animate__fadeInDown">
           <h1 className="text-4xl font-black text-gray-900 mb-4">
             Sobre Nosotros
           </h1>
@@ -23,7 +23,7 @@ export default function About() {
 
         
         <div className="max-w-5xl mx-auto mb-16">
-          <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition border border-brand">
+          <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition border border-brand animate__animated animate__fadeInUp">
             <h2 className="text-2xl font-bold mb-2">
               🎯 Nuestro Objetivo
             </h2>
@@ -37,7 +37,7 @@ export default function About() {
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 mb-16">
 
          
-          <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition border border-brand">
+          <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition border border-brand animate__animated animate__fadeInLeft">
             <div className="w-16 h-16 bg-brand/10 rounded-full flex items-center justify-center mb-4">
               <img
                 src="https://cdn-icons-png.flaticon.com/512/3891/3891726.png"
@@ -56,7 +56,7 @@ export default function About() {
           </div>
 
          
-          <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition border border-brand">
+          <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition border border-brand animate__animated animate__fadeInRight">
             <div className="w-16 h-16 bg-brand/10 rounded-full flex items-center justify-center mb-4">
               <img
                 src="https://cdn-icons-png.freepik.com/512/2985/2985863.png"
@@ -78,7 +78,7 @@ export default function About() {
 
         
         <div className="max-w-5xl mx-auto">
-          <div className="bg-white border border-brand rounded-2xl p-8 shadow-md hover:shadow-xl transition">
+          <div className="bg-white border border-brand rounded-2xl p-8 shadow-md hover:shadow-xl transition animate__animated animate__fadeInUp">
 
             <h2 className="text-xl font-bold text-brand mb-2">
               💡 ¿Por qué fue creado?

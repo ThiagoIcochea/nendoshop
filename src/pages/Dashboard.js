@@ -64,7 +64,7 @@ export default function Dashboard() {
 
       <div className="flex justify-between items-center mb-8">
 
-        <div>
+        <div className="animate__animated animate__fadeInDown">
           <h1 className="text-4xl font-bold text-purple-600">
             Dashboard Admin
           </h1>
@@ -86,7 +86,7 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
-        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-green-500">
+       <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-green-500 animate__animated animate__fadeInUp animate__faster">
 
           <p className="text-gray-500 text-sm">Total Ventas</p>
 
@@ -96,7 +96,7 @@ export default function Dashboard() {
 
         </div>
 
-        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-purple-500">
+      <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-blue-500 animate__animated animate__fadeInUp animate__delay-2s">
 
           <p className="text-gray-500 text-sm">Total Pagos</p>
 
@@ -106,7 +106,7 @@ export default function Dashboard() {
 
         </div>
 
-        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-blue-500">
+        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-blue-500 animate__animated animate__fadeInUp animate__delay-2s">
 
           <p className="text-gray-500 text-sm">Último Pago</p>
 
@@ -120,7 +120,7 @@ export default function Dashboard() {
 
       </div>
 
-      <div className="bg-white rounded-2xl shadow-md p-6">
+      <div className="bg-white rounded-2xl shadow-md p-6 animate__animated animate__fadeIn">
 
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
           Historial de pagos
