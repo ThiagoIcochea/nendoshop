@@ -41,7 +41,7 @@ function App() {
             <Route path="/api-comentarios" element={<ProtectedRoute><ApiComentarios /></ProtectedRoute>} />
             <Route path="/profile" element = {<Profile />} />
 
-            <Route path="/product/:id" element={<ProductDetail />} />
+       
             <Route path="/api-comentarios" element={<ProtectedRoute><ApiComentarios /></ProtectedRoute>} />
 
             <Route path="/cart" element={<Cart />} />
