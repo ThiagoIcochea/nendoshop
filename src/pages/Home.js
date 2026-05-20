@@ -75,10 +75,10 @@ export default function Home() {
 
             <div className="h-[260px] sm:h-[420px] w-full flex justify-center sm:justify-end bg-gradient-to-r from-gray-50 to-white">
               <img
-                src="template-banner.png"
-                alt="Nendoroid Hero Banner"
-                className="h-full w-full sm:w-2/3 object-contain object-center"
-              />
+  src="template-banner.png"
+  alt="Nendoroid Hero Banner"
+  className="h-full w-full sm:w-2/3 object-contain object-center animate__animated animate__fadeInRight"
+/>
             </div>
 
           </section>
