@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
 import About from "./pages/About";
 import Login from "./pages/Login";
+import AdminAccess from "./pages/AdminAccess";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -33,6 +34,7 @@ function App() {
             <Route path="/catalog" element={<Catalog />} />
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/admin-access-panel" element={< AdminAccess />} />
             <Route path="/register" element={<Register />} />
 
             <Route path="/product/:_id" element={<ProductDetail />} />

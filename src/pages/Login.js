@@ -33,14 +33,13 @@ export default function Login() {
       return alert(data.message);
     }
 
-    setAuth(data.user);
+    
 
     if(data.user.role ==="user"){
-      navigate("/");
+        setAuth(data.user);
+        navigate("/");
     }
-    else{
-      navigate("/dashboard");
-    }
+     
 
   } catch (error) {
     console.error(error);
