@@ -44,13 +44,13 @@ useEffect(() => {
 
   const clearFilters = () => {
 
-   setFilters({
-    category: "",
-    brand: "",
-    stock: "",
-    discount: "",
-    sort: ""
-   })
+    setFilters({
+      category: "",
+      brand: "",
+      stock: "",
+      discount: "",
+      sort: ""
+    })
 
     localStorage.removeItem("productSearch");
 
@@ -134,7 +134,7 @@ useEffect(() => {
   );
 
   return (
-    <div className="relative min-h-screen px-6 py-6 overflow-hidden bg-transparent">
+    <div className="relative min-h-screen px-4 sm:px-6 py-4 sm:py-6 overflow-hidden bg-transparent">
 
       <ParticlesBackground />
 
@@ -144,7 +144,7 @@ useEffect(() => {
           Catálogo de Nendoroids
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
 
           <select
             name="category"
@@ -203,50 +203,51 @@ useEffect(() => {
             </option>
           </select>
 
-          <div className="flex justify-start mb-6">
+          <div className="flex justify-start sm:justify-end mb-6 lg:col-span-5">
 
-  <button
-    onClick={clearFilters}
-      
-    className="flex items-center gap-2 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition"
-  >
-    <FilterX className="w-5 h-5" />
-    Limpiar filtros
-  </button>
+            <button
+              onClick={clearFilters}
 
-</div>
+              className="flex items-center gap-2 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition"
+            >
+              <FilterX className="w-5 h-5" />
+              Limpiar filtros
+            </button>
+
+          </div>
 
         </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
 
   {loading
     ? Array.from({ length: 8 }).map((_, i) => (
         <Card key={i} loading={true} />
       ))
-    : currentProducts.map((p,i) => (
+    : currentProducts.map((p, i) => (
         <div
-  className="animate__animated animate__fadeInUp"
-  style={{ animationDelay: `${i * 0.08}s` }}
->
-  <Card key={p._id} {...p} />
-</div>
+          key={p._id}
+          className="animate__animated animate__fadeInUp"
+          style={{ animationDelay: `${i * 0.08}s` }}
+        >
+          <Card {...p} />
+        </div>
       ))}
 
 </div>
-
         {currentProducts.length === 0 && (
-          <div className="text-center mt-10 text-gray-500 text-lg">
+          <div className="text-center mt-10 text-gray-500 text-base sm:text-lg px-4">
             No se encontraron productos
           </div>
         )}
 
-        <div className="flex justify-center mt-8 gap-2">
+        <div className="flex flex-wrap justify-center mt-6 sm:mt-8 gap-2">
 
           <button
             onClick={() => setCurrentPage(currentPage - 1)}
             disabled={currentPage === 1}
-            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+            className="px-3 sm:px-4 py-2 text-sm sm:text-base bg-gray-200 rounded disabled:opacity-50"
           >
             Anterior
           </button>
@@ -255,11 +256,10 @@ useEffect(() => {
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`px-4 py-2 rounded ${
-                currentPage === i + 1
-                  ? "bg-brand text-white"
-                  : "bg-gray-200"
-              }`}
+              className={`px-4 py-2 rounded ${currentPage === i + 1
+                ? "bg-brand text-white"
+                : "bg-gray-200"
+                }`}
             >
               {i + 1}
             </button>

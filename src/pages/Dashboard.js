@@ -112,8 +112,8 @@ export default function Dashboard() {
 
           <h2 className="text-2xl font-bold text-blue-500 mt-2">
             {pagos.length > 0
-  ? new Date(pagos[pagos.length - 1].fecha).toLocaleDateString("es-ES")
-  : "Sin pagos"}
+              ? new Date(pagos[pagos.length - 1].fecha).toLocaleDateString("es-ES")
+              : "Sin pagos"}
           </h2>
 
         </div>

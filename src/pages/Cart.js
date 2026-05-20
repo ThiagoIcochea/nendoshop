@@ -1,183 +1,96 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ParticlesBackground from "../components/ParticlesBackground";
-import Pagos from "./Pagos";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
-export default function Cart() {
+export default function Card({
+  _id,
+  name,
+  price,
+  image,
+  loading = false
+}) {
 
   const navigate = useNavigate();
-  const [cart, setCart] = useState([]);
-
-  useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("cart")) || [];
-    setCart(data);
-  }, []);
-
-  const updateCart = (newCart) => {
-    setCart(newCart);
-    localStorage.setItem("cart", JSON.stringify(newCart));
-    window.dispatchEvent(new Event("storage"));
-  };
-
-  const increase = (id) => {
-    const updated = cart.map(p =>
-      p.id === id
-        ? { ...p, quantity: Math.min(p.stock, p.quantity + 1) }
-        : p
-    );
-    updateCart(updated);
-  };
-
-  const decrease = (id) => {
-    const updated = cart.map(p =>
-      p.id === id
-        ? { ...p, quantity: Math.max(1, p.quantity - 1) }
-        : p
-    );
-    updateCart(updated);
-  };
-
-  const removeItem = (id) => {
-    const updated = cart.filter(p => p.id !== id);
-    updateCart(updated);
-  };
-
-  const clearCart = () => {
-    updateCart([]);
-  };
-
-  const total = cart.reduce((acc, p) => {
-    const price = p.discount > 0 ? p.price * (1 - p.discount) : p.price;
-    return acc + price * p.quantity;
-  }, 0);
 
   return (
-    <div className="relative min-h-screen p-6">
 
-      <ParticlesBackground />
+    <div className="bg-white rounded-xl overflow-hidden border border-brand flex flex-col hover:shadow-lg transition-shadow duration-300 group h-full">
 
-      <div className="relative z-10 max-w-6xl mx-auto bg-white p-6 rounded-xl shadow">
+      <div className="h-48 sm:h-56 md:h-64 overflow-hidden bg-gray-50 relative p-3 sm:p-4 flex items-center justify-center">
 
-        <h1 className="text-3xl font-bold mb-6">Carrito</h1>
+        {loading ? (
 
-        {cart.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-gray-500 mb-4">Tu carrito está vacío</p>
-            <button
-              onClick={() => navigate("/catalog")}
-              className="bg-brand text-white px-6 py-2 rounded-lg"
-            >
-              Ir al catálogo
-            </button>
-          </div>
+          <Skeleton height="100%" width="100%" />
+
         ) : (
-          <>
-            <div className="space-y-6">
 
-              {cart.map(product => {
+          <img
+            src={image}
+            alt={name}
+            className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+          />
 
-                const price = product.discount > 0
-                  ? product.price * (1 - product.discount)
-                  : product.price;
-
-                return (
-                 <div
-  key={product.id}
-  className="flex items-center gap-6 border-b pb-4 animate__animated animate__fadeInUp"
->
-
-                    <img
-                      src={product.image}
-                      className="w-24 h-24 object-contain rounded"
-                    />
-
-                    <div className="flex-1">
-
-                      <h2 className="font-bold text-lg">{product.name}</h2>
-
-                      <p className="text-brand font-bold">
-                        S/. {price.toFixed(2)}
-                      </p>
-
-                      <div className="flex items-center gap-2 mt-2">
-
-                        <button
-                          onClick={() => decrease(product.id)}
-                          className="px-3 bg-gray-200 rounded"
-                        >-</button>
-
-                        <span>{product.quantity}</span>
-
-                        <button
-                          onClick={() => increase(product.id)}
-                          className="px-3 bg-gray-200 rounded"
-                        >+</button>
-
-                      </div>
-
-                    </div>
-
-                    <div className="text-right">
-
-                      <p className="font-bold mb-2">
-                        S/. {(price * product.quantity).toFixed(2)}
-                      </p>
-
-                      <button
-                        onClick={() => removeItem(product.id)}
-                        className="text-red-500 text-sm"
-                      >
-                        Eliminar
-                      </button>
-
-                    </div>
-
-                  </div>
-                );
-              })}
-
-            </div>
-
-            <div className="mt-10 border-t pt-6 flex justify-between items-center">
-
-              <button
-                onClick={clearCart}
-                className="text-red-500"
-              >
-                Vaciar carrito
-              </button>
-
-              <div className="text-right">
-
-                <p className="text-xl font-bold mb-2">
-                  Total: S/. {total.toFixed(2)}
-                </p>
-
-                <div className="flex gap-3 justify-end">
-
-                  <button
-                    onClick={() => navigate("/catalog")}
-                    className="px-4 py-2 border rounded"
-                  >
-                    Seguir comprando
-                  </button>
-
-                  <button
-                    onClick={() => navigate("/pagos")}
-                    className="bg-brand text-white px-6 py-2 shadow-md hover:bg-brand/90 transition-colors rounded-lg"
-                  >
-                    Continuar compra
-                  </button>
-
-                </div>
-
-              </div>
-
-            </div>
-          </>
         )}
 
       </div>
+
+      <div className="p-5 flex-1 flex flex-col justify-between border-t border-gray-100">
+
+        <div>
+
+          {loading ? (
+
+            <>
+              <Skeleton
+                height={28}
+                width="80%"
+                className="mb-3"
+              />
+
+              <Skeleton
+                height={28}
+                width="40%"
+                className="mb-4"
+              />
+            </>
+
+          ) : (
+
+            <>
+              <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2 line-clamp-2">
+                {name}
+              </h3>
+
+              <p className="text-lg sm:text-xl font-black text-brand mb-3 sm:mb-4">
+                S/. {price?.toFixed(2)}
+              </p>
+            </>
+
+          )}
+
+        </div>
+
+        {loading ? (
+
+          <Skeleton
+            height={48}
+            borderRadius={8}
+          />
+
+        ) : (
+
+          <button
+            onClick={() => navigate(`/product/${_id}`)}
+            className="w-full bg-brand hover:bg-brand-dark text-white font-bold py-2 sm:py-3 rounded-lg transition active:scale-95"
+          >
+            Comprar
+          </button>
+
+        )}
+
+      </div>
+
     </div>
+
   );
 }
