@@ -144,7 +144,7 @@ useEffect(() => {
           Catálogo de Nendoroids
         </h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
 
           <select
             name="category"
@@ -203,7 +203,7 @@ useEffect(() => {
             </option>
           </select>
 
-          <div className="flex justify-start sm:justify-end mb-6 lg:col-span-5">
+          <div className="flex justify-start sm:justify-start mb-6 lg:col-span-5">
 
             <button
               onClick={clearFilters}
