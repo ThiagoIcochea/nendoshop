@@ -72,8 +72,8 @@ export default function Payments() {
 
     const matchProducto = pago.productos
       ? pago.productos.some(p =>
-          p.name.toLowerCase().includes(producto.toLowerCase())
-        )
+        p.name.toLowerCase().includes(producto.toLowerCase())
+      )
       : pago.producto?.toLowerCase().includes(producto.toLowerCase());
 
     const matchEstado = estado ? pago.estado === estado : true;
@@ -89,12 +89,12 @@ export default function Payments() {
 
   return (
 
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-4 md:p-6">
 
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col md:flex-row justify-between gap-4 md:items-center mb-8">
 
-        <div className="animate__animated animate__fadeInDown">
-          <h1 className="text-4xl font-bold text-purple-600">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold text-purple-600">
             Dashboard Admin
           </h1>
           <p className="text-gray-500 mt-1">
@@ -104,7 +104,7 @@ export default function Payments() {
 
         <button
           onClick={logout}
-          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition"
+          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition w-full md:w-auto"
         >
           Cerrar sesión
         </button>
@@ -113,21 +113,21 @@ export default function Payments() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
-        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-green-500 animate__animated animate__fadeInUp animate__faster">
+        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-green-500">
           <p className="text-gray-500 text-sm">Total Ventas</p>
           <h2 className="text-3xl font-bold text-green-600 mt-2">
             S/ {totalVentas.toFixed(2)}
           </h2>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-blue-500 animate__animated animate__fadeInUp animate__faster">
+        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-blue-500">
           <p className="text-gray-500 text-sm">Total Pagos</p>
           <h2 className="text-3xl font-bold mt-2">
             {pagos.length}
           </h2>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-indigo-500 animate__animated animate__fadeInUp animate__faster">
+        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-indigo-500">
           <p className="text-gray-500 text-sm">Último Pago</p>
           <h2 className="text-2xl font-bold text-blue-500 mt-2">
             {pagos.length > 0
@@ -138,7 +138,7 @@ export default function Payments() {
 
       </div>
 
-      <div className="bg-white rounded-2xl shadow-md p-6 mb-6 animate__animated animate__fadeInUp">
+      <div className="bg-white rounded-2xl shadow-md p-4 md:p-6 mb-6">
 
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
           Historial de pagos
@@ -154,7 +154,7 @@ export default function Payments() {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-4 py-2 border rounded-lg"
           />
 
           <input
@@ -165,7 +165,7 @@ export default function Payments() {
               setProducto(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-4 py-2 border rounded-lg"
           />
 
           <select
@@ -174,7 +174,7 @@ export default function Payments() {
               setEstado(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-4 py-2 border rounded-lg"
           >
             <option value="">Todos los estados</option>
             <option value="Pagado">Pagado</option>
@@ -184,7 +184,7 @@ export default function Payments() {
 
         </div>
 
-        <div className="flex justify-start mb-6">
+        <div className="flex flex-wrap gap-2 mb-6">
 
           <button
             onClick={() => {
@@ -193,88 +193,71 @@ export default function Payments() {
               setEstado("");
               setCurrentPage(1);
             }}
-            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition"
+            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg"
           >
             Limpiar filtros
           </button>
 
         </div>
 
-        {pagos.length === 0 ? (
+        <div className="overflow-x-auto">
 
-          <div className="text-center py-10">
-            <p className="text-gray-500">
-              No hay pagos registrados
-            </p>
-          </div>
+          <table className="w-full min-w-[600px]">
 
-        ) : (
+            <thead>
+              <tr className="border-b text-left text-gray-500">
+                <th className="pb-4">Usuario</th>
+                <th className="pb-4">Producto</th>
+                <th className="pb-4">Fecha</th>
+                <th className="pb-4">Total</th>
+                <th className="pb-4">Estado</th>
+              </tr>
+            </thead>
 
-          <div className="overflow-x-auto">
+            <tbody>
 
-            <table className="w-full">
+              {currentPagos.map((pago) => (
 
-              <thead>
+                <tr key={pago._id || pago.id} className="border-b">
 
-                <tr className="border-b text-left text-gray-500">
-                  <th className="pb-4">Usuario</th>
-                  <th className="pb-4">Producto</th>
-                  <th className="pb-4">Fecha</th>
-                  <th className="pb-4">Total</th>
-                  <th className="pb-4">Estado</th>
+                  <td className="py-4 font-medium">{pago.cliente}</td>
+
+                  <td className="py-4">
+                    {pago.productos
+                      ? pago.productos.map(p => p.name).join(", ")
+                      : pago.producto}
+                  </td>
+
+                  <td className="py-4">
+                    {new Date(pago.fecha).toLocaleDateString("es-ES")}
+                  </td>
+
+                  <td className="py-4 font-bold text-green-600">
+                    S/ {pago.total}
+                  </td>
+
+                  <td className="py-4">
+                    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                      {pago.estado}
+                    </span>
+                  </td>
+
                 </tr>
 
-              </thead>
+              ))}
 
-              <tbody>
+            </tbody>
 
-                {currentPagos.map((pago) => (
+          </table>
 
-                  <tr
-                    key={pago._id || pago.id}
-                    className="border-b hover:bg-gray-50 transition animate__animated animate__fadeInUp"
-                  >
+        </div>
 
-                    <td className="py-4 font-medium">{pago.cliente}</td>
-
-                    <td className="py-4">
-                      {pago.productos
-                        ? pago.productos.map(p => p.name).join(", ")
-                        : pago.producto}
-                    </td>
-
-                    <td className="py-4">
-                      {new Date(pago.fecha).toLocaleDateString("es-ES")}
-                    </td>
-
-                    <td className="py-4 font-bold text-green-600">
-                      S/ {pago.total}
-                    </td>
-
-                    <td className="py-4">
-                      <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
-                        {pago.estado}
-                      </span>
-                    </td>
-
-                  </tr>
-
-                ))}
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        )}
-
-        <div className="flex justify-center gap-2 mt-6">
+        <div className="flex flex-wrap justify-center gap-2 mt-6">
 
           <button
             onClick={() => setCurrentPage(currentPage - 1)}
             disabled={currentPage === 1}
-            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+            className="px-4 py-2 bg-gray-200 rounded"
           >
             Anterior
           </button>
@@ -283,9 +266,7 @@ export default function Payments() {
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`px-4 py-2 rounded ${
-                currentPage === i + 1 ? "bg-purple-600 text-white" : "bg-gray-200"
-              }`}
+              className={`px-4 py-2 rounded ${currentPage === i + 1 ? "bg-purple-600 text-white" : "bg-gray-200"}`}
             >
               {i + 1}
             </button>
@@ -294,7 +275,7 @@ export default function Payments() {
           <button
             onClick={() => setCurrentPage(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+            className="px-4 py-2 bg-gray-200 rounded"
           >
             Siguiente
           </button>

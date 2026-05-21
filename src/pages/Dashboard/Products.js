@@ -36,11 +36,10 @@ export default function Products() {
   };
 
   const updateField = async (id, field, value) => {
-
     const validated = validateField(field, value);
 
     if (validated === null) {
-      Swal.fire("Error 630","Valor inválido","Error");
+      Swal.fire("Error 630", "Valor inválido", "Error");
       return;
     }
 
@@ -83,46 +82,46 @@ export default function Products() {
   const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 animate__animated animate__fadeIn">
+    <div className="min-h-screen bg-gray-100 p-4 md:p-6 animate__animated animate__fadeIn">
 
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-2">
         <div>
-          <h1 className="text-4xl font-bold text-purple-600">Productos</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-purple-600">Productos</h1>
           <p className="text-gray-500 mt-1">Gestión de catálogo</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
-        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-purple-500 animate__animated animate__fadeInUp">
+        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-purple-500">
           <p className="text-gray-500 text-sm">Total productos</p>
-          <h2 className="text-3xl font-bold text-purple-600 mt-2">{products.length}</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-purple-600 mt-2">{products.length}</h2>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-green-500 animate__animated animate__fadeInUp animate__faster">
+        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-green-500">
           <p className="text-gray-500 text-sm">Con descuento</p>
-          <h2 className="text-3xl font-bold text-green-600 mt-2">
+          <h2 className="text-2xl md:text-3xl font-bold text-green-600 mt-2">
             {products.filter(p => (p.discount || 0) > 0).length}
           </h2>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-blue-500 animate__animated animate__fadeInUp">
+        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-blue-500">
           <p className="text-gray-500 text-sm">Stock alto</p>
-          <h2 className="text-3xl font-bold text-blue-600 mt-2">
+          <h2 className="text-2xl md:text-3xl font-bold text-blue-600 mt-2">
             {products.filter(p => (p.stock || 0) >= 10).length}
           </h2>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-red-500 animate__animated animate__fadeInUp">
+        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-red-500">
           <p className="text-gray-500 text-sm">Sin descuento</p>
-          <h2 className="text-3xl font-bold text-red-600 mt-2">
+          <h2 className="text-2xl md:text-3xl font-bold text-red-600 mt-2">
             {products.filter(p => !p.discount || p.discount === 0).length}
           </h2>
         </div>
 
       </div>
 
-      <div className="bg-white rounded-2xl shadow-md p-6 mb-6 animate__animated animate__fadeInUp">
+      <div className="bg-white rounded-2xl shadow-md p-4 md:p-6 mb-6">
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
@@ -180,12 +179,11 @@ export default function Products() {
 
       </div>
 
-      <div className="bg-white rounded-2xl shadow-md p-6 animate__animated animate__fadeIn">
+      <div className="bg-white rounded-2xl shadow-md p-4 md:p-6 animate__animated animate__fadeIn">
 
-        <div className="overflow-x-auto">
-
+        
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
-
             <thead>
               <tr className="border-b text-left text-gray-500">
                 <th className="pb-4">Nombre</th>
@@ -196,14 +194,8 @@ export default function Products() {
             </thead>
 
             <tbody>
-
               {currentProducts.map((p) => (
-
-                <tr
-                  key={p._id}
-                  className="border-b hover:bg-gray-50 transition animate__animated animate__fadeInUp"
-                >
-
+                <tr key={p._id} className="border-b hover:bg-gray-50 transition">
                   <td className="py-4 font-medium">
                     {p.name}
                     <Pencil
@@ -251,20 +243,72 @@ export default function Products() {
                       }}
                     />
                   </td>
-
                 </tr>
-
               ))}
-
             </tbody>
-
           </table>
+        </div>
 
+        {/* MOBILE CARDS */}
+        <div className="md:hidden space-y-4">
+          {currentProducts.map((p) => (
+            <div key={p._id} className="bg-gray-50 rounded-xl p-4 shadow-sm">
+
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-bold">{p.name}</span>
+                <Pencil
+                  size={16}
+                  className="text-gray-500"
+                  onClick={() => {
+                    const v = prompt("Nuevo nombre", p.name);
+                    if (v) updateField(p._id, "name", v);
+                  }}
+                />
+              </div>
+
+              <div className="text-sm text-gray-600 flex justify-between">
+                <span>Precio: {p.price}</span>
+                <Pencil
+                  size={16}
+                  className="text-gray-500"
+                  onClick={() => {
+                    const v = prompt("Nuevo precio", p.price);
+                    if (v) updateField(p._id, "price", v);
+                  }}
+                />
+              </div>
+
+              <div className="text-sm text-gray-600 flex justify-between">
+                <span>Stock: {p.stock}</span>
+                <Pencil
+                  size={16}
+                  className="text-gray-500"
+                  onClick={() => {
+                    const v = prompt("Nuevo stock", p.stock);
+                    if (v) updateField(p._id, "stock", v);
+                  }}
+                />
+              </div>
+
+              <div className="text-sm text-gray-600 flex justify-between">
+                <span>Descuento: {p.discount || 0}</span>
+                <Pencil
+                  size={16}
+                  className="text-gray-500"
+                  onClick={() => {
+                    const v = prompt("Nuevo descuento", p.discount || 0);
+                    if (v) updateField(p._id, "discount", v);
+                  }}
+                />
+              </div>
+
+            </div>
+          ))}
         </div>
 
       </div>
 
-      <div className="flex justify-center gap-2 mt-6 animate__animated animate__fadeInUp">
+      <div className="flex flex-wrap justify-center gap-2 mt-6">
 
         <button
           onClick={() => setCurrentPage(currentPage - 1)}

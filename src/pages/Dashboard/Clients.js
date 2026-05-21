@@ -17,7 +17,6 @@ export default function Clients() {
   const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
 
   useEffect(() => {
-
     const load = async () => {
       const res = await fetch("https://backendproyectodf.onrender.com/api/admin/clients", {
         credentials: "include"
@@ -35,7 +34,6 @@ export default function Clients() {
     };
 
     load();
-
   }, []);
 
   const showError = (text) => {
@@ -121,33 +119,33 @@ export default function Clients() {
   const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 animate__animated animate__fadeIn">
+    <div className="min-h-screen bg-gray-100 p-4 md:p-6 animate__animated animate__fadeIn">
 
       <div className="mb-8 animate__animated animate__fadeInDown">
-        <h1 className="text-4xl font-bold text-purple-600">Clientes</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-purple-600">Clientes</h1>
         <p className="text-gray-500">Gestión de usuarios registrados</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
 
-        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-purple-500 animate__animated animate__fadeInUp">
+        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-purple-500">
           <p className="text-gray-500 text-sm">Total clientes</p>
-          <h2 className="text-3xl font-bold text-purple-600">{totalClients}</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-purple-600">{totalClients}</h2>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-blue-500 animate__animated animate__fadeInUp">
+        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-blue-500">
           <p className="text-gray-500 text-sm">Región principal</p>
-          <h2 className="text-2xl font-bold text-blue-600">{topCity}</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-blue-600">{topCity}</h2>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-green-500 animate__animated animate__fadeInUp">
+        <div className="bg-white rounded-2xl shadow-md p-6 border-t-4 border-green-500">
           <p className="text-gray-500 text-sm">Sexo predominante</p>
-          <h2 className="text-2xl font-bold text-green-600">{topGender.toUpperCase()}</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-green-600">{topGender.toUpperCase()}</h2>
         </div>
 
       </div>
 
-      <div className="bg-white rounded-2xl shadow-md p-6 mb-6 animate__animated animate__fadeInUp">
+      <div className="bg-white rounded-2xl shadow-md p-4 md:p-6 mb-6">
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
@@ -177,97 +175,150 @@ export default function Clients() {
 
       </div>
 
-      <div className="bg-white rounded-2xl shadow-md p-6 animate__animated animate__fadeIn">
+      <div className="bg-white rounded-2xl shadow-md p-4 md:p-6">
 
-        <table className="w-full">
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b text-left text-gray-500">
+                <th className="pb-4">Nombre</th>
+                 <th className="pb-4">Genero</th>
+                <th className="pb-4">Email</th>
+                <th className="pb-4">Teléfono</th>
+                <th className="pb-4">Ciudad</th>
+                <th className="pb-4">Password</th>
+              </tr>
+            </thead>
 
-          <thead>
-            <tr className="border-b text-left text-gray-500">
-              <th className="pb-4">Nombre</th>
-              <th className="pb-4">Email</th>
-              <th className="pb-4">Teléfono</th>
-              <th className="pb-4">Ciudad</th>
-              <th className="pb-4">Password</th>
-            </tr>
-          </thead>
+            <tbody>
+              {currentClients.map((c) => (
+                <tr key={c._id} className="border-b hover:bg-gray-50">
 
-          <tbody>
-
-            {currentClients.map((c) => (
-
-              <tr key={c._id} className="border-b hover:bg-gray-50">
-
-                <td className="py-4">{c.name}</td>
-
-                <td className="py-4">
-                  {c.email}
-                  <Pencil size={16} className="ml-2 cursor-pointer"
-                    onClick={() => {
-                      const v = prompt("Nuevo email", c.email);
-                      if (v) updateField(c._id, "email", v);
-                    }}
-                  />
-                </td>
-
-                <td className="py-4">
-                  {c.phone}
-                  <Pencil size={16} className="ml-2 cursor-pointer"
-                    onClick={() => {
-                      const v = prompt("Nuevo teléfono", c.phone);
-                      if (v) updateField(c._id, "phone", v);
-                    }}
-                  />
-                </td>
-
-                <td className="py-4">
-                  {c.city}
-                  <Pencil size={16} className="ml-2 cursor-pointer"
-                    onClick={() => {
-                      const v = prompt("Nueva ciudad", c.city);
-                      if (v) updateField(c._id, "city", v);
-                    }}
-                  />
-                </td>
-
-                <td className="py-4 flex items-center gap-2">
-
-                  <span>
-                    {visiblePassword === c._id ? c.password : "••••••••"}
-                  </span>
-
-                  {visiblePassword === c._id ? (
-                    <EyeOff size={16} className="cursor-pointer"
-                      onClick={() => setVisiblePassword(null)}
-                    />
-                  ) : (
-                    <Eye size={16} className="cursor-pointer"
+                  <td className="py-4">{c.name}</td>
+                   <td className="py-4">{c.sex.toUpperCase()}</td>
+                  <td className="py-4">
+                    {c.email}
+                    <Pencil size={16} className="ml-2 cursor-pointer"
                       onClick={() => {
-                        setVisiblePassword(c._id);
-                        setTimeout(() => setVisiblePassword(null), 3000);
+                        const v = prompt("Nuevo email", c.email);
+                        if (v) updateField(c._id, "email", v);
                       }}
                     />
+                  </td>
+
+                  <td className="py-4">
+                    {c.phone}
+                    <Pencil size={16} className="ml-2 cursor-pointer"
+                      onClick={() => {
+                        const v = prompt("Nuevo teléfono", c.phone);
+                        if (v) updateField(c._id, "phone", v);
+                      }}
+                    />
+                  </td>
+
+                  <td className="py-4">
+                    {c.city}
+                    <Pencil size={16} className="ml-2 cursor-pointer"
+                      onClick={() => {
+                        const v = prompt("Nueva ciudad", c.city);
+                        if (v) updateField(c._id, "city", v);
+                      }}
+                    />
+                  </td>
+
+                  <td className="py-4 flex items-center gap-2">
+
+                    <span>
+                      {visiblePassword === c._id ? c.password : "••••••••"}
+                    </span>
+
+                    {visiblePassword === c._id ? (
+                      <EyeOff size={16} className="cursor-pointer"
+                        onClick={() => setVisiblePassword(null)}
+                      />
+                    ) : (
+                      <Eye size={16} className="cursor-pointer"
+                        onClick={() => {
+                          setVisiblePassword(c._id);
+                          setTimeout(() => setVisiblePassword(null), 3000);
+                        }}
+                      />
+                    )}
+
+                    <Pencil size={16} className="cursor-pointer"
+                      onClick={() => {
+                        const v = prompt("Nueva contraseña");
+                        if (v) updateField(c._id, "password", v);
+                      }}
+                    />
+
+                  </td>
+
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="md:hidden space-y-4">
+          {currentClients.map((c) => (
+            <div key={c._id} className="bg-gray-50 rounded-xl p-4">
+
+              <div className="flex justify-between">
+                <span className="font-bold">{c.name}</span>
+              </div>
+
+              <div className="text-sm flex justify-between">
+                <span>{c.email}</span>
+                <Pencil size={16} onClick={() => {
+                  const v = prompt("Nuevo email", c.email);
+                  if (v) updateField(c._id, "email", v);
+                }} />
+              </div>
+
+              <div className="text-sm flex justify-between">
+                <span>{c.phone}</span>
+                <Pencil size={16} onClick={() => {
+                  const v = prompt("Nuevo teléfono", c.phone);
+                  if (v) updateField(c._id, "phone", v);
+                }} />
+              </div>
+
+              <div className="text-sm flex justify-between">
+                <span>{c.city}</span>
+                <Pencil size={16} onClick={() => {
+                  const v = prompt("Nueva ciudad", c.city);
+                  if (v) updateField(c._id, "city", v);
+                }} />
+              </div>
+
+              <div className="text-sm flex justify-between items-center">
+                <span>{visiblePassword === c._id ? c.password : "••••••••"}</span>
+
+                <div className="flex gap-2">
+                  {visiblePassword === c._id ? (
+                    <EyeOff size={16} onClick={() => setVisiblePassword(null)} />
+                  ) : (
+                    <Eye size={16} onClick={() => {
+                      setVisiblePassword(c._id);
+                      setTimeout(() => setVisiblePassword(null), 3000);
+                    }} />
                   )}
 
-                  <Pencil size={16} className="cursor-pointer"
-                    onClick={() => {
-                      const v = prompt("Nueva contraseña");
-                      if (v) updateField(c._id, "password", v);
-                    }}
-                  />
+                  <Pencil size={16} onClick={() => {
+                    const v = prompt("Nueva contraseña");
+                    if (v) updateField(c._id, "password", v);
+                  }} />
+                </div>
+              </div>
 
-                </td>
-
-              </tr>
-
-            ))}
-
-          </tbody>
-
-        </table>
+            </div>
+          ))}
+        </div>
 
       </div>
 
-      <div className="flex justify-center gap-2 mt-6">
+      <div className="flex flex-wrap justify-center gap-2 mt-6">
 
         <button
           onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}

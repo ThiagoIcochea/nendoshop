@@ -34,7 +34,7 @@ export default function Register() {
   if (!passRegex.test(pass)) return Swal.fire("Error 630","Password inválida","error");
   if (!phoneRegex.test(phone)) return Swal.fire("Error 630","Teléfono inválido","error");
   if (!address || !city) return Swal.fire("Error 630","Completa dirección y ciudad","error");
-  if (!sex) return Swal.fire("Error 630","Selecciona tu sexo","error");
+  if (!sex) return Swal.fire("Error 630","Selecciona tu género","error");
   if (!birthdate) return Swal.fire("Error 630","Selecciona tu fecha de nacimiento","error");
 
   const birth = new Date(birthdate);
@@ -150,7 +150,7 @@ export default function Register() {
             onChange={(e) => setSex(e.target.value)}
             defaultValue=""
           >
-            <option value="" disabled>Selecciona sexo</option>
+            <option value="" disabled>Selecciona Género</option>
             <option value="masculino">Masculino</option>
             <option value="femenino">Femenino</option>
             <option value="otro">Otro</option>

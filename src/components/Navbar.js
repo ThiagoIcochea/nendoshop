@@ -86,15 +86,15 @@ export default function Navbar() {
 
             <nav className="hidden md:flex items-center gap-6 border-l border-gray-200 pl-6">
 
-              <Link to="/" className="text-gray-600 hover:text-brand font-medium transition-colors">
+              <Link to="/" className="text-gray-600 hover:text-brand font-medium">
                 Inicio
               </Link>
 
-              <Link to="/about" className="text-gray-600 hover:text-brand font-medium transition-colors">
+              <Link to="/about" className="text-gray-600 hover:text-brand font-medium">
                 Nosotros
               </Link>
 
-              <Link to="/catalog" className="text-gray-600 hover:text-brand font-medium transition-colors">
+              <Link to="/catalog" className="text-gray-600 hover:text-brand font-medium">
                 Catálogo
               </Link>
 
@@ -113,121 +113,68 @@ export default function Navbar() {
                 >
 
                   <button
-                    onClick={() => {
-                      if (window.innerWidth < 768) {
-                        setAdminMenu(v => !v);
-                      } else {
-                        navigate("/dashboard");
-                      }
-                    }}
-                    className="text-gray-600 hover:text-brand font-medium transition-colors"
+                    onClick={() => navigate("/dashboard")}
+                    className="text-gray-600 hover:text-brand font-medium"
                   >
                     Dashboard
                   </button>
 
                   {adminMenu && (
-
                     <div className="absolute top-10 left-0 bg-white shadow-lg rounded-lg border w-48 py-2 z-50">
 
-                      <Link
-                        to="/dashboard/payments"
-                        className="block px-4 py-2 hover:bg-gray-100"
-                        onClick={() => setAdminMenu(false)}
-                      >
+                      <Link to="/dashboard/payments" className="block px-4 py-2 hover:bg-gray-100">
                         Pagos
                       </Link>
 
-                      <Link
-                        to="/dashboard/clients"
-                        className="block px-4 py-2 hover:bg-gray-100"
-                        onClick={() => setAdminMenu(false)}
-                      >
+                      <Link to="/dashboard/clients" className="block px-4 py-2 hover:bg-gray-100">
                         Clientes
                       </Link>
 
-                      <Link
-                        to="/dashboard/products"
-                        className="block px-4 py-2 hover:bg-gray-100"
-                        onClick={() => setAdminMenu(false)}
-                      >
+                      <Link to="/dashboard/products" className="block px-4 py-2 hover:bg-gray-100">
                         Productos
                       </Link>
 
                     </div>
-
                   )}
 
                 </div>
-
               )}
 
             </nav>
 
           </div>
 
-          <div className="flex-1 max-w-lg mx-8 hidden sm:block">
-
-            <div className="relative">
-
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-brand" />
-              </div>
-
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={handleSearch}
-                className="block w-full pl-10 pr-3 py-2 border border-brand rounded-full"
-                placeholder="Buscar productos..."
-              />
-
-            </div>
-
-          </div>
-
           <div className="flex items-center gap-3">
 
             {!auth ? (
-
-              <Link to="/login" className="flex items-center gap-2 text-brand hover:text-brand-dark font-medium">
+              <Link to="/login" className="flex items-center gap-2 text-brand">
                 <User className="h-5 w-5" />
                 <span className="hidden lg:inline">Login</span>
               </Link>
-
             ) : (
-
               <>
-
                 <Link to="/profile">
-
                   <div className="w-10 h-10 rounded-full overflow-hidden bg-brand flex items-center justify-center text-white font-bold text-sm">
-
                     {auth.profileImg ? (
                       <img src={auth.profileImg} className="w-full h-full object-cover" />
                     ) : (
                       (auth.name?.[0] || "") + (auth.lastname?.[0] || "")
                     )}
-
                   </div>
-
                 </Link>
 
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 text-red-500 hover:text-red-700 font-medium"
+                  className="flex items-center gap-2 text-red-500"
                 >
                   <LogOut className="h-5 w-5" />
-                  <span className="hidden lg:inline">Logout</span>
                 </button>
-
               </>
-
             )}
 
             <button
               onClick={() => navigate("/cart")}
-              className="relative text-brand hover:text-brand-dark"
+              className="relative text-brand"
             >
               <ShoppingCart className="h-5 w-5" />
 
@@ -236,19 +183,15 @@ export default function Navbar() {
                   {cartCount}
                 </span>
               )}
-
             </button>
 
             {auth && auth.role === "admin" && (
-
               <Link
                 to="/api-comentarios"
-                className="hidden md:flex items-center gap-2 text-gray-600 hover:text-brand"
+                className="hidden md:flex items-center gap-2 text-gray-600"
               >
                 <Settings className="h-5 w-5" />
-                <span className="hidden lg:inline">Settings</span>
               </Link>
-
             )}
 
           </div>
@@ -256,6 +199,61 @@ export default function Navbar() {
         </div>
 
       </div>
+
+      {menuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setMenuOpen(false)}
+          />
+
+          <div className="absolute top-0 left-0 w-72 h-full bg-white shadow-xl p-5">
+
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="font-bold text-xl">Menú</h2>
+              <button onClick={() => setMenuOpen(false)}>
+                <X />
+              </button>
+            </div>
+
+            <nav className="flex flex-col gap-4">
+
+              <Link to="/" onClick={() => setMenuOpen(false)}>Inicio</Link>
+              <Link to="/about" onClick={() => setMenuOpen(false)}>Nosotros</Link>
+              <Link to="/catalog" onClick={() => setMenuOpen(false)}>Catálogo</Link>
+
+              {auth && auth.role === "admin" && (
+                <>
+                  <Link to="/dashboard" onClick={() => setMenuOpen(false)}>
+                    Dashboard
+                  </Link>
+
+                  <Link to="/dashboard/payments" onClick={() => setMenuOpen(false)}>
+                    Pagos
+                  </Link>
+
+                  <Link to="/dashboard/clients" onClick={() => setMenuOpen(false)}>
+                    Clientes
+                  </Link>
+
+                  <Link to="/dashboard/products" onClick={() => setMenuOpen(false)}>
+                    Productos
+                  </Link>
+
+                  <Link to="/api-comentarios" onClick={() => setMenuOpen(false)}>
+                    Settings
+                  </Link>
+                </>
+              )}
+
+            </nav>
+
+          </div>
+
+        </div>
+      )}
+
     </header>
   );
 }
