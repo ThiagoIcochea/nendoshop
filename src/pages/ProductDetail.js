@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import ParticlesBackground from "../components/ParticlesBackground";
 import CommentCard from "../components/CommentCard";
+import Swal from "sweetalert2";
 
 export default function ProductDetail() {
 
@@ -99,14 +100,14 @@ export default function ProductDetail() {
 
     window.dispatchEvent(new Event("storage"));
 
-    alert("Agregado 🛒");
+   Swal.fire("Carrito"," Producto Agregado 🛒","success");
 
   };
 
   const handleComment = async () => {
 
     if (!auth) {
-      alert("Debes iniciar sesión");
+      Swal.fire("Error 230","Debes iniciar sesión","error");
       return;
     }
 
@@ -127,7 +128,7 @@ export default function ProductDetail() {
       const apiUrl = configData?.value;
 
       if (!apiUrl) {
-        alert("No hay API configurada");
+        Swal.fire("Error 999","No hay API configurada", "error");
         return;
       }
 
@@ -145,7 +146,7 @@ export default function ProductDetail() {
       const modData = await modRes.json();
 
       if (modData?.estado !== "OK") {
-        alert("Comentario bloqueado 🚫");
+        Swal.fire("Contenido Inapropiado", "Comentario bloqueado 🚫","error");
         return;
       }
 
@@ -172,11 +173,11 @@ export default function ProductDetail() {
       setComment("");
       setRating(5);
 
-      alert("Comentario publicado ✅");
+      Swal.fire("Registro exitoso","Comentario publicado ✅","success");
 
     } catch (error) {
 
-      alert("Error conectando con el servidor ❌");
+      Swal.fire("Error 678", "Error conectando con el servidor ❌","error");
 
     }
   };

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import Swal from "sweetalert2";
 
 export default function Profile() {
 
@@ -112,9 +113,9 @@ export default function Profile() {
 
     const data = await res.json();
 
-    if (!res.ok) return alert(data.message);
+    if (!res.ok) return Swal.fire("Error 896",data.message,"error");
 
-    alert("Perfil actualizado correctamente");
+    Swal.fire("Actualización de Registro" ,"Perfil actualizado correctamente","success");
 
   } catch (err) {
     console.log(err);

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export default function Pagos() {
   const navigate = useNavigate();
@@ -95,17 +96,17 @@ export default function Pagos() {
     e.preventDefault();
     
     if (envioDatos.tipoComprobante === "boleta" && envioDatos.documento.length !== 8) {
-      alert("⚠️ Error de Validación: El DNI debe tener exactamente 8 dígitos.");
+      Swal.fire("Error 630","⚠️ Error de Validación: El DNI debe tener exactamente 8 dígitos.","error");
       return; 
     }
 
     if (envioDatos.tipoComprobante === "factura") {
       if (envioDatos.documento.length !== 11) {
-        alert("⚠️ Error de Validación: El RUC debe tener exactamente 11 dígitos.");
+       Swal.fire("Error 630","⚠️ Error de Validación: El RUC debe tener exactamente 11 dígitos.","error");
         return;
       }
       if (!envioDatos.razonSocial.trim()) {
-        alert("⚠️ Error de Validación: La Razón Social es obligatoria para Facturas.");
+        Swal.fire("Error 630","⚠️ Error de Validación: La Razón Social es obligatoria para Facturas.","error");
         return;
       }
     }
@@ -113,7 +114,7 @@ export default function Pagos() {
     // 2. Validar Dirección (Solo si es Delivery)
     if (envioDatos.metodoEnvio === "delivery") {
       if (!envioDatos.direccionEntrega.calle.trim() || !envioDatos.direccionEntrega.distrito.trim()) {
-        alert("⚠️ Error de Validación: Por favor, completa la calle y el distrito para el envío.");
+        Swal.fire("Error 630","⚠️ Error de Validación: Por favor, completa la calle y el distrito para el envío.","error");
         return;
       }
     }
@@ -125,11 +126,11 @@ export default function Pagos() {
     e.preventDefault();
 
     if (card.cardNumber.length < 16) {
-      return alert("Por favor, completa los 16 dígitos de la tarjeta.");
+      return Swal.fire("Error 630","Por favor, completa los 16 dígitos de la tarjeta.","error");
     }
   
     if (card.cardCVV.length < 3) {
-      alert("⚠️ Error de Facturación: El código CVV es inválido.");
+      Swal.fire("Error 630","⚠️ Error de Facturación: El código CVV es inválido.","error");
       return;
     }
 
@@ -181,7 +182,7 @@ export default function Pagos() {
 
     } catch (err) {
       console.log(err);
-      alert("Error al procesar pago");
+      Swal("Error 420","Error al procesar pago","error");
       setPaymentStatus("inactivo");
     }
   }, 2000);

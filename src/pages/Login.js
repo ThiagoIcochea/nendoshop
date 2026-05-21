@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ParticlesBackground from "../components/ParticlesBackground";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import Swal from "sweetalert2";
 
 export default function Login() {
   const [user, setUser] = useState("");
@@ -30,7 +31,7 @@ export default function Login() {
 
     if (!res.ok) {
       
-      return alert(data.message);
+      return Swal.fire("Error 503",data.message,"error");
     }
 
     
@@ -43,7 +44,7 @@ export default function Login() {
 
   } catch (error) {
     console.error(error);
-    alert("Error en login");
+    Swal.fire("Error 794","Error en login","error");
   }
 };
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export default function ApiComentarios() {
 
@@ -74,15 +75,15 @@ export default function ApiComentarios() {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.message || "Error al guardar");
+       Swal.fire("Error 896",data.message || "Error al guardar","error");
         return;
       }
 
-      alert("API guardada correctamente ✅");
+      Swal.fire("Registro exitoso","API guardada correctamente ✅","success");
 
     } catch (err) {
       console.log(err);
-      alert("Error de servidor");
+      Swal.fire("Error 742","Error de servidor","error");
     }
 
     if (!auth || auth.role !== "admin") {

@@ -10,7 +10,10 @@ import About from "./pages/About";
 import Login from "./pages/Login";
 import AdminAccess from "./pages/AdminAccess";
 import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
+import Payments from "./pages/Dashboard/Payments";
+import DashboardLayout from "./pages/Dashboard/DashboardLayout";
+import Clients from "./pages/Dashboard/Clients";
+import Products from "./pages/Dashboard/Products";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProductDetail from "./pages/ProductDetail"
 import Cart from "./pages/Cart";
@@ -46,15 +49,15 @@ function App() {
             <Route path="/cart" element={<Cart />} />
             <Route path="/pagos" element={<ProtectedRoute><Pagos/></ProtectedRoute>}/>
             
-            <Route
+          <Route
               path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-
+              element={<DashboardLayout />}
+            >
+              <Route index element={<Payments />} />
+              <Route path="payments" element={<Payments />} />
+              <Route path="clients" element={<Clients />} />
+              <Route path="products" element={<Products />} />
+            </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

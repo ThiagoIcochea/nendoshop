@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ParticlesBackground from "../components/ParticlesBackground";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import Swal from "sweetalert2";
 import logo from "../components/Assets/logo.png";
 
 export default function AdminAccess() {
@@ -38,11 +39,11 @@ export default function AdminAccess() {
       const data = await res.json();
 
       if (!res.ok) {
-        return alert(data.message);
+        return Swal.fire("Error 503",data.message,"error");
       }
 
       if (data.user.role !== "admin") {
-        return alert("Acceso denegado");
+        return Swal.fire("Permisos Insuficientes","Acceso denegado","error");
       }
 
       setAuth(data.user);

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ParticlesBackground from "../components/ParticlesBackground";
+import Swal from "sweetalert2";
 
 export default function Register() {
 
@@ -27,19 +28,19 @@ export default function Register() {
 
   const today = new Date();
 
-  if (!nameRegex.test(name)) return alert("Nombre inválido");
-  if (!nameRegex.test(lastname)) return alert("Apellido inválido");
-  if (!emailRegex.test(email)) return alert("Email inválido");
-  if (!passRegex.test(pass)) return alert("Password inválida");
-  if (!phoneRegex.test(phone)) return alert("Teléfono inválido");
-  if (!address || !city) return alert("Completa dirección y ciudad");
-  if (!sex) return alert("Selecciona tu sexo");
-  if (!birthdate) return alert("Selecciona tu fecha de nacimiento");
+  if (!nameRegex.test(name)) return Swal.fire("Error 630","Nombre inválido","error");
+  if (!nameRegex.test(lastname)) return Swal.fire("Error 630","Apellido inválido","error");
+  if (!emailRegex.test(email)) return Swal.fire("Error 630","Email inválido","error");
+  if (!passRegex.test(pass)) return Swal.fire("Error 630","Password inválida","error");
+  if (!phoneRegex.test(phone)) return Swal.fire("Error 630","Teléfono inválido","error");
+  if (!address || !city) return Swal.fire("Error 630","Completa dirección y ciudad","error");
+  if (!sex) return Swal.fire("Error 630","Selecciona tu sexo","error");
+  if (!birthdate) return Swal.fire("Error 630","Selecciona tu fecha de nacimiento","error");
 
   const birth = new Date(birthdate);
 
   if (birth > today) {
-    return alert("Fecha inválida");
+    return Swal.fire("Error 630","Fecha inválida","error");
   }
 
   try {
@@ -64,15 +65,15 @@ export default function Register() {
     const data = await res.json();
 
     if (!res.ok) {
-      return alert(data.message);
+      return Swal.fire("Error 896",data.message,"error");
     }
 
-    alert("Registro exitoso");
+    Swal.fire("Registro","Registro exitoso","success");
     navigate("/login");
 
   } catch (error) {
     console.error(error);
-    alert("Error en registro");
+    Swal.fire("Error 631","Error en registro","error");
   }
 };
 
@@ -139,6 +140,7 @@ export default function Register() {
           <input
             type="date"
             className="border p-2 w-full mb-3 rounded"
+            placeholder="Ingresa tu fecha de nacimiento"
             onChange={(e) => setBirthdate(e.target.value)}
           />
 
