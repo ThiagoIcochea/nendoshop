@@ -1,17 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 export default function ApiComentarios() {
-
   const navigate = useNavigate();
 
-  const auth = JSON.parse(localStorage.getItem("auth")) || null;
+  const auth = useMemo(() => {
+    return JSON.parse(localStorage.getItem("auth")) || null;
+  }, []);
 
   const [url, setUrl] = useState("");
 
   useEffect(() => {
-
     if (!auth) {
       navigate("/login");
       return;
@@ -24,7 +24,6 @@ export default function ApiComentarios() {
 
     const loadConfig = async () => {
       try {
-
         const res = await fetch(
           "https://backendproyectodf.onrender.com/api/configs/apiComentarios",
           {
@@ -43,20 +42,16 @@ export default function ApiComentarios() {
         if (data) {
           setUrl(data.value);
         }
-
       } catch (err) {
         console.log(err);
       }
     };
 
     loadConfig();
-
   }, [navigate, auth]);
 
-  
   const save = async () => {
     try {
-
       const res = await fetch(
         "https://backendproyectodf.onrender.com/api/configs/apiComentarios",
         {
@@ -75,15 +70,14 @@ export default function ApiComentarios() {
       const data = await res.json();
 
       if (!res.ok) {
-       Swal.fire("Error 896",data.message || "Error al guardar","error");
+        Swal.fire("Error 896", data.message || "Error al guardar", "error");
         return;
       }
 
-      Swal.fire("Registro exitoso","API guardada correctamente","success");
-
+      Swal.fire("Registro exitoso", "API guardada correctamente", "success");
     } catch (err) {
       console.log(err);
-      Swal.fire("Error 742","Error de servidor","error");
+      Swal.fire("Error 742", "Error de servidor", "error");
     }
 
     if (!auth || auth.role !== "admin") {
@@ -93,12 +87,10 @@ export default function ApiComentarios() {
 
   return (
     <div className="p-6 max-w-xl mx-auto animate__animated animate__fadeIn">
+      <h1 className="text-2xl font-bold mb-6">API de Comentarios</h1>
 
-      <h1 className="text-2xl font-bold mb-6">
-        API de Comentarios
-      </h1>
-
-      <input type="text"
+      <input
+        type="text"
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         placeholder="https://tu-ngrok/ia"
@@ -106,7 +98,6 @@ export default function ApiComentarios() {
       />
 
       <div className="flex gap-3">
-
         <button
           onClick={save}
           className="bg-brand text-white px-6 py-2 rounded"
@@ -120,9 +111,7 @@ export default function ApiComentarios() {
         >
           Volver
         </button>
-
       </div>
-
     </div>
   );
 }
