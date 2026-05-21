@@ -16,69 +16,45 @@ import logo from "./Assets/logo.png";
 export default function Navbar() {
 
   const navigate = useNavigate();
-
   const { auth, setAuth } = useContext(AuthContext);
 
   const [cartCount, setCartCount] = useState(0);
-
   const [menuOpen, setMenuOpen] = useState(false);
+  const [adminMenu, setAdminMenu] = useState(false);
+  const [adminTimeout, setAdminTimeout] = useState(null);
 
   const [search, setSearch] = useState(
     localStorage.getItem("productSearch") || ""
   );
 
   const updateCartCount = () => {
-
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-    const total = cart.reduce(
-      (acc, item) => acc + item.quantity,
-      0
-    );
-
+    const total = cart.reduce((acc, item) => acc + item.quantity, 0);
     setCartCount(total);
-
   };
 
   useEffect(() => {
-
     updateCartCount();
-
     const handleStorage = () => updateCartCount();
-
     window.addEventListener("storage", handleStorage);
-
-    return () =>
-      window.removeEventListener("storage", handleStorage);
-
+    return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
   const handleLogout = () => {
-
     setAuth(null);
-
     localStorage.removeItem("auth");
-
     navigate("/login");
-
   };
 
   const handleSearch = (e) => {
-
     if (e.key === "Enter") {
-
       localStorage.setItem("productSearch", search);
-
       navigate("/catalog");
-
       setMenuOpen(false);
-
     }
-
   };
 
   return (
-
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -94,10 +70,7 @@ export default function Navbar() {
               <Menu className="w-7 h-7" />
             </button>
 
-            <Link
-              to="/"
-              className="flex items-center gap-3"
-            >
+            <Link to="/" className="flex items-center gap-3">
 
               <img
                 src={logo}
@@ -113,35 +86,78 @@ export default function Navbar() {
 
             <nav className="hidden md:flex items-center gap-6 border-l border-gray-200 pl-6">
 
-              <Link
-                to="/"
-                className="text-gray-600 hover:text-brand font-medium transition-colors"
-              >
+              <Link to="/" className="text-gray-600 hover:text-brand font-medium transition-colors">
                 Inicio
               </Link>
 
-              <Link
-                to="/about"
-                className="text-gray-600 hover:text-brand font-medium transition-colors"
-              >
+              <Link to="/about" className="text-gray-600 hover:text-brand font-medium transition-colors">
                 Nosotros
               </Link>
 
-              <Link
-                to="/catalog"
-                className="text-gray-600 hover:text-brand font-medium transition-colors"
-              >
+              <Link to="/catalog" className="text-gray-600 hover:text-brand font-medium transition-colors">
                 Catálogo
               </Link>
 
               {auth && auth.role === "admin" && (
 
-                <Link
-                  to="/dashboard"
-                  className="text-gray-600 hover:text-brand font-medium transition-colors"
+                <div
+                  className="relative"
+                  onMouseEnter={() => {
+                    if (adminTimeout) clearTimeout(adminTimeout);
+                    setAdminMenu(true);
+                  }}
+                  onMouseLeave={() => {
+                    const t = setTimeout(() => setAdminMenu(false), 200);
+                    setAdminTimeout(t);
+                  }}
                 >
-                  Dashboard
-                </Link>
+
+                  <button
+                    onClick={() => {
+                      if (window.innerWidth < 768) {
+                        setAdminMenu(v => !v);
+                      } else {
+                        navigate("/dashboard");
+                      }
+                    }}
+                    className="text-gray-600 hover:text-brand font-medium transition-colors"
+                  >
+                    Dashboard
+                  </button>
+
+                  {adminMenu && (
+
+                    <div className="absolute top-10 left-0 bg-white shadow-lg rounded-lg border w-48 py-2 z-50">
+
+                      <Link
+                        to="/dashboard/payments"
+                        className="block px-4 py-2 hover:bg-gray-100"
+                        onClick={() => setAdminMenu(false)}
+                      >
+                        Pagos
+                      </Link>
+
+                      <Link
+                        to="/dashboard/clients"
+                        className="block px-4 py-2 hover:bg-gray-100"
+                        onClick={() => setAdminMenu(false)}
+                      >
+                        Clientes
+                      </Link>
+
+                      <Link
+                        to="/dashboard/products"
+                        className="block px-4 py-2 hover:bg-gray-100"
+                        onClick={() => setAdminMenu(false)}
+                      >
+                        Productos
+                      </Link>
+
+                    </div>
+
+                  )}
+
+                </div>
 
               )}
 
@@ -154,173 +170,7 @@ export default function Navbar() {
             <div className="relative">
 
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-
                 <Search className="h-5 w-5 text-brand" />
-
-              </div>
-
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={handleSearch}
-                className="block w-full pl-10 pr-3 py-2 border border-brand rounded-full leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-brand focus:border-brand sm:text-sm"
-                placeholder="Buscar productos..."
-              />
-
-            </div>
-
-          </div>
-
-          <div className="flex items-center gap-3">
-
-            {!auth ? (
-
-              <Link
-                to="/login"
-                className="flex items-center gap-2 text-brand hover:text-brand-dark font-medium"
-              >
-
-                <User className="h-5 w-5" />
-
-                <span className="hidden lg:inline">
-                  Login
-                </span>
-
-              </Link>
-
-            ) : (
-
-              <>
-
-                <Link to="/profile">
-
-                  <div className="w-10 h-10 rounded-full overflow-hidden bg-brand flex items-center justify-center text-white font-bold text-sm cursor-pointer hover:opacity-80 transition">
-
-                    {auth.profileImg ? (
-
-                      <img
-                        src={auth.profileImg}
-                        alt="avatar"
-                        className="w-full h-full object-cover scale-90"
-                      />
-
-                    ) : (auth.name || auth.lastname) ? (
-
-                      (auth.name?.[0] || "") +
-                      (auth.lastname?.[0] || "")
-
-                    ) : (
-                      "U"
-                    )}
-
-                  </div>
-
-                </Link>
-
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-2 text-red-500 hover:text-red-700 font-medium"
-                >
-
-                  <LogOut className="h-5 w-5" />
-
-                  <span className="hidden lg:inline">
-                    Logout
-                  </span>
-
-                </button>
-
-              </>
-
-            )}
-
-            <button
-              onClick={() => navigate("/cart")}
-              className="flex items-center gap-2 text-brand hover:text-brand-dark relative group"
-            >
-
-              <div className="p-2 bg-brand/10 rounded-full group-hover:bg-brand/20">
-
-                <ShoppingCart className="h-5 w-5" />
-
-              </div>
-
-              {cartCount > 0 && (
-
-                <span className="absolute top-0 right-0 -mt-1 -mr-1 flex h-5 w-5 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">
-
-                  {cartCount}
-
-                </span>
-
-              )}
-
-            </button>
-
-            {auth && auth.role === "admin" && (
-
-              <Link
-                to="/api-comentarios"
-                className="hidden md:flex items-center gap-2 text-gray-600 hover:text-brand font-medium transition-colors"
-              >
-
-                <Settings className="h-5 w-5" />
-
-                <span className="hidden lg:inline">
-                  Settings
-                </span>
-
-              </Link>
-
-            )}
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <div
-        className={`fixed inset-0 z-50 transition-all duration-300 ${
-          menuOpen
-            ? "visible bg-black/40"
-            : "invisible bg-black/0"
-        }`}
-      >
-
-        <div
-          className={`fixed top-0 left-0 h-full w-72 bg-white shadow-xl transition-transform duration-300 ${
-            menuOpen
-              ? "translate-x-0"
-              : "-translate-x-full"
-          }`}
-        >
-
-          <div className="flex items-center justify-between p-5 border-b">
-
-            <h2 className="font-bold text-xl">
-              Menú
-            </h2>
-
-            <button
-              onClick={() => setMenuOpen(false)}
-            >
-
-              <X className="w-6 h-6" />
-
-            </button>
-
-          </div>
-
-          <div className="p-5">
-
-            <div className="relative mb-6 sm:hidden">
-
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-
-                <Search className="h-5 w-5 text-brand" />
-
               </div>
 
               <input
@@ -334,63 +184,78 @@ export default function Navbar() {
 
             </div>
 
-            <nav className="flex flex-col gap-5">
+          </div>
 
-              <Link
-                to="/"
-                onClick={() => setMenuOpen(false)}
-                className="text-gray-700 font-medium"
-              >
-                Inicio
+          <div className="flex items-center gap-3">
+
+            {!auth ? (
+
+              <Link to="/login" className="flex items-center gap-2 text-brand hover:text-brand-dark font-medium">
+                <User className="h-5 w-5" />
+                <span className="hidden lg:inline">Login</span>
               </Link>
 
-              <Link
-                to="/about"
-                onClick={() => setMenuOpen(false)}
-                className="text-gray-700 font-medium"
-              >
-                Nosotros
-              </Link>
+            ) : (
 
-              <Link
-                to="/catalog"
-                onClick={() => setMenuOpen(false)}
-                className="text-gray-700 font-medium"
-              >
-                Catálogo
-              </Link>
+              <>
 
-              {auth && auth.role === "admin" && (
+                <Link to="/profile">
 
-                <>
-                  <Link
-                    to="/dashboard"
-                    onClick={() => setMenuOpen(false)}
-                    className="text-gray-700 font-medium"
-                  >
-                    Dashboard
-                  </Link>
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-brand flex items-center justify-center text-white font-bold text-sm">
 
-                  <Link
-                    to="/api-comentarios"
-                    onClick={() => setMenuOpen(false)}
-                    className="text-gray-700 font-medium"
-                  >
-                    Settings
-                  </Link>
-                </>
+                    {auth.profileImg ? (
+                      <img src={auth.profileImg} className="w-full h-full object-cover" />
+                    ) : (
+                      (auth.name?.[0] || "") + (auth.lastname?.[0] || "")
+                    )}
 
+                  </div>
+
+                </Link>
+
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 text-red-500 hover:text-red-700 font-medium"
+                >
+                  <LogOut className="h-5 w-5" />
+                  <span className="hidden lg:inline">Logout</span>
+                </button>
+
+              </>
+
+            )}
+
+            <button
+              onClick={() => navigate("/cart")}
+              className="relative text-brand hover:text-brand-dark"
+            >
+              <ShoppingCart className="h-5 w-5" />
+
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-brand text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                  {cartCount}
+                </span>
               )}
 
-            </nav>
+            </button>
+
+            {auth && auth.role === "admin" && (
+
+              <Link
+                to="/api-comentarios"
+                className="hidden md:flex items-center gap-2 text-gray-600 hover:text-brand"
+              >
+                <Settings className="h-5 w-5" />
+                <span className="hidden lg:inline">Settings</span>
+              </Link>
+
+            )}
 
           </div>
 
         </div>
 
       </div>
-
     </header>
-
   );
 }
