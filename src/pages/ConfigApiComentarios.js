@@ -79,7 +79,7 @@ export default function ApiComentarios() {
         return;
       }
 
-      Swal.fire("Registro exitoso","API guardada correctamente ✅","success");
+      Swal.fire("Registro exitoso","API guardada correctamente","success");
 
     } catch (err) {
       console.log(err);

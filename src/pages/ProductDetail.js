@@ -100,7 +100,7 @@ export default function ProductDetail() {
 
     window.dispatchEvent(new Event("storage"));
 
-   Swal.fire("Carrito"," Producto Agregado 🛒","success");
+   Swal.fire("Carrito"," Producto agregado al carrito","success");
 
   };
 
@@ -146,7 +146,7 @@ export default function ProductDetail() {
       const modData = await modRes.json();
 
       if (modData?.estado !== "OK") {
-        Swal.fire("Error", "Comentario Inapropiado 🚫","error");
+        Swal.fire("Error", "Comentario Inapropiado","error");
         return;
       }
 
@@ -173,11 +173,11 @@ export default function ProductDetail() {
       setComment("");
       setRating(5);
 
-      Swal.fire("Registro exitoso","Comentario publicado ✅","success");
+      Swal.fire("Registro exitoso","Comentario publicado","success");
 
     } catch (error) {
 
-      Swal.fire("Error 678", "Error conectando con el servidor ❌","error");
+      Swal.fire("Error 678", "Error conectando con el servidor","error");
 
     }
   };
