@@ -140,7 +140,7 @@ export default function Register() {
           <input
             type="date"
             className="border p-2 w-full mb-3 rounded"
-            placeholder="Ingresa tu fecha de nacimiento"
+           
             onChange={(e) => setBirthdate(e.target.value)}
           />
 

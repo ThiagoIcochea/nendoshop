@@ -249,7 +249,7 @@ export default function Products() {
           </table>
         </div>
 
-        {/* MOBILE CARDS */}
+       
         <div className="md:hidden space-y-4">
           {currentProducts.map((p) => (
             <div key={p._id} className="bg-gray-50 rounded-xl p-4 shadow-sm">
