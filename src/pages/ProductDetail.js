@@ -146,7 +146,7 @@ export default function ProductDetail() {
       const modData = await modRes.json();
 
       if (modData?.estado !== "OK") {
-        Swal.fire("Contenido Inapropiado", "Comentario bloqueado 🚫","error");
+        Swal.fire("Error", "Comentario Inapropiado 🚫","error");
         return;
       }
 
