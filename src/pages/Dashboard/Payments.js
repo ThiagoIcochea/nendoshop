@@ -54,10 +54,7 @@ export default function Payments() {
 
   }, []);
 
-  const logout = () => {
-    localStorage.removeItem("auth");
-    navigate("/login");
-  };
+  
 
   const totalVentas = pagos.reduce(
     (acc, pago) => acc + (pago.total || 0),
@@ -102,12 +99,7 @@ export default function Payments() {
           </p>
         </div>
 
-        <button
-          onClick={logout}
-          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition w-full md:w-auto"
-        >
-          Cerrar sesión
-        </button>
+        
 
       </div>
 
