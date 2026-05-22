@@ -22,6 +22,14 @@ NendoShop is an online store dedicated to **Nendoroids**, collectible figures in
 ### Target Audience
 Anime and manga enthusiasts, gamers, and figure collectors aged **15–35** who value official, high-quality Nendoroids and fast, secure online shopping.
 
+### Members
+
+-Icochea Rodriguez, Thiago Paolo (U22330428) 
+-Chabria Loayza, Percy Alonzo (U20217294) 
+-Rojas Olano, Aaron Toribio (U22210544) 
+-Carbajal Añanca, Melany Daniela (U22222750) 
+-Guevara Morales, Antonio Nicolás (U22217586) 
+
 ---
 
 ## Versión en Español
@@ -48,3 +56,11 @@ NendoShop es una tienda en línea dedicada a **Nendoroids**, figuras coleccionab
 
 ### Público Objetivo
 Entusiastas de anime y manga, gamers y coleccionistas de figuras de **15 a 35 años** que valoran Nendoroids oficiales y de alta calidad, y desean compras en línea seguras y rápidas.
+
+### Integrantes
+
+-Icochea Rodriguez, Thiago Paolo (U22330428) 
+-Chabria Loayza, Percy Alonzo (U20217294) 
+-Rojas Olano, Aaron Toribio (U22210544) 
+-Carbajal Añanca, Melany Daniela (U22222750) 
+-Guevara Morales, Antonio Nicolás (U22217586) 
