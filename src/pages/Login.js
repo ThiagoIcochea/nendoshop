@@ -36,7 +36,11 @@ export default function Login() {
 
     
 
-    if(data.user.role ==="user"){
+    if (data.twoFactorRequired) {
+      return navigate("/verify-2fa", { state: { email: user, tempToken: data.tempToken } });
+    }
+
+    if (data.user && data.user.role === "user") {
         setAuth(data.user);
         navigate("/");
     }

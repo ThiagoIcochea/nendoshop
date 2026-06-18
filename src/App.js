@@ -21,6 +21,7 @@ import ApiComentarios from "./pages/ConfigApiComentarios";
 import Pagos from "./pages/Pagos";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import TwoFactorAuth from "./pages/TwoFactorAuth";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
             <Route path="/catalog" element={<Catalog />} />
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/verify-2fa" element={<TwoFactorAuth />} />
             <Route path="/admin-access-panel" element={<AdminAccess />} />
             <Route path="/register" element={<Register />} />
 
