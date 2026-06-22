@@ -22,6 +22,7 @@ import Pagos from "./pages/Pagos";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import TwoFactorAuth from "./pages/TwoFactorAuth";
+import ChatPage from "./pages/ChatPage";
 
 function App() {
   return (
@@ -60,8 +61,9 @@ function App() {
               <Route path="clients" element={<Clients />} />
               <Route path="products" element={<Products />} />
             </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              <Route path="/chat" element={<ChatPage />} />
+             <Route path="*" element={<NotFound />} />
+           </Routes>
         </main>
 
         <Footer />

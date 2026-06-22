@@ -1,0 +1,151 @@
+import MessageBubble from "../MessageBubble";
+import MessageInput from "../MessageInput";
+import TypingIndicator from "../TypingIndicator";
+
+export default function ChatWindow({
+  currentChat,
+  messages,
+  typingUser,
+  sendMessage,
+  sendTyping,
+}) {
+
+  const chatData = {
+    community: {
+      icon: "🌎",
+      title: "Comunidad",
+      subtitle: "Conecta con usuarios en tiempo real",
+      emptyTitle: "Aún no hay mensajes",
+      emptySubtitle: "Inicia la conversación con la comunidad 🚀",
+    },
+    support: {
+      icon: "🎧",
+      title: "Soporte",
+      subtitle: "Atención y ayuda para NendoShop",
+      emptyTitle: "No hay consultas todavía",
+      emptySubtitle: "¿Necesitas ayuda? Escríbenos 💜",
+    },
+  };
+
+  const chat = chatData[currentChat];
+
+  return (
+    <main className="flex flex-col h-full bg-gradient-to-b from-white via-purple-50/20 to-white">
+
+      <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-purple-100">
+
+        <div className="h-20 px-8 flex items-center justify-between">
+
+          <div className="flex items-center gap-4">
+
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-500 text-white flex items-center justify-center text-xl shadow-md">
+              {chat.icon}
+            </div>
+
+            <div>
+
+              <div className="flex items-center gap-3">
+
+                <h2 className="font-bold text-gray-800 text-lg">
+                  {chat.title}
+                </h2>
+
+                <span className="px-2 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-medium">
+                  live
+                </span>
+
+              </div>
+
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+
+                <span className="relative flex h-2.5 w-2.5">
+
+                  <span className="animate-ping absolute h-full w-full rounded-full bg-green-400 opacity-75"></span>
+
+                  <span className="relative rounded-full h-2.5 w-2.5 bg-green-500"></span>
+
+                </span>
+
+                {chat.subtitle}
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div className="flex items-center gap-2">
+
+            <button className="w-10 h-10 rounded-xl hover:bg-purple-50 text-gray-500 hover:text-purple-600 transition">
+              🔔
+            </button>
+
+            <button className="w-10 h-10 rounded-xl hover:bg-purple-50 text-gray-500 hover:text-purple-600 transition">
+              📌
+            </button>
+
+            <button className="w-10 h-10 rounded-xl hover:bg-purple-50 text-gray-500 hover:text-purple-600 transition">
+              ⋮
+            </button>
+
+          </div>
+
+        </div>
+
+      </header>
+
+      <div className="flex-1 overflow-y-auto">
+
+        <div className="max-w-4xl mx-auto px-8 py-6 space-y-4">
+
+          {messages.length === 0 && (
+
+            <div className="h-full flex flex-col items-center justify-center mt-32">
+
+              <div className="w-24 h-24 rounded-3xl bg-purple-100 flex items-center justify-center text-4xl shadow-lg mb-6">
+                {chat.icon}
+              </div>
+
+              <h2 className="text-xl font-bold text-gray-700">
+                {chat.emptyTitle}
+              </h2>
+
+              <p className="text-sm text-gray-400 mt-2">
+                {chat.emptySubtitle}
+              </p>
+
+            </div>
+
+          )}
+
+          {messages.map((msg, i) => (
+            <MessageBubble
+              key={msg.id || i}
+              {...msg}
+            />
+          ))}
+
+          {typingUser && (
+            <TypingIndicator
+              typingUser={typingUser}
+            />
+          )}
+
+        </div>
+
+      </div>
+
+      <div className="bg-white/80 backdrop-blur-xl border-t border-purple-100">
+
+        <div className="max-w-4xl mx-auto">
+          <MessageInput
+            sendMessage={sendMessage}
+            sendTyping={sendTyping}
+          />
+        </div>
+
+      </div>
+
+    </main>
+  );
+}
