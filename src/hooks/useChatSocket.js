@@ -16,8 +16,13 @@ const getBackendUrl = () => {
 };
 
 const BACKEND_URL = getBackendUrl();
-const WS_PROTOCOL = BACKEND_URL.startsWith("https") ? "wss" : "ws";
-const WS_URL = BACKEND_URL.replace(/^http/, WS_PROTOCOL);
+const getWebSocketUrl = () => {
+  if (!BACKEND_URL) return null;
+  if (BACKEND_URL.startsWith("https://")) return BACKEND_URL.replace("https://", "wss://");
+  if (BACKEND_URL.startsWith("http://")) return BACKEND_URL.replace("http://", "ws://");
+  return BACKEND_URL;
+};
+const WS_URL = getWebSocketUrl();
 
 const fetchRoomMessages = async (roomKey) => {
   const response = await fetch(`${BACKEND_URL}/api/chat/rooms/${roomKey}/messages?limit=200`, {
