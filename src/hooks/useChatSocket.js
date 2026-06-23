@@ -1,6 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
+const getBackendUrl = () => {
+  if (process.env.REACT_APP_BACKEND_URL) {
+    return process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "");
+  }
+
+  if (typeof window !== "undefined") {
+    const hostname = window.location.hostname;
+    if (hostname === "localhost" || hostname === "127.0.0.1") {
+      return "http://localhost:4000";
+    }
+  }
+
+  return "https://backendproyectodf.onrender.com";
+};
+
+const BACKEND_URL = getBackendUrl();
 const WS_PROTOCOL = BACKEND_URL.startsWith("https") ? "wss" : "ws";
 const WS_URL = BACKEND_URL.replace(/^http/, WS_PROTOCOL);
 
