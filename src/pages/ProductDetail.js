@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ParticlesBackground from "../components/ParticlesBackground";
 import CommentCard from "../components/CommentCard";
 import Swal from "sweetalert2";
@@ -26,6 +26,7 @@ export default function ProductDetail() {
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
   const [comments, setComments] = useState([]);
+  const wsRef = useRef(null);
 
   const [page, setPage] = useState(1);
   const pageSize = 5;
@@ -57,6 +58,41 @@ export default function ProductDetail() {
       })
       .catch(() => setLoading(false));
 
+  }, [_id]);
+
+  useEffect(() => {
+    const host = window.location.hostname === "localhost"
+      ? "localhost:4000"
+      : "backendproyectodf.onrender.com";
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const wsUrl = `${protocol}://${host}`;
+
+    const socket = new WebSocket(wsUrl);
+    wsRef.current = socket;
+
+    socket.addEventListener("open", () => {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+          type: "subscribe",
+          productId: _id
+        }));
+      }
+    });
+
+    socket.addEventListener("message", (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === "comment-update" && data.productId === _id) {
+          setComments(data.comments || []);
+        }
+      } catch (err) {
+        console.error("WS parse error", err);
+      }
+    });
+
+    return () => {
+      socket.close();
+    };
   }, [_id]);
 
   if (!loading && !product) {
@@ -115,41 +151,6 @@ export default function ProductDetail() {
 
     try {
 
-      const configRes = await fetch(
-        "https://backendproyectodf.onrender.com/api/configs/apiComentarios",
-        {
-          method: "GET",
-          credentials: "include"
-        }
-      );
-
-      const configData = await configRes.json();
-
-      const apiUrl = configData?.value;
-
-      if (!apiUrl) {
-        Swal.fire("Error 999","No hay API configurada", "error");
-        return;
-      }
-
-      const modRes = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          texto: comment,
-          modo: "comentario"
-        })
-      });
-
-      const modData = await modRes.json();
-
-      if (modData?.estado !== "OK") {
-        Swal.fire("Error", "Comentario Inapropiado","error");
-        return;
-      }
-
       const saveRes = await fetch(
         `https://backendproyectodf.onrender.com/api/products/${_id}/comments`,
         {
@@ -168,8 +169,12 @@ export default function ProductDetail() {
 
       const saveData = await saveRes.json();
 
-      setComments(saveData.comments || []);
+      if (!saveRes.ok) {
+        const errorMessage = saveData?.message || "No se pudo agregar el comentario";
+        return Swal.fire("Error", errorMessage, "error");
+      }
 
+      setComments(saveData.comments || []);
       setComment("");
       setRating(5);
 
