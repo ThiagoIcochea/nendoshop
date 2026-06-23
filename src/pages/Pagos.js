@@ -128,35 +128,28 @@ export default function Pagos() {
     if (card.cardNumber.length < 16) {
       return Swal.fire("Error 630","Por favor, completa los 16 dígitos de la tarjeta.","error");
     }
-  
+
     if (card.cardCVV.length < 3) {
       Swal.fire("Error 630","⚠️ Error de Facturación: El código CVV es inválido.","error");
       return;
     }
 
     setPaymentStatus("procesando");
-    setTimeout(async () => {
-      try {
-      
-        setPaymentStatus("procesando");
-  
+
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://backendproyectodf.onrender.com";
       const paymentData = {
         cliente: user ? `${user.name} ${user.lastname}` : "Cliente Anónimo",
-        
-        // Lógica de Comprobante
         tipo_comprobante: envioDatos.tipoComprobante,
         documento: envioDatos.documento,
         razon_social: envioDatos.tipoComprobante === "factura" ? envioDatos.razonSocial : undefined,
-        
-        // Lógica de Envío
         metodo_envio: envioDatos.metodoEnvio,
-        direccion_entrega: envioDatos.metodoEnvio === "delivery" 
-          ? `${envioDatos.direccionEntrega.calle}, ${envioDatos.direccionEntrega.distrito}` 
+        direccion_entrega: envioDatos.metodoEnvio === "delivery"
+          ? `${envioDatos.direccionEntrega.calle}, ${envioDatos.direccionEntrega.distrito}`
           : "Recojo en Tienda: Av. Arequipa 265, Lima - Perú",
         referencia: envioDatos.metodoEnvio === "delivery" ? envioDatos.referencia : undefined,
-        
-        envio: envioDatos.metodoEnvio === "delivery" ? 15.00 : 0, // Costo dinámico (opcional)
-        productos: cart.map(p => ({
+        envio: envioDatos.metodoEnvio === "delivery" ? 15.00 : 0,
+        productos: cart.map((p) => ({
           name: p.name,
           quantity: p.quantity,
           price: p.price
@@ -165,28 +158,37 @@ export default function Pagos() {
         estado: "Pagado"
       };
 
-      const res = await fetch("https://backendproyectodf.onrender.com/api/payments", {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 18000);
+
+      const res = await fetch(`${backendUrl}/api/payments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(paymentData)
+        body: JSON.stringify(paymentData),
+        signal: controller.signal
       });
 
-      if (!res.ok) throw new Error("Error en pago");
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Error en pago");
+      }
 
       setPaymentStatus("exito");
       localStorage.removeItem("cart");
       window.dispatchEvent(new Event("storage"));
 
-      setTimeout(() => { navigate("/", { replace: true }); }, 1500);
-
+      setTimeout(() => {
+        navigate("/", { replace: true });
+      }, 1500);
     } catch (err) {
-      console.log(err);
-      Swal("Error 420","Error al procesar pago","error");
+      console.error(err);
+      Swal.fire("Error 420", err.name === "AbortError" ? "La solicitud tardó demasiado. Intenta nuevamente." : "No se pudo procesar el pago. Verifica la conexión e intenta otra vez.", "error");
       setPaymentStatus("inactivo");
     }
-  }, 2000);
-};
+  };
 
   return (
     <div className="relative min-h-screen bg-gray-50 p-4 md:p-10">

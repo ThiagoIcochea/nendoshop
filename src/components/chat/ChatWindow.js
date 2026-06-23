@@ -136,7 +136,7 @@ export default function ChatWindow({
                 text={text}
                 time={time}
                 isOwn={isOwn}
-                profileImg={isOwn ? currentUser?.profileImg : null}
+                profileImg={msg.profileImg || msg.meta?.avatar || msg.avatar || (isOwn ? currentUser?.profileImg : null)}
                 displayName={isOwn ? "Tú" : senderName}
               />
             );
