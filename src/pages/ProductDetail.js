@@ -184,6 +184,11 @@ export default function ProductDetail() {
           return Swal.fire("Comentario bloqueado", errorMessage, "warning");
         }
 
+        // If the error is moderation-related (empty/invalid moderation), show a warning and ask to retry
+        if (/moderaci|verificar el comentario|Respuesta de moderaci|moderación/i.test(errorMessage)) {
+          return Swal.fire("Advertencia", "No se pudo verificar el comentario; inténtalo de nuevo.", "warning");
+        }
+
         return Swal.fire("Error", errorMessage, "error");
       }
 
