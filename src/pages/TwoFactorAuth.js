@@ -17,7 +17,7 @@ import Swal from "sweetalert2";
 export default function TwoFactorAuth() {
   const [code, setCode] = useState(Array(6).fill(""));
   const [loading, setLoading] = useState(false);
-  const [resendTimer, setResendTimer] = useState(60);
+  const [resendTimer, setResendTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
   const [verificationMethod, setVerificationMethod] = useState("email");
 
@@ -28,6 +28,12 @@ export default function TwoFactorAuth() {
 
   const email = location.state?.email || "";
   const tempToken = location.state?.tempToken || "";
+
+  useEffect(() => {
+    if (!email || !tempToken) {
+      navigate("/login");
+    }
+  }, [email, tempToken, navigate]);
 
   useEffect(() => {
     if (resendTimer > 0) {
@@ -102,6 +108,7 @@ export default function TwoFactorAuth() {
       const res = await fetch("https://backendproyectodf.onrender.com/api/auth/resend-2fa", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email, tempToken, method: verificationMethod }),
       });
 
@@ -139,6 +146,7 @@ export default function TwoFactorAuth() {
       const res = await fetch("https://backendproyectodf.onrender.com/api/auth/verify-2fa", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email, tempToken, code: fullCode, method: verificationMethod }),
       });
 
