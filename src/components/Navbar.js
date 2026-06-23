@@ -98,6 +98,12 @@ export default function Navbar() {
                 Catálogo
               </Link>
 
+              {auth && (
+                <Link to="/chat" className="text-gray-600 hover:text-brand font-medium">
+                  Chat
+                </Link>
+              )}
+
               {auth && auth.role === "admin" && (
 
                 <div
@@ -222,6 +228,11 @@ export default function Navbar() {
               <Link to="/" onClick={() => setMenuOpen(false)}>Inicio</Link>
               <Link to="/about" onClick={() => setMenuOpen(false)}>Nosotros</Link>
               <Link to="/catalog" onClick={() => setMenuOpen(false)}>Catálogo</Link>
+              {auth && (
+                <Link to="/chat" onClick={() => setMenuOpen(false)}>
+                  Chat
+                </Link>
+              )}
 
               {auth && auth.role === "admin" && (
                 <>

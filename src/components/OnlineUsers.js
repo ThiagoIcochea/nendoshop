@@ -103,25 +103,6 @@ export default function OnlineUsers({ onlineUsers = [] }) {
 
               </div>
 
-              <button
-                className="
-                  opacity-0
-                  group-hover:opacity-100
-                  transition-all
-                  text-xs
-                  px-3 py-1.5
-                  rounded-xl
-                  bg-white
-                  border border-purple-100
-                  text-purple-600
-                  hover:bg-purple-600
-                  hover:text-white
-                  shadow-sm
-                "
-              >
-                Perfil
-              </button>
-
             </div>
 
           ))

@@ -41,7 +41,7 @@ export default function MessageInput({ sendMessage, sendTyping, disabled }) {
           onClick={handleSend}
           disabled={!canSend || disabled}
           className={`
-            flex items-center justify-center w-10 h-10 rounded-xl transition
+            flex items-center justify-center px-4 h-10 rounded-xl transition
             active:scale-95
             ${
               canSend && !disabled
@@ -50,15 +50,7 @@ export default function MessageInput({ sendMessage, sendTyping, disabled }) {
             }
           `}
         >
-
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-5 h-5"
-          >
-            <path d="M3.4 20.2l17.45-7.48c.79-.34.79-1.45 0-1.79L3.4 3.45c-.81-.35-1.64.46-1.29 1.27l2.2 5.2c.13.31.41.53.74.58l6.86.98c.63.09.63 1 0 1.09l-6.86.98c-.33.05-.61.27-.74.58l-2.2 5.2c-.35.81.48 1.62 1.29 1.27z" />
-          </svg>
+          Enviar mensaje
         </button>
 
       </div>

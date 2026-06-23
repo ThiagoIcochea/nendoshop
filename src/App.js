@@ -61,9 +61,9 @@ function App() {
               <Route path="clients" element={<Clients />} />
               <Route path="products" element={<Products />} />
             </Route>
-              <Route path="/chat" element={<ChatPage />} />
-             <Route path="*" element={<NotFound />} />
-           </Routes>
+            <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </main>
 
         <Footer />
