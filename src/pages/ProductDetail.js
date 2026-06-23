@@ -179,6 +179,11 @@ export default function ProductDetail() {
 
       if (!saveRes.ok) {
         const errorMessage = saveData?.message || responseText || "No se pudo agregar el comentario";
+
+        if (saveRes.status === 403) {
+          return Swal.fire("Comentario bloqueado", errorMessage, "warning");
+        }
+
         return Swal.fire("Error", errorMessage, "error");
       }
 
