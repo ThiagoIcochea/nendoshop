@@ -11,7 +11,7 @@ export default function Home() {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   useEffect(() => {
-    fetch("https://backendproyectodf.onrender.com/api/products",{
+    fetch("https://backendproyectodf.onrender.com/api/products", {
       credentials: "include"
     })
       .then(res => res.json())
@@ -52,7 +52,7 @@ export default function Home() {
 
           <section className="mb-12 relative rounded-2xl overflow-hidden border border-brand bg-white shadow-sm">
 
-<div className="animate__animated animate__fadeInLeft absolute inset-0 bg-gradient-to-r from-white/90 via-white/60 to-transparent z-10 flex flex-col justify-center px-6 sm:px-12">
+            <div className="animate__animated animate__fadeInLeft absolute inset-0 bg-gradient-to-r from-white/90 via-white/60 to-transparent z-10 flex flex-col justify-center px-6 sm:px-12">
 
               <h2 className="text-3xl sm:text-5xl font-black text-gray-900 tracking-tight mb-4">
                 Nendoshop
@@ -75,15 +75,15 @@ export default function Home() {
 
             <div className="h-[260px] sm:h-[420px] w-full flex justify-center sm:justify-end bg-gradient-to-r from-gray-50 to-white">
               <img
-  src="template-banner.png"
-  alt="Nendoroid Hero Banner"
-  className="h-full w-full sm:w-2/3 object-contain object-center animate__animated animate__fadeInRight"
-/>
+                src="template-banner.png"
+                alt="Nendoroid Hero Banner"
+                className="h-full w-full sm:w-2/3 object-contain object-center animate__animated animate__fadeInRight"
+              />
             </div>
 
           </section>
 
-        <section className="flex flex-col sm:flex-row gap-3 sm:gap-0 justify-between items-start sm:items-center mb-6 bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-brand">
+          <section className="flex flex-col sm:flex-row gap-3 sm:gap-0 justify-between items-start sm:items-center mb-6 bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-brand">
 
             <div className="flex items-center gap-2 cursor-pointer group text-sm sm:text-base">
               <Filter className="h-5 w-5 text-brand group-hover:text-brand-dark transition-colors" />
@@ -120,19 +120,19 @@ export default function Home() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
 
               {products.length === 0
-  ? Array.from({ length: 4 }).map((_, i) => (
-      <Card key={i} loading={true} />
-    ))
-  : filteredProducts.slice(0, 4).map((p,i) => (
-      <div
-  className="animate__animated animate__fadeInUp"
-  style={{ animationDelay: `${i * 0.1}s` }}
->
-  <Card key={p._id} {...p} />
-</div>
-    ))
-}
-
+                ? Array.from({ length: 4 }).map((_, i) => (
+                  <Card key={i} loading={true} />
+                ))
+                : filteredProducts.slice(0, 4).map((p, i) => (
+                  <div
+                    key={p._id}
+                    className="animate__animated animate__fadeInUp"
+                    style={{ animationDelay: `${i * 0.1}s` }}
+                  >
+                    <Card {...p} />
+                  </div>
+                ))
+              }
             </div>
 
           </section>
