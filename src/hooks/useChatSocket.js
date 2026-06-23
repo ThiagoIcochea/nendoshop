@@ -42,6 +42,7 @@ export default function useChatSocket(roomKey, username, userId) {
   const socketRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
+  const isMountedRef = useRef(true);
 
   const connectWebSocket = useCallback(() => {
     if (socketRef.current) return;
@@ -50,6 +51,7 @@ export default function useChatSocket(roomKey, username, userId) {
     socketRef.current = socket;
 
     socket.addEventListener("open", () => {
+      if (!isMountedRef.current) return;
       setConnected(true);
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
@@ -107,8 +109,11 @@ export default function useChatSocket(roomKey, username, userId) {
     });
 
     socket.addEventListener("close", () => {
+      if (!isMountedRef.current) return;
       setConnected(false);
-      socketRef.current = null;
+      if (socketRef.current === socket) {
+        socketRef.current = null;
+      }
       if (!reconnectTimeoutRef.current) {
         reconnectTimeoutRef.current = setTimeout(() => {
           reconnectTimeoutRef.current = null;
@@ -123,10 +128,12 @@ export default function useChatSocket(roomKey, username, userId) {
   }, [roomKey, username, userId]);
 
   useEffect(() => {
+    isMountedRef.current = true;
     if (!roomKey || !username) return;
 
     let active = true;
 
+    setMessages([]);
     fetchRoomMessages(roomKey)
       .then((data) => {
         if (!active) return;
@@ -136,10 +143,19 @@ export default function useChatSocket(roomKey, username, userId) {
         console.error(error);
       });
 
-    connectWebSocket();
+    if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
+      connectWebSocket();
+    } else {
+      socketRef.current.send(JSON.stringify({ type: "join", roomKey, username, userId }));
+    }
 
     return () => {
       active = false;
+      isMountedRef.current = false;
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
       if (socketRef.current) {
         socketRef.current.close();
         socketRef.current = null;
@@ -147,13 +163,7 @@ export default function useChatSocket(roomKey, username, userId) {
       setTypingUser("");
       setOnlineUsers([]);
     };
-  }, [roomKey, username, connectWebSocket]);
-
-  useEffect(() => {
-    if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
-    if (!roomKey || !username) return;
-    socketRef.current.send(JSON.stringify({ type: "join", roomKey, username, userId }));
-  }, [roomKey, username, userId]);
+  }, [roomKey, username, userId, connectWebSocket]);
 
   const sendMessage = useCallback((text) => {
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {

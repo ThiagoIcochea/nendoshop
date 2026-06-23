@@ -23,6 +23,7 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import TwoFactorAuth from "./pages/TwoFactorAuth";
 import ChatPage from "./pages/ChatPage";
+import PurchaseAlertModal from "./components/PurchaseAlertModal";
 
 function App() {
   return (
@@ -32,6 +33,8 @@ function App() {
         <Navbar />
 
         
+
+        <PurchaseAlertModal />
 
         <main className="flex-grow">
           <Routes>
