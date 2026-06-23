@@ -1,20 +1,24 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import SidebarChats from "../components/chat/SidebarChats";
 import ChatWindow from "../components/chat/ChatWindow";
 import ChatInfo from "../components/chat/ChatInfo";
-//import useSocket from "../hooks/useSocket";
-import useChatMock from "../hooks/useChatMock";
+import { AuthContext } from "../context/AuthContext";
+import useChatSocket from "../hooks/useChatSocket";
 
 export default function ChatPage() {
   const [currentChat, setCurrentChat] = useState("community");
+  const { auth } = useContext(AuthContext);
 
- const {
-  messages,
-  onlineUsers,
-  typingUser,
-  sendMessage,
-  sendTyping,
-} = useChatMock(currentChat);
+  const username = auth?.name || "Invitado";
+
+  const {
+    messages,
+    onlineUsers,
+    typingUser,
+    sendMessage,
+    sendTyping,
+    connected
+  } = useChatSocket(currentChat, username);
 
   return (
     <div className="h-[calc(100vh-64px)] bg-gradient-to-br from-white via-purple-50/30 to-white overflow-hidden">
@@ -38,6 +42,7 @@ export default function ChatPage() {
               typingUser={typingUser}
               sendMessage={sendMessage}
               sendTyping={sendTyping}
+              connected={connected}
             />
 
           </div>

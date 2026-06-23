@@ -1,11 +1,11 @@
 import { useState } from "react";
 
-export default function MessageInput({ sendMessage, sendTyping }) {
+export default function MessageInput({ sendMessage, sendTyping, disabled }) {
   const [text, setText] = useState("");
 
   const handleSend = () => {
     const trimmed = text.trim();
-    if (!trimmed) return;
+    if (!trimmed || disabled) return;
 
     sendMessage(trimmed, "User");
     setText("");
@@ -39,12 +39,12 @@ export default function MessageInput({ sendMessage, sendTyping }) {
 
         <button
           onClick={handleSend}
-          disabled={!canSend}
+          disabled={!canSend || disabled}
           className={`
             flex items-center justify-center w-10 h-10 rounded-xl transition
             active:scale-95
             ${
-              canSend
+              canSend && !disabled
                 ? "bg-gradient-to-r from-purple-600 to-purple-500 text-white shadow-md hover:shadow-lg hover:shadow-purple-200"
                 : "bg-purple-100 text-purple-300 cursor-not-allowed"
             }
@@ -70,8 +70,8 @@ export default function MessageInput({ sendMessage, sendTyping }) {
           Presiona Enter para enviar
         </span>
 
-        <span className="text-[11px] text-purple-400">
-          Comunidad activa 💬
+        <span className={`text-[11px] ${disabled ? "text-red-400" : "text-purple-400"}`}>
+          {disabled ? "Conexión desconectada" : "Comunidad activa 💬"}
         </span>
 
       </div>

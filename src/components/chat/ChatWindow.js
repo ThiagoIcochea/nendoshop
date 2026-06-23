@@ -8,6 +8,7 @@ export default function ChatWindow({
   typingUser,
   sendMessage,
   sendTyping,
+  connected
 }) {
 
   const chatData = {
@@ -50,8 +51,8 @@ export default function ChatWindow({
                   {chat.title}
                 </h2>
 
-                <span className="px-2 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-medium">
-                  live
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${connected ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                  {connected ? "Conectado" : "Desconectado"}
                 </span>
 
               </div>
@@ -141,6 +142,7 @@ export default function ChatWindow({
           <MessageInput
             sendMessage={sendMessage}
             sendTyping={sendTyping}
+            disabled={!connected}
           />
         </div>
 
