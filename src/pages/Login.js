@@ -30,19 +30,23 @@ export default function Login() {
     const data = await res.json();
 
     if (!res.ok) {
-      
-      return Swal.fire("Error 503",data.message,"error");
+      return Swal.fire("Error 503", data.message, "error");
     }
-
-    
 
     if (data.twoFactorRequired) {
       return navigate("/verify-2fa", { state: { email: user, tempToken: data.tempToken } });
     }
 
-    if (data.user && data.user.role === "user") {
-        setAuth(data.user);
-        navigate("/");
+    if (!data.user) {
+      return Swal.fire("Error","No se recibió información de usuario","error");
+    }
+
+    if (data.user.role === "user") {
+      setAuth(data.user);
+      navigate("/");
+    } else if (data.user.role === "admin") {
+      setAuth(data.user);
+      navigate("/dashboard");
     }
      
 

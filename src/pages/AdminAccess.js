@@ -39,7 +39,7 @@ export default function AdminAccess() {
       const data = await res.json();
 
       if (!res.ok) {
-        return Swal.fire("Error 503",data.message,"error");
+        return Swal.fire("Error 503", data.message, "error");
       }
 
       if (data.twoFactorRequired) {
@@ -53,7 +53,11 @@ export default function AdminAccess() {
         });
       }
 
-      if (data.user?.role !== "admin") {
+      if (!data.user) {
+        return Swal.fire("Error","No se recibió información de usuario","error");
+      }
+
+      if (data.user.role !== "admin") {
         return Swal.fire("Permisos Insuficientes","Acceso denegado","error");
       }
 
