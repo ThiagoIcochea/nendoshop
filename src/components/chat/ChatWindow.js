@@ -8,7 +8,9 @@ export default function ChatWindow({
   typingUser,
   sendMessage,
   sendTyping,
-  connected
+  connected,
+  currentUser,
+  currentUserName
 }) {
 
   const chatData = {
@@ -119,12 +121,26 @@ export default function ChatWindow({
 
           )}
 
-          {messages.map((msg, i) => (
-            <MessageBubble
-              key={msg.id || i}
-              {...msg}
-            />
-          ))}
+          {messages.map((msg, i) => {
+            const senderName = msg.username || msg.user || "Usuario";
+            const text = msg.text || msg.content || "";
+            const time = msg.createdAt
+              ? new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+              : "";
+            const isOwn = senderName === currentUserName || (msg.role === "user" && senderName === (currentUser?.name || currentUser?.email || ""));
+
+            return (
+              <MessageBubble
+                key={msg.id || msg._id || i}
+                user={senderName}
+                text={text}
+                time={time}
+                isOwn={isOwn}
+                profileImg={isOwn ? currentUser?.profileImg : null}
+                displayName={isOwn ? "Tú" : senderName}
+              />
+            );
+          })}
 
           {typingUser && (
             <TypingIndicator

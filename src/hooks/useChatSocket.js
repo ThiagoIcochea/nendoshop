@@ -74,6 +74,13 @@ export default function useChatSocket(roomKey, username) {
           case "room-users":
             setOnlineUsers(payload.users || []);
             break;
+          case "force-disconnect":
+            setConnected(false);
+            if (socketRef.current) {
+              socketRef.current.close();
+              socketRef.current = null;
+            }
+            break;
           case "user-joined":
             setOnlineUsers((prev) => {
               if (prev.some((user) => user.id === payload.user.id)) return prev;

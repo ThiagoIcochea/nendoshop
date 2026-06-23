@@ -1,5 +1,10 @@
-export default function MessageBubble({ user, text, time }) {
-  const isOwn = user === "User";
+export default function MessageBubble({ user, text, time, isOwn, profileImg, displayName }) {
+  const initials = (displayName || user || "U")
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
     <div
@@ -9,11 +14,13 @@ export default function MessageBubble({ user, text, time }) {
     >
       <div className={`flex gap-3 max-w-[75%] items-end`}>
 
-        {!isOwn && (
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 via-fuchsia-500 to-indigo-500 text-white flex items-center justify-center text-xs font-bold shadow-md shrink-0">
-            {user?.[0]?.toUpperCase()}
-          </div>
-        )}
+        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 via-fuchsia-500 to-indigo-500 text-white flex items-center justify-center text-xs font-bold shadow-md shrink-0 overflow-hidden">
+          {profileImg ? (
+            <img src={profileImg} alt={displayName || user} className="w-full h-full object-cover" />
+          ) : (
+            initials
+          )}
+        </div>
 
         <div className="flex flex-col">
 
@@ -27,7 +34,7 @@ export default function MessageBubble({ user, text, time }) {
                 isOwn ? "text-purple-300" : "text-purple-700"
               }`}
             >
-              {isOwn ? "Tú" : user}
+              {displayName || (isOwn ? "Tú" : user)}
             </span>
 
             <span className="text-[11px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200">

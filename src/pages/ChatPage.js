@@ -9,7 +9,7 @@ export default function ChatPage() {
   const [currentChat, setCurrentChat] = useState("community");
   const { auth } = useContext(AuthContext);
 
-  const username = auth?.name || "Invitado";
+  const username = auth?.name || auth?.email || "Invitado";
 
   const {
     messages,
@@ -43,6 +43,8 @@ export default function ChatPage() {
               sendMessage={sendMessage}
               sendTyping={sendTyping}
               connected={connected}
+              currentUser={auth}
+              currentUserName={username}
             />
 
           </div>
