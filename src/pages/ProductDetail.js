@@ -167,7 +167,13 @@ export default function ProductDetail() {
         }
       );
 
-      const saveData = await saveRes.json();
+      let saveData;
+      try {
+        saveData = await saveRes.json();
+      } catch (err) {
+        const text = await saveRes.text();
+        saveData = { message: text || "Respuesta inválida del servidor" };
+      }
 
       if (!saveRes.ok) {
         const errorMessage = saveData?.message || "No se pudo agregar el comentario";
