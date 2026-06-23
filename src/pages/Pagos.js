@@ -143,7 +143,7 @@ export default function Pagos() {
         tipo_comprobante: envioDatos.tipoComprobante,
         documento: envioDatos.documento,
         razon_social: envioDatos.tipoComprobante === "factura" ? envioDatos.razonSocial : undefined,
-        metodo_envio: envioDatos.metodoEnvio,
+        metodo_envio: envioDatos.metodoEnvio === "presencial" ? "recojo" : envioDatos.metodoEnvio,
         direccion_entrega: envioDatos.metodoEnvio === "delivery"
           ? `${envioDatos.direccionEntrega.calle}, ${envioDatos.direccionEntrega.distrito}`
           : "Recojo en Tienda: Av. Arequipa 265, Lima - Perú",

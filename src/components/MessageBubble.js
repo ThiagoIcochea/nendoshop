@@ -1,3 +1,11 @@
+const getAvatarSrc = (profileImg, fallbackName) => {
+  if (!profileImg) return null;
+  if (typeof profileImg === "string" && profileImg.trim()) {
+    return profileImg;
+  }
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName || "Usuario")}&background=7c3aed&color=ffffff`;
+};
+
 export default function MessageBubble({ user, text, time, isOwn, profileImg, displayName }) {
   const initials = (displayName || user || "U")
     .split(" ")
@@ -5,6 +13,8 @@ export default function MessageBubble({ user, text, time, isOwn, profileImg, dis
     .join("")
     .slice(0, 2)
     .toUpperCase();
+
+  const avatarSrc = getAvatarSrc(profileImg, displayName || user || "Usuario");
 
   return (
     <div
@@ -15,8 +25,8 @@ export default function MessageBubble({ user, text, time, isOwn, profileImg, dis
       <div className={`flex gap-3 max-w-[75%] items-end`}>
 
         <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 via-fuchsia-500 to-indigo-500 text-white flex items-center justify-center text-xs font-bold shadow-md shrink-0 overflow-hidden">
-          {profileImg ? (
-            <img src={profileImg} alt={displayName || user} className="w-full h-full object-cover" />
+          {avatarSrc ? (
+            <img src={avatarSrc} alt={displayName || user} className="w-full h-full object-cover" />
           ) : (
             initials
           )}
