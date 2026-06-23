@@ -2,10 +2,11 @@ import { useState } from "react";
 import OnlineUsers from "../OnlineUsers";
 
 
-export default function ChatInfo({ users }) {
+export default function ChatInfo({ users, onReportUser }) {
 
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [reportText, setReportText] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
 
   return (
     <aside className="w-80 h-full bg-white flex flex-col">
@@ -57,7 +58,7 @@ export default function ChatInfo({ users }) {
 
         </div>
 
-        <OnlineUsers onlineUsers={users} />
+        <OnlineUsers onlineUsers={users} onSelectUser={setSelectedUser} />
 
       </div>
 
@@ -96,7 +97,13 @@ export default function ChatInfo({ users }) {
       <div className="p-5 border-t border-purple-100 bg-white">
 
         <button
-          onClick={() => setIsReportOpen(true)}
+          onClick={() => {
+            if (!selectedUser) {
+              alert("Selecciona un usuario de la lista primero");
+              return;
+            }
+            setIsReportOpen(true);
+          }}
           className="
           w-full py-3 rounded-2xl
           bg-gradient-to-r
@@ -146,7 +153,12 @@ export default function ChatInfo({ users }) {
 
               <button
                 onClick={() => {
-                  console.log("Reporte enviado:", reportText);
+                  if (!selectedUser) return;
+                  onReportUser?.({
+                    targetUserId: selectedUser.id,
+                    targetUsername: selectedUser.username,
+                    reason: reportText
+                  });
                   setReportText("");
                   setIsReportOpen(false);
                 }}

@@ -34,13 +34,14 @@ const fetchRoomMessages = async (roomKey) => {
   return response.json();
 };
 
-export default function useChatSocket(roomKey, username) {
+export default function useChatSocket(roomKey, username, userId) {
   const [messages, setMessages] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [typingUser, setTypingUser] = useState("");
   const [connected, setConnected] = useState(false);
   const socketRef = useRef(null);
   const typingTimeoutRef = useRef(null);
+  const reconnectTimeoutRef = useRef(null);
 
   const connectWebSocket = useCallback(() => {
     if (socketRef.current) return;
@@ -50,8 +51,12 @@ export default function useChatSocket(roomKey, username) {
 
     socket.addEventListener("open", () => {
       setConnected(true);
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
       if (roomKey && username) {
-        socket.send(JSON.stringify({ type: "join", roomKey, username }));
+        socket.send(JSON.stringify({ type: "join", roomKey, username, userId }));
       }
     });
 
@@ -104,12 +109,18 @@ export default function useChatSocket(roomKey, username) {
     socket.addEventListener("close", () => {
       setConnected(false);
       socketRef.current = null;
+      if (!reconnectTimeoutRef.current) {
+        reconnectTimeoutRef.current = setTimeout(() => {
+          reconnectTimeoutRef.current = null;
+          connectWebSocket();
+        }, 2500);
+      }
     });
 
     socket.addEventListener("error", () => {
       setConnected(false);
     });
-  }, [roomKey, username]);
+  }, [roomKey, username, userId]);
 
   useEffect(() => {
     if (!roomKey || !username) return;
@@ -141,8 +152,8 @@ export default function useChatSocket(roomKey, username) {
   useEffect(() => {
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
     if (!roomKey || !username) return;
-    socketRef.current.send(JSON.stringify({ type: "join", roomKey, username }));
-  }, [roomKey, username]);
+    socketRef.current.send(JSON.stringify({ type: "join", roomKey, username, userId }));
+  }, [roomKey, username, userId]);
 
   const sendMessage = useCallback((text) => {
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
@@ -157,12 +168,18 @@ export default function useChatSocket(roomKey, username) {
     socketRef.current.send(JSON.stringify({ type: "typing", roomKey }));
   }, [roomKey]);
 
+  const reportUser = useCallback((payload) => {
+    if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
+    socketRef.current.send(JSON.stringify({ type: "report-user", roomKey, ...payload }));
+  }, [roomKey]);
+
   return {
     messages,
     onlineUsers,
     typingUser,
     sendMessage,
     sendTyping,
+    reportUser,
     connected
   };
 }

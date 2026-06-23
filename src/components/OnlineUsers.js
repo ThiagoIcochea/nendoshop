@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function OnlineUsers({ onlineUsers = [] }) {
+export default function OnlineUsers({ onlineUsers = [], onSelectUser }) {
 
   const [searchUser, setSearchUser] = useState("");
 
@@ -43,6 +43,7 @@ export default function OnlineUsers({ onlineUsers = [] }) {
 
             <div
               key={user.id}
+              onClick={() => onSelectUser?.(user)}
               className="
                 group
                 flex items-center justify-between

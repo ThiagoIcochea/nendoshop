@@ -11,14 +11,17 @@ export default function ChatPage() {
 
   const username = auth?.name || auth?.email || "Invitado";
 
+  const userId = auth?._id || auth?.id || auth?.userId || null;
+
   const {
     messages,
     onlineUsers,
     typingUser,
     sendMessage,
     sendTyping,
+    reportUser,
     connected
-  } = useChatSocket(currentChat, username);
+  } = useChatSocket(currentChat, username, userId);
 
   return (
     <div className="h-[calc(100vh-64px)] bg-gradient-to-br from-white via-purple-50/30 to-white overflow-hidden">
@@ -61,7 +64,7 @@ export default function ChatPage() {
           hidden
           xl:block
         ">
-          <ChatInfo users={onlineUsers} />
+          <ChatInfo users={onlineUsers} onReportUser={reportUser} />
         </aside>
 
       </div>
