@@ -176,7 +176,7 @@ export default function TwoFactorAuth() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gray-50 overflow-hidden">
-      <ParticlesBackground />
+      <ParticlesBackground density={30} speed={0.3} />
 
       <div className="relative z-10 w-full max-w-md px-4">
         <div className="bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl border p-8">
