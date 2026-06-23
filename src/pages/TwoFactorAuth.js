@@ -28,6 +28,8 @@ export default function TwoFactorAuth() {
 
   const email = location.state?.email || "";
   const tempToken = location.state?.tempToken || "";
+  const redirectTo = location.state?.redirectTo || "/";
+  const requireAdmin = location.state?.requireAdmin || false;
 
   useEffect(() => {
     if (!email || !tempToken) {
@@ -168,7 +170,11 @@ export default function TwoFactorAuth() {
 
       setTimeout(() => {
         setAuth(data.user);
-        navigate("/");
+        if (requireAdmin && data.user?.role !== "admin") {
+          Swal.fire("Permisos Insuficientes", "Acceso denegado", "error");
+          return navigate("/login");
+        }
+        navigate(redirectTo || (data.user?.role === "admin" ? "/dashboard" : "/"));
       }, 1500);
     } catch (error) {
       setLoading(false);

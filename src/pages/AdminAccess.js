@@ -42,12 +42,22 @@ export default function AdminAccess() {
         return Swal.fire("Error 503",data.message,"error");
       }
 
-      if (data.user.role !== "admin") {
+      if (data.twoFactorRequired) {
+        return navigate("/verify-2fa", {
+          state: {
+            email: user,
+            tempToken: data.tempToken,
+            redirectTo: "/dashboard",
+            requireAdmin: true
+          }
+        });
+      }
+
+      if (data.user?.role !== "admin") {
         return Swal.fire("Permisos Insuficientes","Acceso denegado","error");
       }
 
       setAuth(data.user);
-
       navigate("/dashboard");
 
     } catch (error) {
