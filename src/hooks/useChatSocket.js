@@ -34,7 +34,7 @@ const fetchRoomMessages = async (roomKey) => {
   return response.json();
 };
 
-export default function useChatSocket(roomKey, username, userId) {
+export default function useChatSocket(roomKey, username, userId, profileImg = "") {
   const [messages, setMessages] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [typingUser, setTypingUser] = useState("");
@@ -58,7 +58,7 @@ export default function useChatSocket(roomKey, username, userId) {
         reconnectTimeoutRef.current = null;
       }
       if (roomKey && username) {
-        socket.send(JSON.stringify({ type: "join", roomKey, username, userId }));
+        socket.send(JSON.stringify({ type: "join", roomKey, username, userId, profileImg }));
       }
     });
 
@@ -146,7 +146,7 @@ export default function useChatSocket(roomKey, username, userId) {
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
       connectWebSocket();
     } else {
-      socketRef.current.send(JSON.stringify({ type: "join", roomKey, username, userId }));
+      socketRef.current.send(JSON.stringify({ type: "join", roomKey, username, userId, profileImg }));
     }
 
     return () => {
@@ -163,15 +163,15 @@ export default function useChatSocket(roomKey, username, userId) {
       setTypingUser("");
       setOnlineUsers([]);
     };
-  }, [roomKey, username, userId, connectWebSocket]);
+  }, [roomKey, username, userId, profileImg, connectWebSocket]);
 
   const sendMessage = useCallback((text) => {
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
       console.warn("Socket no conectado");
       return;
     }
-    socketRef.current.send(JSON.stringify({ type: "message", roomKey, text }));
-  }, [roomKey]);
+    socketRef.current.send(JSON.stringify({ type: "message", roomKey, text, username, userId, profileImg }));
+  }, [roomKey, username, userId, profileImg]);
 
   const sendTyping = useCallback(() => {
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;

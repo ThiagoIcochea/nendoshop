@@ -67,6 +67,14 @@ export default function PurchaseAlertModal() {
         <p className="mt-2 text-xs text-purple-700 font-medium">
           {alert.message}
         </p>
+        {alert.productId ? (
+          <a
+            href={`/product/${alert.productId}`}
+            className="mt-3 inline-flex items-center rounded-full bg-purple-600 px-3 py-2 text-sm font-semibold text-white hover:bg-purple-700"
+          >
+            Ver detalle del producto
+          </a>
+        ) : null}
       </div>
     </div>,
     document.body

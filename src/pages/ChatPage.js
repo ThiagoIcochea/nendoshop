@@ -21,7 +21,7 @@ export default function ChatPage() {
     sendTyping,
     reportUser,
     connected
-  } = useChatSocket(currentChat, username, userId);
+  } = useChatSocket(currentChat, username, userId, auth?.profileImg || "");
 
   return (
     <div className="h-[calc(100vh-64px)] bg-gradient-to-br from-white via-purple-50/30 to-white overflow-hidden">
