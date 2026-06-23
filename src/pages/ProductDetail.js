@@ -167,16 +167,18 @@ export default function ProductDetail() {
         }
       );
 
-      let saveData;
-      try {
-        saveData = await saveRes.json();
-      } catch (err) {
-        const text = await saveRes.text();
-        saveData = { message: text || "Respuesta inválida del servidor" };
+      const responseText = await saveRes.text();
+      let saveData = {};
+      if (responseText) {
+        try {
+          saveData = JSON.parse(responseText);
+        } catch {
+          saveData = { message: responseText };
+        }
       }
 
       if (!saveRes.ok) {
-        const errorMessage = saveData?.message || "No se pudo agregar el comentario";
+        const errorMessage = saveData?.message || responseText || "No se pudo agregar el comentario";
         return Swal.fire("Error", errorMessage, "error");
       }
 
@@ -187,9 +189,7 @@ export default function ProductDetail() {
       Swal.fire("Registro exitoso","Comentario publicado","success");
 
     } catch (error) {
-
-      Swal.fire("Error 678", "Error conectando con el servidor","error");
-
+      Swal.fire("Error 678", `Error conectando con el servidor: ${error.message || error}`, "error");
     }
   };
 

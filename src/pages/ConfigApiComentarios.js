@@ -50,8 +50,25 @@ export default function ApiComentarios() {
     loadConfig();
   }, [navigate, auth]);
 
+  const normalizeKey = (value) => {
+    if (!value) return "";
+    const trimmed = value.trim();
+    try {
+      const url = new URL(trimmed);
+      const match = url.pathname.match(/(gsk_[A-Za-z0-9_-]+)/);
+      if (match) {
+        return match[1];
+      }
+      return trimmed;
+    } catch {
+      const match = trimmed.match(/(gsk_[A-Za-z0-9_-]+)/);
+      return match ? match[1] : trimmed;
+    }
+  };
+
   const save = async () => {
     try {
+      const normalized = normalizeKey(url);
       const res = await fetch(
         "https://backendproyectodf.onrender.com/api/configs/apiComentarios",
         {
@@ -61,7 +78,7 @@ export default function ApiComentarios() {
           },
           credentials: "include",
           body: JSON.stringify({
-            value: url,
+            value: normalized,
             tipo: "string"
           })
         }
