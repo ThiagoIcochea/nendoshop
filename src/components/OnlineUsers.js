@@ -131,7 +131,7 @@ export default function OnlineUsers({ onlineUsers = [], onSelectUser }) {
                   </p>
 
                   <p className="text-xs text-gray-400">
-                    {user.online ? "Activo ahora" : "Desconectado"}
+                    {user.online === true || user.connected === true || user.status === "connected" ? "Conectado" : "Desconectado"}
                   </p>
 
                 </div>
