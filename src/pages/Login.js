@@ -12,6 +12,7 @@ export default function Login() {
   const [resetEmail, setResetEmail] = useState("");
   const [resetPassword, setResetPassword] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
   const navigate = useNavigate()
   const { setAuth } = useContext(AuthContext);
 
@@ -156,37 +157,45 @@ export default function Login() {
             <button
               type="button"
               className="text-sm text-brand hover:underline"
-              onClick={() => setResetMode((value) => !value)}
+              onClick={() => {
+                setResetEmail(user);
+                setShowResetModal(true);
+              }}
             >
-              {resetMode ? "Ocultar recuperación" : "¿Olvidaste tu contraseña?"}
+              ¿Olvidaste tu contraseña?
             </button>
           </div>
-
-          {resetMode && (
-            <form onSubmit={handleForgotPassword} className="mt-4 border-t pt-4">
-              <input
-                className="border p-2 w-full mb-2 rounded"
-                placeholder="Correo para recuperar"
-                value={resetEmail}
-                onChange={(e) => setResetEmail(e.target.value)}
-              />
-              <input
-                type="password"
-                className="border p-2 w-full mb-2 rounded"
-                placeholder="Nueva contraseña"
-                value={resetPassword}
-                onChange={(e) => setResetPassword(e.target.value)}
-              />
-              <button
-                type="submit"
-                className="w-full bg-gray-800 text-white py-2 rounded"
-                disabled={resetLoading}
-              >
-                {resetLoading ? "Enviando..." : "Recuperar acceso"}
-              </button>
-            </form>
-          )}
         </form>
+
+        {showResetModal && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4">
+            <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+              <h3 className="text-lg font-semibold text-gray-900">Recuperar contraseña</h3>
+              <p className="mt-2 text-sm text-gray-500">Ingresa tu correo y una nueva contraseña. Luego te pediremos la verificación en dos pasos.</p>
+              <form onSubmit={handleForgotPassword} className="mt-4 space-y-3">
+                <input
+                  className="border p-2 w-full rounded"
+                  placeholder="Correo para recuperar"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                />
+                <input
+                  type="password"
+                  className="border p-2 w-full rounded"
+                  placeholder="Nueva contraseña"
+                  value={resetPassword}
+                  onChange={(e) => setResetPassword(e.target.value)}
+                />
+                <div className="flex justify-end gap-2 pt-2">
+                  <button type="button" onClick={() => setShowResetModal(false)} className="rounded-lg border px-3 py-2 text-sm">Cancelar</button>
+                  <button type="submit" className="rounded-lg bg-brand px-3 py-2 text-sm text-white" disabled={resetLoading}>
+                    {resetLoading ? "Enviando..." : "Recuperar acceso"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

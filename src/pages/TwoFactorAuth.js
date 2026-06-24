@@ -29,6 +29,9 @@ export default function TwoFactorAuth() {
   const redirectTo = location.state?.redirectTo || "/";
   const requireAdmin = location.state?.requireAdmin || false;
   const pendingRegistration = location.state?.pendingRegistration || null;
+  const pendingPasswordChange = location.state?.pendingPasswordChange || null;
+  const forgotPassword = location.state?.forgotPassword || false;
+  const newPassword = location.state?.newPassword || "";
 
   useEffect(() => {
     if (!email || !tempToken) {
@@ -127,7 +130,16 @@ export default function TwoFactorAuth() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email, tempToken, code: fullCode, method: verificationMethod, pendingRegistration }),
+        body: JSON.stringify({
+          email,
+          tempToken,
+          code: fullCode,
+          method: verificationMethod,
+          pendingRegistration,
+          forgotPassword,
+          newPassword,
+          pendingPasswordChange
+        }),
       });
 
       const data = await res.json();
@@ -139,14 +151,20 @@ export default function TwoFactorAuth() {
         return Swal.fire("Error", data.message || "Código incorrecto", "error");
       }
 
+      const isPasswordFlow = Boolean(pendingPasswordChange || forgotPassword);
+
       Swal.fire({
         icon: "success",
-        title: "Verificación Exitosa",
+        title: isPasswordFlow ? "Contraseña actualizada" : "Verificación Exitosa",
         timer: 1500,
         showConfirmButton: false,
       });
 
       setTimeout(() => {
+        if (isPasswordFlow) {
+          return navigate("/login");
+        }
+
         setAuth(data.user);
         if (requireAdmin && data.user?.role !== "admin") {
           Swal.fire("Permisos Insuficientes", "Acceso denegado", "error");

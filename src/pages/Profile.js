@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useContext } from "react";
+import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import Swal from "sweetalert2";
 
@@ -14,6 +14,7 @@ const cvvRegex = /^\d{3,4}$/;
 export default function Profile() {
 
   const { setAuth } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     name: "",
@@ -29,6 +30,10 @@ export default function Profile() {
     cardType: "visa",
     avatar: ""
   });
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
  useEffect(() => {
   const loadUser = async () => {
@@ -139,6 +144,45 @@ export default function Profile() {
   }
 };
 
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+
+    if (!currentPassword || !newPassword) {
+      return Swal.fire("Completa los campos", "Ingresa tu contraseña actual y la nueva.", "warning");
+    }
+
+    setPasswordLoading(true);
+
+    try {
+      const res = await fetch("https://backendproyectodf.onrender.com/api/auth/change-password-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+
+      const data = await res.json();
+      setPasswordLoading(false);
+
+      if (!res.ok) {
+        return Swal.fire("Error", data.message || "No se pudo iniciar el cambio", "error");
+      }
+
+      setShowPasswordModal(false);
+      navigate("/verify-2fa", {
+        state: {
+          email: form.email,
+          tempToken: data.tempToken,
+          pendingPasswordChange: { email: form.email, newPassword },
+          changePassword: true
+        }
+      });
+    } catch (error) {
+      setPasswordLoading(false);
+      Swal.fire("Error", "No se pudo cambiar la contraseña", "error");
+    }
+  };
+
   const getInitials = () => {
     return (form.name?.[0] || "") + (form.lastname?.[0] || "");
   };
@@ -220,12 +264,40 @@ export default function Profile() {
 
       </div>
 
-      <button
-        onClick={saveProfile}
-        className="mt-6 w-full sm:w-auto bg-brand text-white px-6 py-2 rounded"
-      >
-        Guardar cambios
-      </button>
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+        <button
+          onClick={saveProfile}
+          className="w-full sm:w-auto bg-brand text-white px-6 py-2 rounded"
+        >
+          Guardar cambios
+        </button>
+
+        <button
+          onClick={() => setShowPasswordModal(true)}
+          className="w-full sm:w-auto bg-gray-800 text-white px-6 py-2 rounded"
+        >
+          Cambiar contraseña
+        </button>
+      </div>
+
+      {showPasswordModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <h3 className="text-lg font-semibold text-gray-900">Cambiar contraseña</h3>
+            <p className="mt-2 text-sm text-gray-500">Confirma tu contraseña actual y escribe la nueva.</p>
+            <form onSubmit={handlePasswordChange} className="mt-4 space-y-3">
+              <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="border p-2 w-full rounded" placeholder="Contraseña actual" />
+              <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="border p-2 w-full rounded" placeholder="Nueva contraseña" />
+              <div className="flex justify-end gap-2 pt-2">
+                <button type="button" onClick={() => setShowPasswordModal(false)} className="rounded-lg border px-3 py-2 text-sm">Cancelar</button>
+                <button type="submit" className="rounded-lg bg-brand px-3 py-2 text-sm text-white" disabled={passwordLoading}>
+                  {passwordLoading ? "Procesando..." : "Confirmar cambio"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );
