@@ -16,6 +16,22 @@ export const readPending2FAFlow = () => {
   }
 };
 
+export const getTwoFactorSuccessTarget = ({
+  redirectTo,
+  pendingPasswordChange,
+  forgotPassword,
+  pendingProfileUpdate,
+  user,
+  requireAdmin,
+}) => {
+  if (redirectTo) return redirectTo;
+  if (pendingProfileUpdate) return "/profile";
+  if (pendingPasswordChange || forgotPassword) return "/login";
+  if (requireAdmin && user?.role !== "admin") return "/login";
+  if (user?.role === "admin") return "/admin-access-panel";
+  return "/";
+};
+
 export const clearPending2FAFlow = () => {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(STORAGE_KEY);

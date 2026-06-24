@@ -11,7 +11,11 @@ import {
 import { AuthContext } from "../context/AuthContext";
 import ParticlesBackground from "../components/ParticlesBackground";
 import Swal from "sweetalert2";
-import { clearPending2FAFlow, readPending2FAFlow } from "../utils/twoFactorFlow";
+import {
+  clearPending2FAFlow,
+  getTwoFactorSuccessTarget,
+  readPending2FAFlow,
+} from "../utils/twoFactorFlow";
 
 export default function TwoFactorAuth() {
   const [code, setCode] = useState(Array(6).fill(""));
@@ -176,7 +180,14 @@ export default function TwoFactorAuth() {
       const isPasswordFlow = Boolean(pendingPasswordChange || forgotPassword);
       const isProfileFlow = Boolean(pendingProfileUpdate);
       const shouldAutoLogin = Boolean(loginFlow || pendingRegistration || forgotPassword);
-      const targetPath = redirectTo || (data.user?.role === "admin" ? "/admin-access-panel" : isPasswordFlow ? "/login" : isProfileFlow ? "/profile" : "/");
+      const targetPath = getTwoFactorSuccessTarget({
+        redirectTo,
+        pendingPasswordChange,
+        forgotPassword,
+        pendingProfileUpdate,
+        user: data.user,
+        requireAdmin,
+      });
 
       Swal.fire({
         icon: "success",

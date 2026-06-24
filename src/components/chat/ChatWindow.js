@@ -33,7 +33,7 @@ export default function ChatWindow({
   const chat = chatData[currentChat];
 
   return (
-    <main className="flex flex-col h-full bg-gradient-to-b from-white via-purple-50/20 to-white">
+    <main className="flex flex-col h-full min-h-0 bg-gradient-to-b from-white via-purple-50/20 to-white overflow-hidden">
 
       <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-purple-100">
 

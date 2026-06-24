@@ -20,7 +20,7 @@ export default function SidebarChats({
   setCurrentChat
 }) {
   return (
-    <aside className="w-full h-full bg-white border-r border-purple-100 flex flex-col md:w-80">
+    <aside className="w-full h-full bg-white border-r border-purple-100 flex flex-col md:w-80 min-h-0">
 
      <div className="p-4 border-b border-purple-100 bg-gradient-to-r from-white to-purple-50">
 
