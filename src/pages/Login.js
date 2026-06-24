@@ -4,7 +4,7 @@ import ParticlesBackground from "../components/ParticlesBackground";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import Swal from "sweetalert2";
-import { clearPending2FAFlow, readPending2FAFlow, savePending2FAFlow } from "../utils/twoFactorFlow";
+import { clearPending2FAFlow, savePending2FAFlow } from "../utils/twoFactorFlow";
 
 export default function Login() {
   const [user, setUser] = useState("");
