@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { jsPDF } from "jspdf";
 
 export default function Payments() {
 
@@ -60,6 +61,25 @@ export default function Payments() {
     (acc, pago) => acc + (pago.total || 0),
     0
   );
+
+  const exportToPdf = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text("Reporte de pagos", 14, 16);
+    doc.setFontSize(10);
+    doc.text(`Total de pagos: ${pagos.length}`, 14, 26);
+    doc.text(`Ventas totales: S/ ${totalVentas.toFixed(2)}`, 14, 32);
+    let y = 42;
+    pagos.forEach((pago, index) => {
+      if (y > 280) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.text(`${index + 1}. ${pago.cliente || "Cliente"} - ${pago.estado || "Sin estado"} - S/ ${pago.total || 0}`, 14, y);
+      y += 8;
+    });
+    doc.save("reporte-pagos.pdf");
+  };
 
   const pagosFiltrados = pagos.filter((pago) => {
 
@@ -188,6 +208,13 @@ export default function Payments() {
             className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg"
           >
             Limpiar filtros
+          </button>
+
+          <button
+            onClick={exportToPdf}
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg"
+          >
+            Exportar PDF
           </button>
 
         </div>

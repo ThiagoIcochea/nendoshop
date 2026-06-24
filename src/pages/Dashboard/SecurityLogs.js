@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Filter, Search, ShieldAlert, Unlock } from "lucide-react";
+import { Filter, Search, ShieldAlert, Unlock, Download } from "lucide-react";
 import Swal from "sweetalert2";
 
 export default function SecurityLogs() {
@@ -63,6 +63,17 @@ export default function SecurityLogs() {
 
   const blockedUsers = users.filter((user) => user.chatBlockedUntil && new Date(user.chatBlockedUntil) > new Date());
 
+  const exportLogs = () => {
+    const content = filteredLogs.map((log) => `[${new Date(log.createdAt).toLocaleString("es-ES")}] ${log.tipo} | ${log.usuario} | ${log.descripcion} | ${log.metodo} ${log.ruta}`).join("\n");
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "logs-seguridad.txt";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -103,6 +114,13 @@ export default function SecurityLogs() {
               <option value="ERROR">Errores</option>
             </select>
           </label>
+        </div>
+
+        <div className="mb-4 flex flex-wrap gap-2">
+          <button onClick={exportLogs} className="flex items-center gap-2 rounded-lg bg-purple-600 px-3 py-2 text-sm text-white">
+            <Download className="h-4 w-4" />
+            Exportar logs .txt
+          </button>
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">

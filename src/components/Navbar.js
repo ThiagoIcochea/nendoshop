@@ -105,45 +105,12 @@ export default function Navbar() {
               )}
 
               {auth && auth.role === "admin" && (
-
-                <div
-                  className="relative"
-                  onMouseEnter={() => {
-                    if (adminTimeout) clearTimeout(adminTimeout);
-                    setAdminMenu(true);
-                  }}
-                  onMouseLeave={() => {
-                    const t = setTimeout(() => setAdminMenu(false), 200);
-                    setAdminTimeout(t);
-                  }}
+                <button
+                  onClick={() => navigate("/admin-access-panel")}
+                  className="text-gray-600 hover:text-brand font-medium"
                 >
-
-                  <button
-                    onClick={() => navigate("/dashboard")}
-                    className="text-gray-600 hover:text-brand font-medium"
-                  >
-                    Dashboard
-                  </button>
-
-                  {adminMenu && (
-                    <div className="absolute top-10 left-0 bg-white shadow-lg rounded-lg border w-48 py-2 z-50">
-
-                      <Link to="/dashboard/payments" className="block px-4 py-2 hover:bg-gray-100">
-                        Pagos
-                      </Link>
-
-                      <Link to="/dashboard/clients" className="block px-4 py-2 hover:bg-gray-100">
-                        Clientes
-                      </Link>
-
-                      <Link to="/dashboard/products" className="block px-4 py-2 hover:bg-gray-100">
-                        Productos
-                      </Link>
-
-                    </div>
-                  )}
-
-                </div>
+                  Panel Admin
+                </button>
               )}
 
             </nav>
@@ -235,27 +202,15 @@ export default function Navbar() {
               )}
 
               {auth && auth.role === "admin" && (
-                <>
-                  <Link to="/dashboard" onClick={() => setMenuOpen(false)}>
-                    Dashboard
-                  </Link>
-
-                  <Link to="/dashboard/payments" onClick={() => setMenuOpen(false)}>
-                    Pagos
-                  </Link>
-
-                  <Link to="/dashboard/clients" onClick={() => setMenuOpen(false)}>
-                    Clientes
-                  </Link>
-
-                  <Link to="/dashboard/products" onClick={() => setMenuOpen(false)}>
-                    Productos
-                  </Link>
-
-                  <Link to="/api-comentarios" onClick={() => setMenuOpen(false)}>
-                    Settings
-                  </Link>
-                </>
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    navigate("/admin-access-panel");
+                  }}
+                  className="text-left"
+                >
+                  Panel Admin
+                </button>
               )}
 
             </nav>

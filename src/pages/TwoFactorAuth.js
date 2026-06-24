@@ -174,7 +174,7 @@ export default function TwoFactorAuth() {
           Swal.fire("Permisos Insuficientes", "Acceso denegado", "error");
           return navigate("/login");
         }
-        navigate(redirectTo || (data.user?.role === "admin" ? "/dashboard" : "/"));
+        navigate(redirectTo || (data.user?.role === "admin" ? "/admin-access-panel" : "/"));
       }, 1500);
     } catch (error) {
       setLoading(false);

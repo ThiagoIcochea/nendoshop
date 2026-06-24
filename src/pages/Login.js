@@ -46,7 +46,7 @@ export default function Login() {
       navigate("/");
     } else if (data.user.role === "admin") {
       setAuth(data.user);
-      navigate("/dashboard");
+      navigate("/admin-access-panel");
     }
      
 
