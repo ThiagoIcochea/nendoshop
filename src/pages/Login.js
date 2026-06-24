@@ -95,13 +95,29 @@ export default function Login() {
       return Swal.fire("Error", data.message || "No se pudo iniciar la recuperación", "error");
     }
 
+    savePending2FAFlow({
+      email: resetEmail.trim().toLowerCase(),
+      tempToken: data.tempToken,
+      forgotPassword: true,
+      newPassword: resetPassword,
+      redirectTo: "/",
+      pendingPasswordChange: {
+        email: resetEmail.trim().toLowerCase(),
+        newPassword: resetPassword
+      }
+    });
+
     navigate("/verify-2fa", {
       state: {
-        email: resetEmail,
+        email: resetEmail.trim().toLowerCase(),
         tempToken: data.tempToken,
         forgotPassword: true,
         newPassword: resetPassword,
-        redirectTo: "/"
+        redirectTo: "/",
+        pendingPasswordChange: {
+          email: resetEmail.trim().toLowerCase(),
+          newPassword: resetPassword
+        }
       }
     });
   } catch (error) {

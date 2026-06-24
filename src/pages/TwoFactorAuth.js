@@ -102,7 +102,16 @@ export default function TwoFactorAuth() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email, tempToken, method: verificationMethod }),
+        body: JSON.stringify({
+          email,
+          tempToken,
+          method: verificationMethod,
+          pendingRegistration,
+          pendingPasswordChange,
+          pendingProfileUpdate,
+          forgotPassword,
+          newPassword,
+        }),
       });
 
       if (res.ok) {
