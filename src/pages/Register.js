@@ -86,7 +86,7 @@ export default function Register() {
     savePending2FAFlow({
       email: email.trim(),
       tempToken: initialData.tempToken,
-      redirectTo: "/login",
+      redirectTo: "/",
       requireAdmin: false,
       forceEmailOnly: true,
       pendingRegistration: {
@@ -105,7 +105,7 @@ export default function Register() {
       state: {
         email: email.trim(),
         tempToken: initialData.tempToken,
-        redirectTo: "/login",
+        redirectTo: "/",
         requireAdmin: false,
         forceEmailOnly: true,
         pendingRegistration: {

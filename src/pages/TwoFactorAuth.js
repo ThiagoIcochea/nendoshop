@@ -166,30 +166,30 @@ export default function TwoFactorAuth() {
 
       const isPasswordFlow = Boolean(pendingPasswordChange || forgotPassword);
       const isProfileFlow = Boolean(pendingProfileUpdate);
+      const shouldAutoLogin = Boolean(loginFlow || pendingRegistration || forgotPassword);
       const targetPath = redirectTo || (data.user?.role === "admin" ? "/admin-access-panel" : isPasswordFlow ? "/login" : isProfileFlow ? "/profile" : "/");
 
       Swal.fire({
         icon: "success",
-        title: isPasswordFlow ? "Contraseña actualizada" : isProfileFlow ? "Perfil actualizado" : "Verificación Exitosa",
+        title: isPasswordFlow ? "Contraseña actualizada" : isProfileFlow ? "Perfil actualizado" : shouldAutoLogin ? "Inicio de sesión completado" : "Verificación Exitosa",
         timer: 1500,
         showConfirmButton: false,
       });
 
       setTimeout(() => {
+        if (data.user) {
+          setAuth(data.user);
+        }
+
         if (isPasswordFlow) {
           return navigate(targetPath);
         }
 
-        if (loginFlow && data.user) {
-          setAuth(data.user);
-          return navigate(targetPath);
-        }
-
-        setAuth(data.user);
         if (requireAdmin && data.user?.role !== "admin") {
           Swal.fire("Permisos Insuficientes", "Acceso denegado", "error");
           return navigate("/login");
         }
+
         navigate(targetPath);
       }, 1500);
     } catch (error) {

@@ -100,7 +100,8 @@ export default function Login() {
         email: resetEmail,
         tempToken: data.tempToken,
         forgotPassword: true,
-        newPassword: resetPassword
+        newPassword: resetPassword,
+        redirectTo: "/"
       }
     });
   } catch (error) {
