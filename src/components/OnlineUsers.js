@@ -1,5 +1,12 @@
 import { useState } from "react";
 
+const getUserInitials = (username = "") => {
+  const parts = String(username).trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return "U";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+};
+
 export default function OnlineUsers({ onlineUsers = [], onSelectUser }) {
 
   const [searchUser, setSearchUser] = useState("");
@@ -58,19 +65,38 @@ export default function OnlineUsers({ onlineUsers = [], onSelectUser }) {
 
                 <div className="relative">
 
-                  <img
-                    src={user.avatar}
-                    alt={user.username}
-                    className="
-                      w-10 h-10
-                      rounded-full
-                      object-cover
-                      border border-purple-100
-                      shadow-sm
-                      group-hover:scale-105
-                      transition
-                    "
-                  />
+                  {user.profileImg || user.avatar ? (
+                    <img
+                      src={user.profileImg || user.avatar}
+                      alt={user.username}
+                      className="
+                        w-10 h-10
+                        rounded-full
+                        object-cover
+                        border border-purple-100
+                        shadow-sm
+                        group-hover:scale-105
+                        transition
+                      "
+                    />
+                  ) : (
+                    <div
+                      className="
+                        w-10 h-10
+                        rounded-full
+                        bg-gradient-to-br from-purple-500 to-fuchsia-500
+                        text-white
+                        flex items-center justify-center
+                        text-sm font-semibold
+                        border border-purple-100
+                        shadow-sm
+                        group-hover:scale-105
+                        transition
+                      "
+                    >
+                      {getUserInitials(user.username)}
+                    </div>
+                  )}
 
                   <span
                     className="
