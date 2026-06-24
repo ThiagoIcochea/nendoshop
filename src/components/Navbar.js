@@ -106,10 +106,10 @@ export default function Navbar() {
 
               {auth && auth.role === "admin" && (
                 <button
-                  onClick={() => navigate("/admin-access-panel")}
+                  onClick={() => navigate("/dashboard")}
                   className="text-gray-600 hover:text-brand font-medium"
                 >
-                  Panel Admin
+                  Dashboard
                 </button>
               )}
 
@@ -205,11 +205,11 @@ export default function Navbar() {
                 <button
                   onClick={() => {
                     setMenuOpen(false);
-                    navigate("/admin-access-panel");
+                    navigate("/dashboard");
                   }}
                   className="text-left"
                 >
-                  Panel Admin
+                  Dashboard
                 </button>
               )}
 

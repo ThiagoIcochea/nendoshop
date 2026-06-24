@@ -31,7 +31,8 @@ export default function AdminAccess() {
           credentials: "include",
           body: JSON.stringify({
             email: user,
-            password: pass
+            password: pass,
+            loginContext: "admin"
           })
         }
       );

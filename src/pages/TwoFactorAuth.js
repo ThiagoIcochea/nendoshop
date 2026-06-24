@@ -3,8 +3,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import {
   ShieldAlert,
   ArrowLeft,
-  RefreshCw,
-  CheckCircle,
   Mail,
   Smartphone,
   Phone,
@@ -30,6 +28,7 @@ export default function TwoFactorAuth() {
   const tempToken = location.state?.tempToken || "";
   const redirectTo = location.state?.redirectTo || "/";
   const requireAdmin = location.state?.requireAdmin || false;
+  const pendingRegistration = location.state?.pendingRegistration || null;
 
   useEffect(() => {
     if (!email || !tempToken) {
@@ -76,27 +75,6 @@ export default function TwoFactorAuth() {
         newCode[index] = "";
         setCode(newCode);
       }
-    }
-  };
-
-  const handlePaste = (e) => {
-    e.preventDefault();
-    const pasteData = e.clipboardData.getData("text").trim();
-
-    if (/^\d{6}$/.test(pasteData)) {
-      const digits = pasteData.split("");
-      setCode(digits);
-      inputRefs.current[5].focus();
-    } else {
-      Swal.fire({
-        icon: "warning",
-        title: "Código inválido",
-        text: "Por favor, pega un código numérico de 6 dígitos.",
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-      });
     }
   };
 
@@ -149,7 +127,7 @@ export default function TwoFactorAuth() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email, tempToken, code: fullCode, method: verificationMethod }),
+        body: JSON.stringify({ email, tempToken, code: fullCode, method: verificationMethod, pendingRegistration }),
       });
 
       const data = await res.json();

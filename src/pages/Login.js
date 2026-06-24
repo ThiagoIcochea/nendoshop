@@ -8,6 +8,10 @@ import Swal from "sweetalert2";
 export default function Login() {
   const [user, setUser] = useState("");
   const [pass, setPass] = useState("");
+  const [resetMode, setResetMode] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetPassword, setResetPassword] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
   const navigate = useNavigate()
   const { setAuth } = useContext(AuthContext);
 
@@ -23,13 +27,18 @@ export default function Login() {
       credentials: "include",
       body: JSON.stringify({
         email: user,
-        password: pass
+        password: pass,
+        loginContext: "user"
       })
     });
 
     const data = await res.json();
 
     if (!res.ok) {
+      if (data?.requiresPasswordReset) {
+        setResetEmail(user.trim());
+        setResetMode(true);
+      }
       return Swal.fire("Error 503", data.message, "error");
     }
 
@@ -45,7 +54,7 @@ export default function Login() {
       setAuth(data.user);
       navigate("/");
     } else if (data.user.role === "admin") {
-      setAuth(data.user);
+      Swal.fire("Acceso restringido", "El acceso de administradores se realiza desde el panel dedicado.", "warning");
       navigate("/admin-access-panel");
     }
      
@@ -53,6 +62,46 @@ export default function Login() {
   } catch (error) {
     console.error(error);
     Swal.fire("Error 794","Error en login","error");
+  }
+};
+
+ const handleForgotPassword = async (e) => {
+  e.preventDefault();
+  if (!resetEmail || !resetPassword) {
+    return Swal.fire("Completa los campos", "Ingresa tu correo y una nueva contraseña.", "warning");
+  }
+
+  setResetLoading(true);
+
+  try {
+    const res = await fetch("https://backendproyectodf.onrender.com/api/auth/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        email: resetEmail,
+        newPassword: resetPassword
+      })
+    });
+
+    const data = await res.json();
+    setResetLoading(false);
+
+    if (!res.ok) {
+      return Swal.fire("Error", data.message || "No se pudo iniciar la recuperación", "error");
+    }
+
+    navigate("/verify-2fa", {
+      state: {
+        email: resetEmail,
+        tempToken: data.tempToken,
+        forgotPassword: true,
+        newPassword: resetPassword
+      }
+    });
+  } catch (error) {
+    setResetLoading(false);
+    Swal.fire("Error", "No se pudo completar la recuperación", "error");
   }
 };
 
@@ -102,6 +151,41 @@ export default function Login() {
               Regístrate
             </span>
           </p>
+
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              className="text-sm text-brand hover:underline"
+              onClick={() => setResetMode((value) => !value)}
+            >
+              {resetMode ? "Ocultar recuperación" : "¿Olvidaste tu contraseña?"}
+            </button>
+          </div>
+
+          {resetMode && (
+            <form onSubmit={handleForgotPassword} className="mt-4 border-t pt-4">
+              <input
+                className="border p-2 w-full mb-2 rounded"
+                placeholder="Correo para recuperar"
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+              />
+              <input
+                type="password"
+                className="border p-2 w-full mb-2 rounded"
+                placeholder="Nueva contraseña"
+                value={resetPassword}
+                onChange={(e) => setResetPassword(e.target.value)}
+              />
+              <button
+                type="submit"
+                className="w-full bg-gray-800 text-white py-2 rounded"
+                disabled={resetLoading}
+              >
+                {resetLoading ? "Enviando..." : "Recuperar acceso"}
+              </button>
+            </form>
+          )}
         </form>
 
       </div>

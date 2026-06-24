@@ -3,6 +3,14 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import Swal from "sweetalert2";
 
+const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,40}$/;
+const phoneRegex = /^(?:\+51\s?)?9\d{8}$/;
+const addressRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9#°.,\s-]{5,80}$/;
+const cityRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,40}$/;
+const cardNameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,40}$/;
+const cardNumberRegex = /^(?:\d{4}[-\s]?){3}\d{4}$/;
+const cvvRegex = /^\d{3,4}$/;
+
 export default function Profile() {
 
   const { setAuth } = useContext(AuthContext);
@@ -86,6 +94,15 @@ export default function Profile() {
 
  const saveProfile = async () => {
   try {
+    if (!nameRegex.test((form.name || "").trim())) return Swal.fire("Error 630", "Nombre inválido. Usa solo letras y espacios.", "error");
+    if (!nameRegex.test((form.lastname || "").trim())) return Swal.fire("Error 630", "Apellido inválido. Usa solo letras y espacios.", "error");
+    if (!phoneRegex.test((form.phone || "").trim())) return Swal.fire("Error 630", "Teléfono inválido. Ejemplo: 987654321 o +51 987654321", "error");
+    if (!addressRegex.test((form.address || "").trim())) return Swal.fire("Error 630", "Dirección inválida. Debe tener entre 5 y 80 caracteres.", "error");
+    if (!cityRegex.test((form.city || "").trim())) return Swal.fire("Error 630", "Ciudad inválida. Usa solo letras y espacios.", "error");
+    if (form.cardName && !cardNameRegex.test(form.cardName.trim())) return Swal.fire("Error 630", "Nombre de tarjeta inválido.", "error");
+    if (form.cardNumber && !cardNumberRegex.test(form.cardNumber.replace(/\s/g, ""))) return Swal.fire("Error 630", "Número de tarjeta inválido.", "error");
+    if (form.cardCVV && !cvvRegex.test(form.cardCVV)) return Swal.fire("Error 630", "CVV inválido.", "error");
+
     const res = await fetch("https://backendproyectodf.onrender.com/api/users/profile", {
       method: "PUT",
       headers: {
@@ -127,10 +144,10 @@ export default function Profile() {
   };
 
   return (
-   <div className="max-w-4xl mx-auto p-6 animate__animated animate__fadeIn">
+   <div className="max-w-4xl mx-auto p-4 sm:p-6 animate__animated animate__fadeIn">
 
      
-      <div className="flex items-center gap-6 mb-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6 mb-6">
 
       
         <div className="w-20 h-20 rounded-full overflow-hidden bg-brand flex items-center justify-center text-white font-bold text-xl">
@@ -205,7 +222,7 @@ export default function Profile() {
 
       <button
         onClick={saveProfile}
-        className="mt-6 bg-brand text-white px-6 py-2 rounded"
+        className="mt-6 w-full sm:w-auto bg-brand text-white px-6 py-2 rounded"
       >
         Guardar cambios
       </button>
