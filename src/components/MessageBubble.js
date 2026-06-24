@@ -6,6 +6,29 @@ const getAvatarSrc = (profileImg, fallbackName) => {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName || "Usuario")}&background=7c3aed&color=ffffff`;
 };
 
+const renderTextWithLinks = (text) => {
+  if (!text) return null;
+  const parts = String(text).split(/(https?:\/\/\S+)/g).filter(Boolean);
+
+  return parts.map((part, index) => {
+    if (/^https?:\/\//.test(part)) {
+      return (
+        <a
+          key={`${part}-${index}`}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-purple-600 underline break-all"
+        >
+          {part}
+        </a>
+      );
+    }
+
+    return <span key={`${part}-${index}`} className="whitespace-pre-wrap">{part}</span>;
+  });
+};
+
 export default function MessageBubble({ user, text, time, isOwn, profileImg, displayName }) {
   const initials = (displayName || user || "U")
     .split(" ")
@@ -71,7 +94,9 @@ export default function MessageBubble({ user, text, time, isOwn, profileImg, dis
               }
             `}
           >
-            {text}
+            <div className="whitespace-pre-wrap break-words">
+              {renderTextWithLinks(text)}
+            </div>
 
             {/* “Tail” tipo chat bubble */}
             <div
