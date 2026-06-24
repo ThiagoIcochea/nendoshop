@@ -368,12 +368,7 @@ export default function Pagos() {
                       <input name="cardCVV" value={card.cardCVV} onChange={(e) => setCard({ ...card, cardCVV: e.target.value.replace(/\D/g, '').slice(0, 3) })} type="password" required placeholder="123" className="w-full border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand" />
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <input type="checkbox" id="saveCard" name="saveCard" checked={saveCard} onChange={(e) => setSaveCard(e.target.checked)} className="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand" />
-                      <label htmlFor="saveCard" className="block text-sm font-medium text-gray-700">
-                        Guardar tarjeta para futuras compras
-                      </label>
-                    </div>
+                   
 
                     <div className="flex-1">
                       <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
@@ -381,6 +376,13 @@ export default function Pagos() {
                         <option value="visa">Visa</option>
                         <option value="mastercard">MasterCard</option>
                       </select>
+                    </div>
+
+                     <div className="flex items-center gap-2">
+                      <input type="checkbox" id="saveCard" name="saveCard" checked={saveCard} onChange={(e) => setSaveCard(e.target.checked)} className="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand" />
+                      <label htmlFor="saveCard" className="block text-sm font-medium text-gray-700">
+                        Guardar tarjeta para futuras compras
+                      </label>
                     </div>
                   </div>
                 </div>
