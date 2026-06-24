@@ -10,10 +10,12 @@ const getUserInitials = (username = "") => {
 export default function OnlineUsers({ onlineUsers = [], onSelectUser }) {
 
   const [searchUser, setSearchUser] = useState("");
+  const [imageErrors, setImageErrors] = useState({});
 
-  const filteredUsers = onlineUsers.filter(user =>
-    user.username.toLowerCase().includes(searchUser.toLowerCase())
-  );
+  const filteredUsers = (onlineUsers || []).filter((user) => {
+    const username = String(user?.username || user?.name || "").toLowerCase();
+    return username.includes(String(searchUser || "").toLowerCase());
+  });
 
   return (
     <>
@@ -46,10 +48,15 @@ export default function OnlineUsers({ onlineUsers = [], onSelectUser }) {
 
         {filteredUsers.length > 0 ? (
 
-          filteredUsers.map((user) => (
+          filteredUsers.map((user, index) => {
+            const username = user?.username || user?.name || "Usuario";
+            const avatarSrc = user?.profileImg || user?.avatar || "";
+            const imageFailed = Boolean(imageErrors[index]);
+
+            return (
 
             <div
-              key={user.id}
+              key={user.id || `${username}-${index}`}
               onClick={() => onSelectUser?.(user)}
               className="
                 group
@@ -65,10 +72,11 @@ export default function OnlineUsers({ onlineUsers = [], onSelectUser }) {
 
                 <div className="relative">
 
-                  {user.profileImg || user.avatar ? (
+                  {avatarSrc && !imageFailed ? (
                     <img
-                      src={user.profileImg || user.avatar}
-                      alt={user.username}
+                      src={avatarSrc}
+                      alt={username}
+                      onError={() => setImageErrors((prev) => ({ ...prev, [index]: true }))}
                       className="
                         w-10 h-10
                         rounded-full
@@ -94,7 +102,7 @@ export default function OnlineUsers({ onlineUsers = [], onSelectUser }) {
                         transition
                       "
                     >
-                      {getUserInitials(user.username)}
+                      {getUserInitials(username)}
                     </div>
                   )}
 
@@ -119,7 +127,7 @@ export default function OnlineUsers({ onlineUsers = [], onSelectUser }) {
                       transition
                     "
                   >
-                    {user.username}
+                    {username}
                   </p>
 
                   <p className="text-xs text-gray-400">
@@ -132,7 +140,8 @@ export default function OnlineUsers({ onlineUsers = [], onSelectUser }) {
 
             </div>
 
-          ))
+          );
+          })
 
         ) : (
 

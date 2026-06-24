@@ -1,12 +1,19 @@
 import { useState } from "react";
 import OnlineUsers from "../OnlineUsers";
 
+const getUserInitials = (username = "") => {
+  const parts = String(username).trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return "U";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+};
 
 export default function ChatInfo({ users, onReportUser }) {
 
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [reportText, setReportText] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
+  const [brokenImages, setBrokenImages] = useState({});
 
   return (
     <aside className="w-80 h-full bg-white flex flex-col">
@@ -39,20 +46,29 @@ export default function ChatInfo({ users, onReportUser }) {
 
           <div className="flex -space-x-3">
 
-            {users.slice(0, 4).map((u, i) => (
+            {users.slice(0, 4).map((u, i) => {
+              const username = u?.username || u?.name || "Usuario";
+              const avatarSrc = u?.profileImg || u?.avatar || "";
+              const showImage = Boolean(avatarSrc) && !brokenImages[i];
 
-              <img
-                key={i}
-                src={u.profileImg || u.avatar}
-                alt={u.username}
-                className="
-                w-9 h-9 rounded-full
-                border-2 border-white
-                shadow-sm
-                "
-              />
-
-            ))}
+              return (
+                <div
+                  key={i}
+                  className="w-9 h-9 rounded-full border-2 border-white shadow-sm overflow-hidden bg-gradient-to-br from-purple-500 to-fuchsia-500 text-white flex items-center justify-center text-[11px] font-semibold"
+                >
+                  {showImage ? (
+                    <img
+                      src={avatarSrc}
+                      alt={username}
+                      onError={() => setBrokenImages((prev) => ({ ...prev, [i]: true }))}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    getUserInitials(username)
+                  )}
+                </div>
+              );
+            })}
 
           </div>
 
