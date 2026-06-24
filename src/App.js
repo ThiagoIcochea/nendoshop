@@ -14,6 +14,8 @@ import Payments from "./pages/Dashboard/Payments";
 import DashboardLayout from "./pages/Dashboard/DashboardLayout";
 import Clients from "./pages/Dashboard/Clients";
 import Products from "./pages/Dashboard/Products";
+import AdminOverview from "./pages/Dashboard/AdminOverview";
+import SecurityLogs from "./pages/Dashboard/SecurityLogs";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProductDetail from "./pages/ProductDetail"
 import Cart from "./pages/Cart";
@@ -59,10 +61,12 @@ function App() {
               path="/dashboard"
               element={<DashboardLayout />}
             >
-              <Route index element={<Payments />} />
+              <Route index element={<AdminOverview />} />
+              <Route path="overview" element={<AdminOverview />} />
               <Route path="payments" element={<Payments />} />
               <Route path="clients" element={<Clients />} />
               <Route path="products" element={<Products />} />
+              <Route path="security" element={<SecurityLogs />} />
             </Route>
             <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />

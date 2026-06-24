@@ -14,6 +14,7 @@ export default function ChatInfo({ users, onReportUser }) {
   const [reportText, setReportText] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [brokenImages, setBrokenImages] = useState({});
+  const [feedback, setFeedback] = useState("");
 
   return (
     <aside className="w-80 h-full bg-white flex flex-col">
@@ -118,6 +119,7 @@ export default function ChatInfo({ users, onReportUser }) {
               alert("Selecciona un usuario de la lista primero");
               return;
             }
+            setFeedback("");
             setIsReportOpen(true);
           }}
           className="
@@ -135,6 +137,9 @@ export default function ChatInfo({ users, onReportUser }) {
         <p className="text-[11px] text-gray-400 text-center mt-2">
           El equipo revisará tu reporte
         </p>
+        {feedback ? (
+          <p className="mt-2 text-center text-sm text-red-500">{feedback}</p>
+        ) : null}
 
       </div>
 
@@ -175,6 +180,7 @@ export default function ChatInfo({ users, onReportUser }) {
                     targetUsername: selectedUser.username,
                     reason: reportText
                   });
+                  setFeedback(reportText.trim() ? "Reporte enviado. Si el usuario alcanza 10 reportes quedará bloqueado." : "Reporte enviado.");
                   setReportText("");
                   setIsReportOpen(false);
                 }}
