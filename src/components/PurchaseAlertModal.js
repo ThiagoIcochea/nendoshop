@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
+const getProductUrl = (productId) => {
+  if (!productId) return null;
+  return `/#/product/${productId}`;
+};
+
 const getBackendUrl = () => {
   if (process.env.REACT_APP_BACKEND_URL) {
     return process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "");
@@ -52,13 +57,13 @@ export default function PurchaseAlertModal() {
   if (!alert || typeof document === "undefined") return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[1200] pointer-events-none flex items-start justify-center px-4 pt-6">
-      <div className="w-full max-w-md rounded-3xl border border-amber-200 bg-white/95 shadow-2xl backdrop-blur-md p-4 animate-[fadeIn_0.25s_ease-out]">
-        <div className="flex items-center gap-2 text-amber-600 font-semibold text-sm">
+    <div className="fixed bottom-4 right-4 z-[1200] pointer-events-none">
+      <div className="w-[320px] max-w-[calc(100vw-2rem)] rounded-2xl border border-amber-200 bg-white/95 shadow-2xl backdrop-blur-md p-3 animate-[fadeIn_0.25s_ease-out]">
+        <div className="flex items-center gap-2 text-amber-600 font-semibold text-xs uppercase tracking-wide">
           <span>🔥</span>
           <span>Oferta en tiempo real</span>
         </div>
-        <h3 className="mt-2 text-lg font-bold text-gray-900">
+        <h3 className="mt-2 text-sm font-bold text-gray-900 leading-snug">
           {alert.customer} acaba de comprar {alert.product}
         </h3>
         <p className="mt-1 text-sm text-gray-600">
@@ -69,10 +74,10 @@ export default function PurchaseAlertModal() {
         </p>
         {alert.productId ? (
           <a
-            href={`/product/${alert.productId}`}
-            className="mt-3 inline-flex items-center rounded-full bg-purple-600 px-3 py-2 text-sm font-semibold text-white hover:bg-purple-700"
+            href={getProductUrl(alert.productId)}
+            className="mt-3 inline-flex items-center rounded-full bg-purple-600 px-3 py-2 text-sm font-semibold text-white hover:bg-purple-700 pointer-events-auto"
           >
-            Ver detalle del producto
+            Ver producto
           </a>
         ) : null}
       </div>
