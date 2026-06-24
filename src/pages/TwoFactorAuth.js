@@ -32,6 +32,7 @@ export default function TwoFactorAuth() {
   const pendingPasswordChange = location.state?.pendingPasswordChange || null;
   const forgotPassword = location.state?.forgotPassword || false;
   const newPassword = location.state?.newPassword || "";
+  const forceEmailOnly = Boolean(location.state?.forceEmailOnly);
 
   useEffect(() => {
     if (!email || !tempToken) {
@@ -47,6 +48,12 @@ export default function TwoFactorAuth() {
       setCanResend(true);
     }
   }, [resendTimer]);
+
+  useEffect(() => {
+    if (forceEmailOnly) {
+      setVerificationMethod("email");
+    }
+  }, [forceEmailOnly]);
 
   useEffect(() => {
     if (inputRefs.current[0]) {
@@ -202,20 +209,29 @@ export default function TwoFactorAuth() {
 
             <h2 className="text-2xl font-bold">Verificación de 2 Factores</h2>
 
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <button onClick={() => setVerificationMethod("email")} className="p-2 border rounded-xl flex items-center gap-2">
-                <Mail size={16} /> Correo
-              </button>
-              <button onClick={() => setVerificationMethod("sms")} className="p-2 border rounded-xl flex items-center gap-2">
-                <Smartphone size={16} /> SMS
-              </button>
-              <button onClick={() => setVerificationMethod("call")} className="p-2 border rounded-xl flex items-center gap-2">
-                <Phone size={16} /> Llamada
-              </button>
-              <button onClick={() => setVerificationMethod("whatsapp")} className="p-2 border rounded-xl flex items-center gap-2">
-                <MessageCircle size={16} /> WhatsApp
-              </button>
-            </div>
+            {forceEmailOnly ? (
+              <div className="mt-4 rounded-xl border border-purple-200 bg-purple-50 p-3 text-sm text-purple-700">
+                <div className="flex items-center gap-2 font-medium">
+                  <Mail size={16} /> Verificación por correo
+                </div>
+                <p className="mt-1 text-xs text-purple-600">Este paso del registro solo admite el envío del código por correo electrónico.</p>
+              </div>
+            ) : (
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <button onClick={() => setVerificationMethod("email")} className="p-2 border rounded-xl flex items-center gap-2">
+                  <Mail size={16} /> Correo
+                </button>
+                <button onClick={() => setVerificationMethod("sms")} className="p-2 border rounded-xl flex items-center gap-2">
+                  <Smartphone size={16} /> SMS
+                </button>
+                <button onClick={() => setVerificationMethod("call")} className="p-2 border rounded-xl flex items-center gap-2">
+                  <Phone size={16} /> Llamada
+                </button>
+                <button onClick={() => setVerificationMethod("whatsapp")} className="p-2 border rounded-xl flex items-center gap-2">
+                  <MessageCircle size={16} /> WhatsApp
+                </button>
+              </div>
+            )}
 
             <p className="text-sm mt-3 text-gray-600">
               Código enviado por {verificationMethod}

@@ -10,6 +10,15 @@ const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 const addressRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9#°.,\s-]{5,80}$/;
 const cityRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,40}$/;
 
+const showRegexHints = () => {
+  Swal.fire({
+    icon: "info",
+    title: "Formato requerido",
+    html: "<ul style='text-align:left;'><li>Nombre y apellido: solo letras y espacios.</li><li>Correo: usuario@dominio.com</li><li>Contraseña: mínimo 8 caracteres, una letra, un número y un símbolo.</li><li>Teléfono: 987654321 o +51 987654321</li><li>Dirección: entre 5 y 80 caracteres.</li><li>Ciudad: solo letras y espacios.</li></ul>",
+    confirmButtonText: "Entendido"
+  });
+};
+
 export default function Register() {
 
   const [name, setName] = useState("");
@@ -29,13 +38,13 @@ export default function Register() {
 
   const today = new Date();
 
-  if (!nameRegex.test(name.trim())) return Swal.fire("Error 630","Nombre inválido. Usa solo letras y espacios.","error");
-  if (!nameRegex.test(lastname.trim())) return Swal.fire("Error 630","Apellido inválido. Usa solo letras y espacios.","error");
-  if (!emailRegex.test(email.trim())) return Swal.fire("Error 630","Email inválido. Ejemplo: usuario@dominio.com","error");
-  if (!passwordRegex.test(pass)) return Swal.fire("Error 630","Contraseña inválida. Mínimo 8 caracteres, una letra, un número y un símbolo.","error");
-  if (!phoneRegex.test(phone.trim())) return Swal.fire("Error 630","Teléfono inválido. Ejemplo: 987654321 o +51 987654321","error");
-  if (!addressRegex.test(address.trim())) return Swal.fire("Error 630","Dirección inválida. Debe tener entre 5 y 80 caracteres.","error");
-  if (!cityRegex.test(city.trim())) return Swal.fire("Error 630","Ciudad inválida. Usa solo letras y espacios.","error");
+  if (!nameRegex.test(name.trim())) return Swal.fire({ icon:"error", title:"Nombre inválido", text:"Usa solo letras y espacios.", footer:"<a href='#' id='regex-hint'>Ver formato correcto</a>" }).then(() => { document.getElementById("regex-hint")?.addEventListener("click", (event) => { event.preventDefault(); showRegexHints(); }); });
+  if (!nameRegex.test(lastname.trim())) return Swal.fire({ icon:"error", title:"Apellido inválido", text:"Usa solo letras y espacios.", footer:"<a href='#' id='regex-hint'>Ver formato correcto</a>" }).then(() => { document.getElementById("regex-hint")?.addEventListener("click", (event) => { event.preventDefault(); showRegexHints(); }); });
+  if (!emailRegex.test(email.trim())) return Swal.fire({ icon:"error", title:"Correo inválido", text:"Ejemplo: usuario@dominio.com", footer:"<a href='#' id='regex-hint'>Ver formato correcto</a>" }).then(() => { document.getElementById("regex-hint")?.addEventListener("click", (event) => { event.preventDefault(); showRegexHints(); }); });
+  if (!passwordRegex.test(pass)) return Swal.fire({ icon:"error", title:"Contraseña inválida", text:"Mínimo 8 caracteres, una letra, un número y un símbolo.", footer:"<a href='#' id='regex-hint'>Ver formato correcto</a>" }).then(() => { document.getElementById("regex-hint")?.addEventListener("click", (event) => { event.preventDefault(); showRegexHints(); }); });
+  if (!phoneRegex.test(phone.trim())) return Swal.fire({ icon:"error", title:"Teléfono inválido", text:"Ejemplo: 987654321 o +51 987654321", footer:"<a href='#' id='regex-hint'>Ver formato correcto</a>" }).then(() => { document.getElementById("regex-hint")?.addEventListener("click", (event) => { event.preventDefault(); showRegexHints(); }); });
+  if (!addressRegex.test(address.trim())) return Swal.fire({ icon:"error", title:"Dirección inválida", text:"Debe tener entre 5 y 80 caracteres.", footer:"<a href='#' id='regex-hint'>Ver formato correcto</a>" }).then(() => { document.getElementById("regex-hint")?.addEventListener("click", (event) => { event.preventDefault(); showRegexHints(); }); });
+  if (!cityRegex.test(city.trim())) return Swal.fire({ icon:"error", title:"Ciudad inválida", text:"Usa solo letras y espacios.", footer:"<a href='#' id='regex-hint'>Ver formato correcto</a>" }).then(() => { document.getElementById("regex-hint")?.addEventListener("click", (event) => { event.preventDefault(); showRegexHints(); }); });
   if (!sex) return Swal.fire("Error 630","Selecciona tu género","error");
   if (!birthdate) return Swal.fire("Error 630","Selecciona tu fecha de nacimiento","error");
 
@@ -79,6 +88,7 @@ export default function Register() {
         tempToken: initialData.tempToken,
         redirectTo: "/login",
         requireAdmin: false,
+        forceEmailOnly: true,
         pendingRegistration: {
           name: name.trim(),
           lastname: lastname.trim(),

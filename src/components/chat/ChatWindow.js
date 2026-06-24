@@ -37,11 +37,11 @@ export default function ChatWindow({
 
       <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-purple-100">
 
-        <div className="h-20 px-8 flex items-center justify-between">
+        <div className="h-20 px-3 sm:px-8 flex items-center justify-between gap-2">
 
           <div className="flex items-center gap-4">
 
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-500 text-white flex items-center justify-center text-xl shadow-md">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-500 text-white flex items-center justify-center text-lg sm:text-xl shadow-md">
               {chat.icon}
             </div>
 
@@ -77,7 +77,7 @@ export default function ChatWindow({
 
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-2">
 
             <button className="w-10 h-10 rounded-xl hover:bg-purple-50 text-gray-500 hover:text-purple-600 transition">
               🔔
@@ -99,7 +99,7 @@ export default function ChatWindow({
 
       <div className="flex-1 overflow-y-auto">
 
-        <div className="max-w-4xl mx-auto px-8 py-6 space-y-4">
+        <div className="max-w-4xl mx-auto px-3 sm:px-8 py-4 sm:py-6 space-y-4">
 
           {messages.length === 0 && (
 

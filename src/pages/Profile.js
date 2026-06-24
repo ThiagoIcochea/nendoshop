@@ -108,8 +108,8 @@ export default function Profile() {
     if (form.cardNumber && !cardNumberRegex.test(form.cardNumber.replace(/\s/g, ""))) return Swal.fire("Error 630", "Número de tarjeta inválido.", "error");
     if (form.cardCVV && !cvvRegex.test(form.cardCVV)) return Swal.fire("Error 630", "CVV inválido.", "error");
 
-    const res = await fetch("https://backendproyectodf.onrender.com/api/users/profile", {
-      method: "PUT",
+    const res = await fetch("https://backendproyectodf.onrender.com/api/auth/profile-update-request", {
+      method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
@@ -123,7 +123,6 @@ export default function Profile() {
         birthdate: form.birthdate,
         sex: form.sex,
         profileImg: form.avatar,
-
         paymentmethod: {
           nombretarjeta: form.cardName,
           numerotarjeta: form.cardNumber,
@@ -135,9 +134,30 @@ export default function Profile() {
 
     const data = await res.json();
 
-    if (!res.ok) return Swal.fire("Error 896",data.message,"error");
+    if (!res.ok) return Swal.fire("Error 896", data.message || "No se pudo iniciar la actualización", "error");
 
-    Swal.fire("Actualización de Registro" ,"Perfil actualizado correctamente","success");
+    navigate("/verify-2fa", {
+      state: {
+        email: form.email,
+        tempToken: data.tempToken,
+        pendingProfileUpdate: { email: form.email, payload: {
+          name: form.name,
+          lastname: form.lastname,
+          phone: form.phone,
+          address: form.address,
+          city: form.city,
+          birthdate: form.birthdate,
+          sex: form.sex,
+          profileImg: form.avatar,
+          paymentmethod: {
+            nombretarjeta: form.cardName,
+            numerotarjeta: form.cardNumber,
+            cvv: form.cardCVV,
+            tipo: form.cardType
+          }
+        } }
+      }
+    });
 
   } catch (err) {
     console.log(err);
@@ -282,14 +302,14 @@ export default function Profile() {
 
       {showPasswordModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+          <div className="w-full max-w-md rounded-2xl border border-purple-200 bg-white p-6 shadow-2xl">
             <h3 className="text-lg font-semibold text-gray-900">Cambiar contraseña</h3>
-            <p className="mt-2 text-sm text-gray-500">Confirma tu contraseña actual y escribe la nueva.</p>
+            <p className="mt-2 text-sm text-gray-500">Confirma tu contraseña actual y escribe la nueva. Después se pedirá verificación en dos pasos.</p>
             <form onSubmit={handlePasswordChange} className="mt-4 space-y-3">
-              <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="border p-2 w-full rounded" placeholder="Contraseña actual" />
-              <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="border p-2 w-full rounded" placeholder="Nueva contraseña" />
+              <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="w-full rounded-xl border border-gray-200 p-3 outline-none focus:border-purple-400" placeholder="Contraseña actual" />
+              <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full rounded-xl border border-gray-200 p-3 outline-none focus:border-purple-400" placeholder="Nueva contraseña" />
               <div className="flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setShowPasswordModal(false)} className="rounded-lg border px-3 py-2 text-sm">Cancelar</button>
+                <button type="button" onClick={() => setShowPasswordModal(false)} className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-600">Cancelar</button>
                 <button type="submit" className="rounded-lg bg-brand px-3 py-2 text-sm text-white" disabled={passwordLoading}>
                   {passwordLoading ? "Procesando..." : "Confirmar cambio"}
                 </button>

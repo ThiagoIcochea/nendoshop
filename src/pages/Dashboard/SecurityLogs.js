@@ -157,7 +157,8 @@ export default function SecurityLogs() {
                   </div>
                   <p className="mt-2 text-sm text-gray-600">{log.descripcion}</p>
                   <p className="mt-1 text-xs text-gray-400">{log.metodo} {log.ruta} · {new Date(log.createdAt).toLocaleString("es-ES")}</p>
-                  <p className="mt-1 text-xs text-gray-400">IP: {log.ip || "unknown"} · UA: {log.userAgent || "unknown"}</p>
+                  <p className="mt-1 text-xs text-gray-400 break-all">IP: {log.ip || "unknown"}</p>
+                  <p className="mt-1 text-xs text-gray-400 break-all">User-Agent: {log.userAgent || "unknown"}</p>
                 </div>
               ))}
             </div>

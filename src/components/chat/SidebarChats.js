@@ -20,11 +20,11 @@ export default function SidebarChats({
   setCurrentChat
 }) {
   return (
-    <aside className="w-80 h-full bg-white border-r border-purple-100 flex flex-col">
+    <aside className="w-full h-full bg-white border-r border-purple-100 flex flex-col md:w-80">
 
      <div className="p-4 border-b border-purple-100 bg-gradient-to-r from-white to-purple-50">
 
-  <div className="flex items-center justify-between">
+<div className="flex items-center justify-between gap-3">
 
     {/* izquierda */}
     <div>
@@ -54,7 +54,7 @@ export default function SidebarChats({
 
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3 space-y-2">
+      <div className="flex-1 overflow-y-auto p-2 sm:p-3 space-y-2">
 
         {chats.map(chat => (
 
