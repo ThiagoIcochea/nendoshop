@@ -26,10 +26,20 @@ export default function Products() {
   }, []);
 
   const validateField = (field, value) => {
+    if (field === "name") {
+      return /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9#°.,\s-]{2,80}$/.test(String(value).trim()) ? value.trim() : null;
+    }
+
+    if (field === "description") {
+      return /^.{10,300}$/.test(String(value).trim()) ? value.trim() : null;
+    }
+
     if (["price", "stock", "discount"].includes(field)) {
       const num = Number(value);
       if (value === "" || isNaN(num)) return null;
-      if (num < 0) return null;
+      if (field === "price" && num < 0) return null;
+      if (field === "stock" && (!Number.isInteger(num) || num < 0)) return null;
+      if (field === "discount" && (num < 0 || num > 100)) return null;
       return num;
     }
     return value;
@@ -39,16 +49,32 @@ export default function Products() {
     const validated = validateField(field, value);
 
     if (validated === null) {
-      Swal.fire("Error 630", "Valor inválido", "Error");
+      const message = field === "name"
+        ? "Nombre inválido. Usa entre 2 y 80 caracteres con letras, números y signos básicos."
+        : field === "description"
+          ? "Descripción inválida. Usa entre 10 y 300 caracteres."
+          : field === "price"
+            ? "Precio inválido. Ejemplo: 129.90"
+            : field === "stock"
+              ? "Stock inválido. Usa solo números enteros positivos."
+              : "Descuento inválido. Usa un valor entre 0 y 100.";
+      Swal.fire("Error 630", message, "error");
       return;
     }
 
-    await fetch(`https://backendproyectodf.onrender.com/api/admin/products/${id}/${field}`, {
+    const res = await fetch(`https://backendproyectodf.onrender.com/api/admin/products/${id}/${field}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({ [field]: validated })
     });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      Swal.fire("Error 630", data.message || "No se pudo actualizar el campo", "error");
+      return;
+    }
 
     setProducts(prev =>
       prev.map(p => (p._id === id ? { ...p, [field]: validated } : p))

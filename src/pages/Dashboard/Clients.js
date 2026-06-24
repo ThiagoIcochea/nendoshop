@@ -12,9 +12,11 @@ export default function Clients() {
 
   const itemsPerPage = 8;
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const phoneRegex = /^[0-9]{7,15}$/;
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
+  const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+  const phoneRegex = /^(?:\+51\s?)?9\d{8}$/;
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+  const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,40}$/;
+  const cityRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,40}$/;
 
   useEffect(() => {
     const load = async () => {
@@ -46,23 +48,28 @@ export default function Clients() {
 
   const updateField = async (id, field, value) => {
 
-    if (field === "email" && !emailRegex.test(value)) {
-      showError("Correo inválido");
+    if (field === "email" && !emailRegex.test(String(value).trim())) {
+      showError("Correo inválido. Usa el formato nombre@dominio.com.");
       return;
     }
 
-    if (field === "phone" && !phoneRegex.test(value)) {
-      showError("Teléfono inválido (solo números 7-15 dígitos)");
+    if (field === "phone" && !phoneRegex.test(String(value).trim())) {
+      showError("Teléfono inválido. Ejemplo: 987654321 o +51 987654321.");
       return;
     }
 
-    if (field === "city" && value.trim().length < 2) {
-      showError("Ciudad inválida");
+    if (field === "name" && !nameRegex.test(String(value).trim())) {
+      showError("Nombre inválido. Usa 2 a 40 letras y espacios.");
       return;
     }
 
-    if (field === "password" && !passwordRegex.test(value)) {
-      showError("Contraseña débil (mínimo 6 caracteres, letras y números)");
+    if (field === "city" && !cityRegex.test(String(value).trim())) {
+      showError("Ciudad inválida. Usa solo letras y espacios.");
+      return;
+    }
+
+    if (field === "password" && !passwordRegex.test(String(value))) {
+      showError("Contraseña inválida. Debe tener al menos 8 caracteres, una letra, un número y un símbolo.");
       return;
     }
 
@@ -73,8 +80,10 @@ export default function Clients() {
       body: JSON.stringify({ [field]: value })
     });
 
+    const data = await res.json().catch(() => ({}));
+
     if (!res.ok) {
-      showError("No se pudo actualizar el campo");
+      showError(data.message || "No se pudo actualizar el campo");
       return;
     }
 

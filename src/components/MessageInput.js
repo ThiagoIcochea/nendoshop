@@ -21,9 +21,9 @@ export default function MessageInput({ sendMessage, sendTyping, disabled }) {
   const canSend = text.trim().length > 0;
 
   return (
-    <div className="w-full px-4 py-3 border-t border-purple-100 bg-white/70 backdrop-blur-xl">
+    <div className="w-full px-3 py-3 border-t border-purple-100 bg-white/70 backdrop-blur-xl sm:px-4">
 
-      <div className="flex items-center gap-3 bg-purple-50/40 border border-purple-100 rounded-2xl px-3 py-2 focus-within:ring-2 focus-within:ring-purple-200 transition">
+      <div className="flex flex-col gap-2 rounded-2xl border border-purple-100 bg-purple-50/40 px-3 py-2 focus-within:ring-2 focus-within:ring-purple-200 transition sm:flex-row sm:items-center">
 
         <input
           type="text"
@@ -34,14 +34,14 @@ export default function MessageInput({ sendMessage, sendTyping, disabled }) {
           }}
           onKeyDown={handleKeyDown}
           placeholder="Escribe un mensaje..."
-          className="flex-1 bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none"
+          className="flex-1 min-w-0 bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none"
         />
 
         <button
           onClick={handleSend}
           disabled={!canSend || disabled}
           className={`
-            flex items-center justify-center px-4 h-10 rounded-xl transition
+            flex items-center justify-center px-4 h-10 rounded-xl transition whitespace-nowrap
             active:scale-95
             ${
               canSend && !disabled

@@ -97,9 +97,9 @@ export default function ChatWindow({
 
       </header>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
 
-        <div className="max-w-4xl mx-auto px-3 sm:px-8 py-4 sm:py-6 space-y-4">
+        <div className="max-w-4xl mx-auto px-3 sm:px-8 py-4 sm:py-6 space-y-4 pb-24">
 
           {messages.length === 0 && (
 

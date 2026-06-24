@@ -75,39 +75,40 @@ export default function Profile() {
 }, []);
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
-    let auth = JSON.parse(localStorage.getItem("auth"));
-    auth.profileImg= e.target.value;
-    setAuth(auth);
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "avatar") {
+      const savedAuth = JSON.parse(localStorage.getItem("auth") || "null");
+      if (savedAuth) {
+        savedAuth.profileImg = value;
+        setAuth(savedAuth);
+      }
+    }
   };
 
  
   const handleImage = (e) => {
-   
-   console.log(e.target.value);
-   
-        setForm({
-          ...form,
-          avatar: e.target.value
-        });
-    let auth = JSON.parse(localStorage.getItem("auth"));
-    auth.profileImg= e.target.value;
-    setAuth(auth);
+    const value = e.target.value;
+    setForm((prev) => ({ ...prev, avatar: value }));
+
+    const savedAuth = JSON.parse(localStorage.getItem("auth") || "null");
+    if (savedAuth) {
+      savedAuth.profileImg = value;
+      setAuth(savedAuth);
+    }
   };
 
  const saveProfile = async () => {
   try {
-    if (!nameRegex.test((form.name || "").trim())) return Swal.fire("Error 630", "Nombre inválido. Usa solo letras y espacios.", "error");
-    if (!nameRegex.test((form.lastname || "").trim())) return Swal.fire("Error 630", "Apellido inválido. Usa solo letras y espacios.", "error");
-    if (!phoneRegex.test((form.phone || "").trim())) return Swal.fire("Error 630", "Teléfono inválido. Ejemplo: 987654321 o +51 987654321", "error");
-    if (!addressRegex.test((form.address || "").trim())) return Swal.fire("Error 630", "Dirección inválida. Debe tener entre 5 y 80 caracteres.", "error");
+    if (!nameRegex.test((form.name || "").trim())) return Swal.fire("Error 630", "Nombre inválido. Usa 2 a 40 letras y espacios.", "error");
+    if (!nameRegex.test((form.lastname || "").trim())) return Swal.fire("Error 630", "Apellido inválido. Usa 2 a 40 letras y espacios.", "error");
+    if (!phoneRegex.test((form.phone || "").trim())) return Swal.fire("Error 630", "Teléfono inválido. Ejemplo: 987654321 o +51 987654321.", "error");
+    if (!addressRegex.test((form.address || "").trim())) return Swal.fire("Error 630", "Dirección inválida. Usa entre 5 y 80 caracteres con letras, números y signos básicos.", "error");
     if (!cityRegex.test((form.city || "").trim())) return Swal.fire("Error 630", "Ciudad inválida. Usa solo letras y espacios.", "error");
-    if (form.cardName && !cardNameRegex.test(form.cardName.trim())) return Swal.fire("Error 630", "Nombre de tarjeta inválido.", "error");
-    if (form.cardNumber && !cardNumberRegex.test(form.cardNumber.replace(/\s/g, ""))) return Swal.fire("Error 630", "Número de tarjeta inválido.", "error");
-    if (form.cardCVV && !cvvRegex.test(form.cardCVV)) return Swal.fire("Error 630", "CVV inválido.", "error");
+    if (form.cardName && !cardNameRegex.test(form.cardName.trim())) return Swal.fire("Error 630", "Nombre de tarjeta inválido. Usa solo letras y espacios.", "error");
+    if (form.cardNumber && !cardNumberRegex.test(form.cardNumber.replace(/\s/g, ""))) return Swal.fire("Error 630", "Número de tarjeta inválido. Usa 16 dígitos con espacios o guiones.", "error");
+    if (form.cardCVV && !cvvRegex.test(form.cardCVV)) return Swal.fire("Error 630", "CVV inválido. Usa 3 o 4 dígitos.", "error");
 
     const res = await fetch("https://backendproyectodf.onrender.com/api/auth/profile-update-request", {
       method: "POST",
@@ -118,6 +119,7 @@ export default function Profile() {
       body: JSON.stringify({
         name: form.name,
         lastname: form.lastname,
+        email: form.email,
         phone: form.phone,
         address: form.address,
         city: form.city,
@@ -268,6 +270,11 @@ export default function Profile() {
       </div>
 
      
+      <div className="mb-6 rounded-xl border border-purple-100 bg-purple-50/50 p-3 text-sm text-purple-700">
+        <p className="font-semibold">Guía de datos</p>
+        <p className="mt-1">Nombre y apellido: solo letras y espacios. Teléfono: 987654321 o +51 987654321. Dirección: entre 5 y 80 caracteres. Ciudad: solo letras. Si cambias el correo, debe ser único en la plataforma.</p>
+      </div>
+
       <div className="mb-6">
         <input
         name="avatar"
@@ -286,7 +293,7 @@ export default function Profile() {
 
         <input name="lastname" value={form.lastname} onChange={handleChange} placeholder="Apellidos" className="border p-2 rounded" />
 
-        <input name="email" value={form.email} disabled className="border p-2 rounded bg-gray-100" />
+        <input name="email" value={form.email} onChange={handleChange} placeholder="Correo electrónico" className="border p-2 rounded" />
 
         <input name="phone" value={form.phone} onChange={handleChange} placeholder="Teléfono" className="border p-2 rounded" />
 
