@@ -43,7 +43,7 @@ export default function ChatInfo({ users, onReportUser }) {
 
               <img
                 key={i}
-                src={u.avatar}
+                src={u.profileImg || u.avatar}
                 alt={u.username}
                 className="
                 w-9 h-9 rounded-full
