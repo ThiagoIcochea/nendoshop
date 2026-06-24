@@ -11,6 +11,7 @@ import {
 import { AuthContext } from "../context/AuthContext";
 import ParticlesBackground from "../components/ParticlesBackground";
 import Swal from "sweetalert2";
+import { clearPending2FAFlow, readPending2FAFlow } from "../utils/twoFactorFlow";
 
 export default function TwoFactorAuth() {
   const [code, setCode] = useState(Array(6).fill(""));
@@ -24,15 +25,17 @@ export default function TwoFactorAuth() {
   const location = useLocation();
   const inputRefs = useRef([]);
 
-  const email = location.state?.email || "";
-  const tempToken = location.state?.tempToken || "";
-  const redirectTo = location.state?.redirectTo || "/";
-  const requireAdmin = location.state?.requireAdmin || false;
-  const pendingRegistration = location.state?.pendingRegistration || null;
-  const pendingPasswordChange = location.state?.pendingPasswordChange || null;
-  const forgotPassword = location.state?.forgotPassword || false;
-  const newPassword = location.state?.newPassword || "";
-  const forceEmailOnly = Boolean(location.state?.forceEmailOnly);
+  const email = location.state?.email || readPending2FAFlow()?.email || "";
+  const tempToken = location.state?.tempToken || readPending2FAFlow()?.tempToken || "";
+  const redirectTo = location.state?.redirectTo || readPending2FAFlow()?.redirectTo || "/";
+  const requireAdmin = Boolean(location.state?.requireAdmin || readPending2FAFlow()?.requireAdmin || false);
+  const pendingRegistration = location.state?.pendingRegistration || readPending2FAFlow()?.pendingRegistration || null;
+  const pendingPasswordChange = location.state?.pendingPasswordChange || readPending2FAFlow()?.pendingPasswordChange || null;
+  const forgotPassword = Boolean(location.state?.forgotPassword || readPending2FAFlow()?.forgotPassword || false);
+  const newPassword = location.state?.newPassword || readPending2FAFlow()?.newPassword || "";
+  const forceEmailOnly = Boolean(location.state?.forceEmailOnly || readPending2FAFlow()?.forceEmailOnly || false);
+  const pendingProfileUpdate = location.state?.pendingProfileUpdate || readPending2FAFlow()?.pendingProfileUpdate || null;
+  const loginFlow = Boolean(location.state?.loginFlow || readPending2FAFlow()?.loginFlow || false);
 
   useEffect(() => {
     if (!email || !tempToken) {
@@ -145,7 +148,8 @@ export default function TwoFactorAuth() {
           pendingRegistration,
           forgotPassword,
           newPassword,
-          pendingPasswordChange
+          pendingPasswordChange,
+          pendingProfileUpdate
         }),
       });
 
@@ -157,6 +161,8 @@ export default function TwoFactorAuth() {
         inputRefs.current[0].focus();
         return Swal.fire("Error", data.message || "Código incorrecto", "error");
       }
+
+      clearPending2FAFlow();
 
       const isPasswordFlow = Boolean(pendingPasswordChange || forgotPassword);
 
@@ -170,6 +176,11 @@ export default function TwoFactorAuth() {
       setTimeout(() => {
         if (isPasswordFlow) {
           return navigate("/login");
+        }
+
+        if (loginFlow && data.user) {
+          setAuth(data.user);
+          return navigate(redirectTo || "/");
         }
 
         setAuth(data.user);

@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import Swal from "sweetalert2";
+import { savePending2FAFlow } from "../utils/twoFactorFlow";
 
 const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,40}$/;
 const phoneRegex = /^(?:\+51\s?)?9\d{8}$/;
@@ -136,10 +137,33 @@ export default function Profile() {
 
     if (!res.ok) return Swal.fire("Error 896", data.message || "No se pudo iniciar la actualización", "error");
 
+    savePending2FAFlow({
+      email: form.email,
+      tempToken: data.tempToken,
+      redirectTo: "/profile",
+      pendingProfileUpdate: { email: form.email, payload: {
+          name: form.name,
+          lastname: form.lastname,
+          phone: form.phone,
+          address: form.address,
+          city: form.city,
+          birthdate: form.birthdate,
+          sex: form.sex,
+          profileImg: form.avatar,
+          paymentmethod: {
+            nombretarjeta: form.cardName,
+            numerotarjeta: form.cardNumber,
+            cvv: form.cardCVV,
+            tipo: form.cardType
+          }
+        } }
+    });
+
     navigate("/verify-2fa", {
       state: {
         email: form.email,
         tempToken: data.tempToken,
+        redirectTo: "/profile",
         pendingProfileUpdate: { email: form.email, payload: {
           name: form.name,
           lastname: form.lastname,
@@ -189,10 +213,18 @@ export default function Profile() {
       }
 
       setShowPasswordModal(false);
+      savePending2FAFlow({
+        email: form.email,
+        tempToken: data.tempToken,
+        redirectTo: "/profile",
+        pendingPasswordChange: { email: form.email, newPassword },
+        changePassword: true
+      });
       navigate("/verify-2fa", {
         state: {
           email: form.email,
           tempToken: data.tempToken,
+          redirectTo: "/profile",
           pendingPasswordChange: { email: form.email, newPassword },
           changePassword: true
         }

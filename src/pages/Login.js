@@ -4,6 +4,7 @@ import ParticlesBackground from "../components/ParticlesBackground";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import Swal from "sweetalert2";
+import { clearPending2FAFlow, readPending2FAFlow, savePending2FAFlow } from "../utils/twoFactorFlow";
 
 export default function Login() {
   const [user, setUser] = useState("");
@@ -18,6 +19,7 @@ export default function Login() {
 
  const handleLogin = async (e) => {
   e.preventDefault();
+  clearPending2FAFlow();
 
   try {
     const res = await fetch("https://backendproyectodf.onrender.com/api/auth/login", {
@@ -44,7 +46,8 @@ export default function Login() {
     }
 
     if (data.twoFactorRequired) {
-      return navigate("/verify-2fa", { state: { email: user, tempToken: data.tempToken } });
+      savePending2FAFlow({ email: user, tempToken: data.tempToken, redirectTo: "/", requireAdmin: false, loginFlow: true });
+      return navigate("/verify-2fa", { state: { email: user, tempToken: data.tempToken, redirectTo: "/", requireAdmin: false, loginFlow: true } });
     }
 
     if (!data.user) {

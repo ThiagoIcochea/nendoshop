@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ParticlesBackground from "../components/ParticlesBackground";
 import Swal from "sweetalert2";
+import { savePending2FAFlow } from "../utils/twoFactorFlow";
 
 const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,40}$/;
 const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
@@ -81,6 +82,24 @@ export default function Register() {
     if (!initialData.twoFactorRequired) {
       return Swal.fire("Verificación requerida", "Debes completar la verificación en dos pasos para registrar la cuenta.", "info");
     }
+
+    savePending2FAFlow({
+      email: email.trim(),
+      tempToken: initialData.tempToken,
+      redirectTo: "/login",
+      requireAdmin: false,
+      forceEmailOnly: true,
+      pendingRegistration: {
+          name: name.trim(),
+          lastname: lastname.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          address: address.trim(),
+          city: city.trim(),
+          birthdate,
+          sex
+        }
+    });
 
     navigate("/verify-2fa", {
       state: {
