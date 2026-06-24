@@ -9,6 +9,7 @@ export default function Pagos() {
   // Estados del flujo
   const [paymentStatus, setPaymentStatus] = useState("inactivo");
   const [paso, setPaso] = useState(1); // 1 = Envío/Facturación, 2 = Tarjeta
+  const [saveCard, setSaveCard] = useState(false);
 
   const [user, setUser] = useState(null);
   
@@ -139,24 +140,34 @@ export default function Pagos() {
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://backendproyectodf.onrender.com";
       const paymentData = {
-        cliente: user ? `${user.name} ${user.lastname}` : "Cliente Anónimo",
-        tipo_comprobante: envioDatos.tipoComprobante,
-        documento: envioDatos.documento,
-        razon_social: envioDatos.tipoComprobante === "factura" ? envioDatos.razonSocial : undefined,
-        metodo_envio: envioDatos.metodoEnvio === "presencial" ? "recojo" : envioDatos.metodoEnvio,
-        direccion_entrega: envioDatos.metodoEnvio === "delivery"
-          ? `${envioDatos.direccionEntrega.calle}, ${envioDatos.direccionEntrega.distrito}`
-          : "Recojo en Tienda: Av. Arequipa 265, Lima - Perú",
-        referencia: envioDatos.metodoEnvio === "delivery" ? envioDatos.referencia : undefined,
-        envio: envioDatos.metodoEnvio === "delivery" ? 15.00 : 0,
-        productos: cart.map((p) => ({
-          name: p.name,
-          quantity: p.quantity,
-          price: p.price
-        })),
-        total: envioDatos.metodoEnvio === "delivery" ? total + 15 : total,
-        estado: "Pagado"
-      };
+  cliente: user ? `${user.name} ${user.lastname}` : "Cliente Anónimo",
+
+  saveCard,
+
+  paymentmethod: saveCard ? {
+    nombretarjeta: card.cardName,
+    numerotarjeta: card.cardNumber,
+    cvv: card.cardCVV,
+    tipo: card.cardType
+  } : undefined,
+
+  tipo_comprobante: envioDatos.tipoComprobante,
+  documento: envioDatos.documento,
+  razon_social: envioDatos.tipoComprobante === "factura" ? envioDatos.razonSocial : undefined,
+  metodo_envio: envioDatos.metodoEnvio === "presencial" ? "recojo" : envioDatos.metodoEnvio,
+  direccion_entrega: envioDatos.metodoEnvio === "delivery"
+    ? `${envioDatos.direccionEntrega.calle}, ${envioDatos.direccionEntrega.distrito}`
+    : "Recojo en Tienda: Av. Arequipa 265, Lima - Perú",
+  referencia: envioDatos.metodoEnvio === "delivery" ? envioDatos.referencia : undefined,
+  envio: envioDatos.metodoEnvio === "delivery" ? 15.00 : 0,
+  productos: cart.map((p) => ({
+    name: p.name,
+    quantity: p.quantity,
+    price: p.price
+  })),
+  total: envioDatos.metodoEnvio === "delivery" ? total + 15 : total,
+  estado: "Pagado"
+};
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 18000);
@@ -355,6 +366,13 @@ export default function Pagos() {
                         <span className={`text-xs ${card.cardCVV.length === 3 ? 'text-green-600 font-bold' : 'text-red-400'}`}>{card.cardCVV.length}/3</span>
                       </div>
                       <input name="cardCVV" value={card.cardCVV} onChange={(e) => setCard({ ...card, cardCVV: e.target.value.replace(/\D/g, '').slice(0, 3) })} type="password" required placeholder="123" className="w-full border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand" />
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <input type="checkbox" id="saveCard" name="saveCard" checked={saveCard} onChange={(e) => setSaveCard(e.target.checked)} className="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand" />
+                      <label htmlFor="saveCard" className="block text-sm font-medium text-gray-700">
+                        Guardar tarjeta para futuras compras
+                      </label>
                     </div>
 
                     <div className="flex-1">
