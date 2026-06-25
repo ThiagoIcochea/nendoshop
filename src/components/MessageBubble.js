@@ -75,7 +75,6 @@ export default function MessageBubble({ user, text, time, isOwn, profileImg, dis
             </span>
           </div>
 
-          {/* Bubble */}
           <div
             className={`
               relative px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words
@@ -98,7 +97,6 @@ export default function MessageBubble({ user, text, time, isOwn, profileImg, dis
               {renderTextWithLinks(text)}
             </div>
 
-            {/* “Tail” tipo chat bubble */}
             <div
               className={`
                 absolute bottom-0 w-3 h-3 rotate-45

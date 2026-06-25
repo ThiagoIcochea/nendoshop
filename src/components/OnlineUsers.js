@@ -43,7 +43,6 @@ export default function OnlineUsers({ onlineUsers = [], onSelectUser }) {
         </span>
       </div>
 
-      {/* USUARIOS */}
       <div className="space-y-2 max-h-64 overflow-y-auto">
 
         {filteredUsers.length > 0 ? (

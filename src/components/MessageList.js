@@ -47,7 +47,6 @@ export default function MessageList({ messages }) {
         </div>
       )}
 
-      {/* MENSAJES */}
       <div className="space-y-2">
         {messages.map((msg, i) => (
           <div

@@ -5,20 +5,16 @@ import Swal from "sweetalert2";
 export default function Pagos() {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
-  
-  // Estados del flujo
   const [paymentStatus, setPaymentStatus] = useState("inactivo");
-  const [paso, setPaso] = useState(1); // 1 = Envío/Facturación, 2 = Tarjeta
+  const [paso, setPaso] = useState(1); 
   const [saveCard, setSaveCard] = useState(false);
 
   const [user, setUser] = useState(null);
-  
-  // EL NUEVO ESTADO CONSOLIDADO 
   const [envioDatos, setEnvioDatos] = useState({
-    tipoComprobante: "boleta", // boleta o factura
-    documento: "",             // DNI o RUC
+    tipoComprobante: "boleta", 
+    documento: "",             
     razonSocial: "",
-    metodoEnvio: "delivery",   // delivery o presencial
+    metodoEnvio: "delivery",   
     direccionEntrega: {
       calle: "",
       distrito: ""
@@ -33,7 +29,6 @@ export default function Pagos() {
   cardType: "visa"
 });
 
-  // Guardián del carrito
   useEffect(() => {
     const data = JSON.parse(localStorage.getItem("cart")) || [];
     if (data.length === 0) {
@@ -43,7 +38,6 @@ export default function Pagos() {
     setCart(data);
   }, [navigate]);
 
-  // Cargar usuario
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -81,7 +75,6 @@ export default function Pagos() {
     return acc + price * p.quantity;
   }, 0);
 
-  // Manejador genérico para el estado anidado de dirección
   const handleDireccionChange = (e) => {
     setEnvioDatos({
       ...envioDatos,
@@ -92,7 +85,6 @@ export default function Pagos() {
     });
   };
 
-  //Validaciones del 1er Estado
   const avanzarPaso = (e) => {
     e.preventDefault();
     
@@ -112,7 +104,6 @@ export default function Pagos() {
       }
     }
 
-    // 2. Validar Dirección (Solo si es Delivery)
     if (envioDatos.metodoEnvio === "delivery") {
       if (!envioDatos.direccionEntrega.calle.trim() || !envioDatos.direccionEntrega.distrito.trim()) {
         Swal.fire("Error 630","⚠️ Error de Validación: Por favor, completa la calle y el distrito para el envío.","error");
@@ -122,7 +113,6 @@ export default function Pagos() {
     setPaso(2);
   };
 
-  // EL FETCH PARA SERVIDOR DE RENDER
   const handlePayment = async (e) => {
     e.preventDefault();
 
@@ -203,8 +193,7 @@ export default function Pagos() {
 
   return (
     <div className="relative min-h-screen bg-gray-50 p-4 md:p-10">
-      
-      {/* MODAL DE CARGA */}
+
       {paymentStatus !== "inactivo" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
           <div className="bg-white p-8 rounded-2xl shadow-2xl flex flex-col items-center transform transition-all scale-105">
@@ -230,10 +219,8 @@ export default function Pagos() {
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 items-start">
 
-          {/* COLUMNA IZQUIERDA: EL WIZARD */}
           <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
             
-            {/* PASO 1: FACTURACIÓN Y ENVÍO */}
             {paso === 1 && (
               <form onSubmit={avanzarPaso} className="animate__animated animate__fadeIn space-y-8">
                 <div className="flex items-center gap-3 border-b pb-2">
@@ -241,7 +228,6 @@ export default function Pagos() {
                   <h2 className="text-xl font-bold text-gray-800">Datos de Facturación y Envío</h2>
                 </div>
 
-                {/* BLOQUE A: COMPROBANTE DE PAGO */}
                 <div>
                   <h3 className="text-md font-semibold text-gray-700 mb-3">Tipo de Comprobante</h3>
                   <div className="flex gap-4 mb-4">
@@ -255,7 +241,6 @@ export default function Pagos() {
                     </label>
                   </div>
 
-                  {/* Renderizado dinámico según el comprobante */}
                   {envioDatos.tipoComprobante === "boleta" ? (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">DNI</label> 
@@ -282,7 +267,6 @@ export default function Pagos() {
                   )}
                 </div>
 
-                {/* BLOQUE B: MÉTODO DE ENTREGA */}
                 <div className="pt-4 border-t">
                   <h3 className="text-md font-semibold text-gray-700 mb-3">Método de Entrega</h3>
                   <select 
@@ -294,7 +278,6 @@ export default function Pagos() {
                     <option value="presencial">Recojo en Tienda</option>
                   </select>
 
-                  {/* Renderizado dinámico según el método de entrega */}
                   {envioDatos.metodoEnvio === "delivery" ? (
                     <div className="space-y-4">
                       <div className="flex gap-4">
@@ -313,7 +296,7 @@ export default function Pagos() {
                       </div>
                     </div>
                   ) : (
-                    // La Tarjeta Elegante con el Iframe
+
                     <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 shadow-inner">
                       <div className="flex items-center gap-3 mb-2">
                         <svg className="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -321,7 +304,6 @@ export default function Pagos() {
                       </div>
                       <p className="text-gray-600 mb-4 ml-9">Av. Arequipa 265, Lima - Perú</p>
                       <div className="rounded-lg overflow-hidden border border-gray-300">
-                        {/* Iframe de Google Maps incrustado */}
                         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3901.7828004149955!2d-77.03816652414346!3d-12.058455842245238!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c8c6db20b335%3A0xcab528f44d5cf301!2sAv.%20Arequipa%20265%2C%20Lima%2015046!5e0!3m2!1ses-419!2spe!4v1715480000000!5m2!1ses-419!2spe" width="100%" height="200" style={{border:0}} allowFullScreen="" loading="lazy" referrerPolicy="no-referrer-when-downgrade" title="Mapa de la Tienda"></iframe>
                       </div>
                     </div>
@@ -334,7 +316,6 @@ export default function Pagos() {
               </form>
             )}
 
-            {/* PASO 2: TARJETA DE CRÉDITO */}
             {paso === 2 && (
               <form onSubmit={handlePayment} className="animate__animated animate__fadeIn">
                 <div className="flex items-center justify-between mb-6 border-b pb-2">
@@ -368,8 +349,6 @@ export default function Pagos() {
                       <input name="cardCVV" value={card.cardCVV} onChange={(e) => setCard({ ...card, cardCVV: e.target.value.replace(/\D/g, '').slice(0, 3) })} type="password" required placeholder="123" className="w-full border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand" />
                     </div>
 
-                   
-
                     <div className="flex-1">
                       <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
                       <select name="cardType" value={card.cardType} onChange={(e) => setCard({ ...card, cardType: e.target.value })} className="w-full border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand bg-white">
@@ -394,7 +373,6 @@ export default function Pagos() {
             )}
           </div>
 
-          {/* COLUMNA DERECHA: RESUMEN */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit sticky top-6">
             <h2 className="text-lg font-bold mb-4">Resumen del Pedido</h2>
             <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 mb-6">
@@ -427,7 +405,6 @@ export default function Pagos() {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>

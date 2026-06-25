@@ -9,7 +9,6 @@ export default function TypingIndicator({ typingUser }) {
           {typingUser?.[0]?.toUpperCase()}
         </div>
 
-        {/* dots */}
         <div className="flex items-center gap-1">
           <span className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce"></span>
           <span className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce [animation-delay:120ms]"></span>
