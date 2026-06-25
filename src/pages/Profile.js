@@ -12,6 +12,11 @@ const cardNameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,40}$/;
 const cardNumberRegex = /^(?:\d{4}[-\s]?){3}\d{4}$/;
 const cvvRegex = /^\d{3,4}$/;
 
+const normalizeTextValue = (value) => {
+  if (value === null || value === undefined) return "";
+  return String(value).trim();
+};
+
 export default function Profile() {
 
   const { setAuth } = useContext(AuthContext);
@@ -60,9 +65,9 @@ export default function Profile() {
         city: data.city || "",
         birthdate: data.birthdate ? data.birthdate.split("T")[0] : "",
         sex: data.sex || "",
-        cardName:data.paymentmethod?.nombretarjeta || "",
-        cardNumber: data.paymentmethod?.numerotarjeta || "",
-        cardCVV: data.paymentmethod?.cvv || "",
+        cardName: normalizeTextValue(data.paymentmethod?.nombretarjeta),
+        cardNumber: normalizeTextValue(data.paymentmethod?.numerotarjeta),
+        cardCVV: normalizeTextValue(data.paymentmethod?.cvv),
         cardType: data.paymentmethod?.tipo || "visa",
         avatar: data.profileImg || ""
       });
@@ -107,9 +112,14 @@ export default function Profile() {
     if (!phoneRegex.test((form.phone || "").trim())) return Swal.fire("Error 630", "Teléfono inválido. Ejemplo: 987654321 o +51 987654321.", "error");
     if (!addressRegex.test((form.address || "").trim())) return Swal.fire("Error 630", "Dirección inválida. Usa entre 5 y 80 caracteres con letras, números y signos básicos.", "error");
     if (!cityRegex.test((form.city || "").trim())) return Swal.fire("Error 630", "Ciudad inválida. Usa solo letras y espacios.", "error");
-    if (form.cardName && !cardNameRegex.test(form.cardName.trim())) return Swal.fire("Error 630", "Nombre de tarjeta inválido. Usa solo letras y espacios.", "error");
-    if (form.cardNumber && !cardNumberRegex.test(form.cardNumber.replace(/\s/g, ""))) return Swal.fire("Error 630", "Número de tarjeta inválido. Usa 16 dígitos con espacios o guiones.", "error");
-    if (form.cardCVV && !cvvRegex.test(form.cardCVV)) return Swal.fire("Error 630", "CVV inválido. Usa 3 o 4 dígitos.", "error");
+
+    const normalizedCardName = normalizeTextValue(form.cardName);
+    const normalizedCardNumber = normalizeTextValue(form.cardNumber).replace(/\s/g, "");
+    const normalizedCardCVV = normalizeTextValue(form.cardCVV);
+
+    if (normalizedCardName && !cardNameRegex.test(normalizedCardName)) return Swal.fire("Error 630", "Nombre de tarjeta inválido. Usa solo letras y espacios.", "error");
+    if (normalizedCardNumber && !cardNumberRegex.test(normalizedCardNumber)) return Swal.fire("Error 630", "Número de tarjeta inválido. Usa 16 dígitos con espacios o guiones.", "error");
+    if (normalizedCardCVV && !cvvRegex.test(normalizedCardCVV)) return Swal.fire("Error 630", "CVV inválido. Usa 3 o 4 dígitos.", "error");
 
     const payload = {
       name: form.name,
@@ -122,9 +132,9 @@ export default function Profile() {
       sex: form.sex,
       profileImg: form.avatar,
       paymentmethod: {
-        nombretarjeta: form.cardName,
-        numerotarjeta: form.cardNumber,
-        cvv: form.cardCVV,
+        nombretarjeta: normalizedCardName,
+        numerotarjeta: normalizedCardNumber,
+        cvv: normalizedCardCVV,
         tipo: form.cardType
       }
     };
