@@ -99,7 +99,7 @@ export default function ChatWindow({
 
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
 
-        <div className="mx-auto max-w-4xl space-y-4 px-3 py-4 pb-28 sm:px-8 sm:py-6 sm:pb-32">
+        <div className="mx-auto max-w-4xl space-y-4 px-3 py-4 pb-32 sm:px-8 sm:py-6 sm:pb-40">
 
           {messages.length === 0 && (
 
@@ -152,7 +152,7 @@ export default function ChatWindow({
 
       </div>
 
-      <div className="sticky bottom-0 z-20 border-t border-purple-100 bg-white/90 backdrop-blur-xl">
+      <div className="sticky bottom-0 z-20 border-t border-purple-100 bg-gradient-to-t from-white via-white to-purple-50/40 px-1 py-2 shadow-[0_-10px_30px_rgba(88,28,135,0.06)] backdrop-blur-xl sm:px-2 sm:py-3">
 
         <div className="mx-auto max-w-4xl">
           <MessageInput

@@ -87,9 +87,9 @@ export default function MessageInput({ sendMessage, sendTyping, disabled }) {
   };
 
   return (
-    <div className="w-full border-t border-purple-100 bg-white/80 px-2 py-2 backdrop-blur-xl sm:px-4 sm:py-3">
+    <div className="w-full border-t border-purple-100 bg-gradient-to-t from-white via-white to-purple-50/30 px-3 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(88,28,135,0.06)] backdrop-blur-xl sm:px-4 sm:py-4">
 
-      <div className="mx-auto flex max-w-3xl flex-col gap-2 rounded-2xl border border-purple-100 bg-purple-50/40 px-2 py-2 transition focus-within:ring-2 focus-within:ring-purple-200 sm:flex-row sm:items-center sm:px-3">
+      <div className="mx-auto flex max-w-3xl flex-col gap-2 rounded-[22px] border border-purple-200/80 bg-white/95 px-2.5 py-2 shadow-sm transition focus-within:ring-2 focus-within:ring-purple-200 sm:flex-row sm:items-center sm:px-3 sm:py-2.5">
 
         <input
           type="text"
@@ -108,9 +108,9 @@ export default function MessageInput({ sendMessage, sendTyping, disabled }) {
             type="button"
             onClick={handleVoiceInput}
             aria-label="Enviar mensaje por voz"
-            className={`flex h-10 w-10 items-center justify-center rounded-xl border transition ${
+            className={`flex h-11 w-11 items-center justify-center rounded-xl border transition ${
               isListening
-                ? "border-purple-500 bg-purple-600 text-white"
+                ? "border-purple-500 bg-purple-600 text-white shadow-sm"
                 : "border-purple-200 bg-white text-purple-600 hover:bg-purple-100"
             }`}
           >
@@ -121,12 +121,11 @@ export default function MessageInput({ sendMessage, sendTyping, disabled }) {
             onClick={handleSend}
             disabled={!canSend || disabled}
             className={`
-              flex items-center justify-center gap-2 px-4 h-10 rounded-xl transition whitespace-nowrap
-              active:scale-95
+              flex h-11 items-center justify-center gap-2 rounded-xl px-4 whitespace-nowrap transition active:scale-95
               ${
                 canSend && !disabled
                   ? "bg-gradient-to-r from-purple-600 to-purple-500 text-white shadow-md hover:shadow-lg hover:shadow-purple-200"
-                  : "bg-purple-100 text-purple-300 cursor-not-allowed"
+                  : "cursor-not-allowed bg-purple-100 text-purple-300"
               }
             `}
           >

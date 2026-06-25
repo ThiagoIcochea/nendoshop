@@ -151,31 +151,31 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
+    <header className="sticky top-0 z-50 overflow-x-hidden border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
 
       <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
 
-        <div className="flex h-16 items-center justify-between gap-2 sm:h-20">
+        <div className="flex min-h-[56px] items-center justify-between gap-2 py-2 sm:h-20 sm:min-h-0 sm:py-0">
 
-          <div className="flex min-w-0 items-center gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
 
             <button
               onClick={() => setMenuOpen((value) => !value)}
-              className="md:hidden text-gray-700"
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-sm md:hidden"
               aria-label="Abrir menú"
             >
-              <Menu className="w-7 h-7" />
+              <Menu className="h-5 w-5" />
             </button>
 
-            <Link to="/" className="flex min-w-0 items-center gap-3">
+            <Link to="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
 
               <img
                 src={logo}
                 alt="Nendoshop Logo"
-                className="h-12 w-12 object-contain rounded-full border border-gray-100 shadow-sm"
+                className="h-10 w-10 rounded-full border border-gray-100 object-contain shadow-sm sm:h-12 sm:w-12"
               />
 
-              <span className="hidden text-xl font-bold tracking-tight text-gray-900 sm:block">
+              <span className="hidden text-lg font-bold tracking-tight text-gray-900 sm:block sm:text-xl">
                 Nendoshop
               </span>
 
@@ -214,7 +214,7 @@ export default function Navbar() {
 
           </div>
 
-          <div className="flex flex-1 items-center justify-end gap-2 sm:gap-3">
+          <div className="flex flex-shrink-0 items-center justify-end gap-2 sm:gap-3">
 
             <div className="hidden flex-1 items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-2 shadow-sm md:flex md:max-w-xl">
               <Search className="h-4 w-4 text-gray-400" />
@@ -242,10 +242,10 @@ export default function Navbar() {
               </Link>
             ) : (
               <>
-                <Link to="/profile">
+                <Link to="/profile" className="flex-shrink-0">
                   <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-brand text-sm font-bold text-white">
                     {auth.profileImg ? (
-                      <img src={auth.profileImg} className="w-full h-full object-cover" />
+                      <img src={auth.profileImg} alt="Perfil" className="h-full w-full object-cover" />
                     ) : (
                       (auth.name?.[0] || "") + (auth.lastname?.[0] || "")
                     )}
@@ -254,7 +254,8 @@ export default function Navbar() {
 
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 text-red-500"
+                  className="flex h-10 w-10 items-center justify-center rounded-full text-red-500 hover:bg-red-50"
+                  aria-label="Cerrar sesión"
                 >
                   <LogOut className="h-5 w-5" />
                 </button>
@@ -290,7 +291,7 @@ export default function Navbar() {
       </div>
 
       <div className="px-3 pb-3 md:hidden">
-        <div className="flex min-h-[44px] items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-2 shadow-sm">
+        <div className="flex min-h-[44px] w-full items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-2 shadow-sm">
           <Search className="h-4 w-4 text-gray-400" />
           <input
             value={search}
@@ -318,7 +319,7 @@ export default function Navbar() {
             onClick={() => setMenuOpen(false)}
           />
 
-          <div className="absolute inset-y-0 left-0 flex w-80 max-w-[85vw] flex-col bg-white shadow-2xl">
+          <div className="absolute inset-y-0 left-0 flex w-80 max-w-[85vw] flex-col overflow-y-auto bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
               <div>
                 <p className="text-sm font-medium text-purple-600">NendoShop</p>

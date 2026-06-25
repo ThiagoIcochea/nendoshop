@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 const getProductUrl = (productId) => {
@@ -31,33 +31,72 @@ const getWebSocketUrl = () => {
 
 export default function PurchaseAlertModal() {
   const [alert, setAlert] = useState(null);
+  const socketRef = useRef(null);
+  const timeoutRef = useRef(null);
+  const reconnectRef = useRef(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
 
-    const socket = new WebSocket(getWebSocketUrl());
-
-    socket.addEventListener("message", (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.type === "purchase-alert") {
-          setAlert(data.payload);
-          window.setTimeout(() => setAlert((current) => (current?.id === data.payload?.id ? null : current)), 10000);
-        }
-      } catch (error) {
-        console.error("Purchase alert parse error", error);
+    const connectSocket = () => {
+      if (socketRef.current && ["connecting", "open"].includes(socketRef.current.readyState)) {
+        return;
       }
-    });
+
+      const socket = new WebSocket(getWebSocketUrl());
+      socketRef.current = socket;
+
+      socket.addEventListener("message", (event) => {
+        try {
+          const data = typeof event.data === "string" ? JSON.parse(event.data) : null;
+          if (data?.type !== "purchase-alert") return;
+
+          const payload = data.payload || data;
+          if (!payload?.id) return;
+
+          setAlert(payload);
+
+          if (timeoutRef.current) {
+            window.clearTimeout(timeoutRef.current);
+          }
+
+          timeoutRef.current = window.setTimeout(() => {
+            setAlert((current) => (current?.id === payload.id ? null : current));
+          }, 10000);
+        } catch (error) {
+          console.error("Purchase alert parse error", error);
+        }
+      });
+
+      socket.addEventListener("close", () => {
+        if (reconnectRef.current) {
+          window.clearTimeout(reconnectRef.current);
+        }
+        reconnectRef.current = window.setTimeout(() => {
+          connectSocket();
+        }, 2000);
+      });
+    };
+
+    connectSocket();
 
     return () => {
-      socket.close();
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
+      }
+      if (reconnectRef.current) {
+        window.clearTimeout(reconnectRef.current);
+      }
+      if (socketRef.current) {
+        socketRef.current.close();
+      }
     };
   }, []);
 
   if (!alert || typeof document === "undefined") return null;
 
   return createPortal(
-    <div className="fixed bottom-4 right-4 z-[1200] pointer-events-none">
+    <div className="fixed bottom-4 right-4 z-[1200] pointer-events-none" role="status" aria-live="polite">
       <div className="w-[320px] max-w-[calc(100vw-2rem)] rounded-2xl border border-amber-200 bg-white/95 shadow-2xl backdrop-blur-md p-3 animate-[fadeIn_0.25s_ease-out]">
         <div className="flex items-center gap-2 text-amber-600 font-semibold text-xs uppercase tracking-wide">
           <span>🔥</span>
