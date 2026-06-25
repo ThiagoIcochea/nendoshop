@@ -43,6 +43,33 @@ export default function Navbar() {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
+  useEffect(() => {
+    if (!menuOpen) {
+      document.body.style.overflow = "";
+      return undefined;
+    }
+
+    document.body.style.overflow = "hidden";
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [menuOpen]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) setMenuOpen(false);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const handleLogout = () => {
     setAuth(null);
     localStorage.removeItem("auth");
@@ -133,8 +160,9 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
 
             <button
-              onClick={() => setMenuOpen(true)}
+              onClick={() => setMenuOpen((value) => !value)}
               className="md:hidden text-gray-700"
+              aria-label="Abrir menú"
             >
               <Menu className="w-7 h-7" />
             </button>
@@ -284,29 +312,39 @@ export default function Navbar() {
       </div>
 
       {menuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-
+        <div className="fixed inset-0 z-[60] md:hidden">
           <div
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-black/45"
             onClick={() => setMenuOpen(false)}
           />
 
-          <div className="absolute top-0 left-0 w-72 h-full bg-white shadow-xl p-5">
-
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="font-bold text-xl">Menú</h2>
-              <button onClick={() => setMenuOpen(false)}>
-                <X />
+          <div className="absolute inset-y-0 left-0 flex w-80 max-w-[85vw] flex-col bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+              <div>
+                <p className="text-sm font-medium text-purple-600">NendoShop</p>
+                <h2 className="text-lg font-semibold text-gray-800">Menú</h2>
+              </div>
+              <button
+                onClick={() => setMenuOpen(false)}
+                className="rounded-full p-2 text-gray-600 hover:bg-gray-100"
+                aria-label="Cerrar menú"
+              >
+                <X className="h-5 w-5" />
               </button>
             </div>
 
-            <nav className="flex flex-col gap-4">
-
-              <Link to="/" onClick={() => setMenuOpen(false)}>Inicio</Link>
-              <Link to="/about" onClick={() => setMenuOpen(false)}>Nosotros</Link>
-              <Link to="/catalog" onClick={() => setMenuOpen(false)}>Catálogo</Link>
+            <nav className="flex flex-1 flex-col gap-2 p-5">
+              <Link to="/" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                Inicio
+              </Link>
+              <Link to="/about" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                Nosotros
+              </Link>
+              <Link to="/catalog" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                Catálogo
+              </Link>
               {auth && (
-                <Link to="/chat" onClick={() => setMenuOpen(false)}>
+                <Link to="/chat" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
                   Chat
                 </Link>
               )}
@@ -317,16 +355,27 @@ export default function Navbar() {
                     setMenuOpen(false);
                     navigate("/dashboard");
                   }}
-                  className="text-left"
+                  className="rounded-xl px-3 py-3 text-left text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700"
                 >
                   Dashboard
                 </button>
               )}
-
             </nav>
 
+            <div className="border-t border-gray-200 p-5 text-sm text-gray-500">
+              {auth ? (
+                <button onClick={handleLogout} className="flex items-center gap-2 text-red-500">
+                  <LogOut className="h-4 w-4" />
+                  Cerrar sesión
+                </button>
+              ) : (
+                <Link to="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 text-purple-600">
+                  <User className="h-4 w-4" />
+                  Iniciar sesión
+                </Link>
+              )}
+            </div>
           </div>
-
         </div>
       )}
 

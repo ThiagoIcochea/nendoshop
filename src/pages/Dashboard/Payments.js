@@ -63,21 +63,80 @@ export default function Payments() {
   );
 
   const exportToPdf = () => {
-    const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text("Reporte de pagos", 14, 16);
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 36;
+    const lineHeight = 16;
+
+    const formatCurrency = (value) => `S/ ${Number(value || 0).toFixed(2)}`;
+    const splitText = (text, maxWidth) => doc.splitTextToSize(text || "", maxWidth);
+
+    doc.setFillColor(109, 40, 217);
+    doc.rect(0, 0, pageWidth, 90, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("Reporte de pagos", margin, 38);
     doc.setFontSize(10);
-    doc.text(`Total de pagos: ${pagos.length}`, 14, 26);
-    doc.text(`Ventas totales: S/ ${totalVentas.toFixed(2)}`, 14, 32);
-    let y = 42;
+    doc.setFont("helvetica", "normal");
+    doc.text(`Generado el ${new Date().toLocaleString("es-ES")}`, margin, 58);
+    doc.text(`Total de pagos: ${pagos.length}`, margin, 74);
+
+    doc.setTextColor(30, 30, 30);
+    doc.setFillColor(245, 242, 255);
+    doc.roundedRect(margin, 108, pageWidth - margin * 2, 70, 10, 10, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Resumen", margin + 16, 128);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`Ventas totales: ${formatCurrency(totalVentas)}`, margin + 16, 148);
+    doc.text(`Pagos registrados: ${pagos.length}`, margin + 16, 162);
+    doc.text(`Estado principal: ${pagos[0]?.estado || "Sin pagos"}`, pageWidth / 2 + 8, 148);
+
+    let y = 210;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(109, 40, 217);
+    doc.text("Detalle", margin, y);
+    doc.setDrawColor(225, 225, 225);
+    doc.line(margin, y + 6, pageWidth - margin, y + 6);
+
+    doc.setTextColor(60, 60, 60);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.text("#", margin, y + 24);
+    doc.text("Cliente", margin + 28, y + 24);
+    doc.text("Producto", margin + 140, y + 24);
+    doc.text("Estado", margin + 300, y + 24);
+    doc.text("Total", pageWidth - 90, y + 24);
+    doc.line(margin, y + 30, pageWidth - margin, y + 30);
+
+    doc.setFont("helvetica", "normal");
     pagos.forEach((pago, index) => {
-      if (y > 280) {
+      if (y > pageHeight - 80) {
         doc.addPage();
-        y = 20;
+        y = 40;
+        doc.setDrawColor(225, 225, 225);
+        doc.line(margin, y, pageWidth - margin, y);
       }
-      doc.text(`${index + 1}. ${pago.cliente || "Cliente"} - ${pago.estado || "Sin estado"} - S/ ${pago.total || 0}`, 14, y);
-      y += 8;
+
+      const productText = pago.productos
+        ? pago.productos.map((item) => item.name).join(", ")
+        : pago.producto || "Sin producto";
+      const lines = splitText(productText, 140);
+      const rowHeight = Math.max(18, lines.length * 10 + 8);
+
+      doc.text(String(index + 1), margin, y + 14);
+      doc.text(splitText(pago.cliente || "Cliente", 90)[0] || "Cliente", margin + 28, y + 14);
+      doc.text(lines[0] || "", margin + 140, y + 14);
+      doc.text(pago.estado || "Sin estado", margin + 300, y + 14);
+      doc.text(formatCurrency(pago.total || 0), pageWidth - 90, y + 14);
+      doc.line(margin, y + 20 + rowHeight - 8, pageWidth - margin, y + 20 + rowHeight - 8);
+      y += rowHeight;
     });
+
     doc.save("reporte-pagos.pdf");
   };
 
