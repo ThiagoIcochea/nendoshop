@@ -98,6 +98,7 @@ export default function Navbar() {
       localStorage.setItem("productSearchResults", JSON.stringify([]));
     }
 
+    setSearch("");
     navigate({ pathname: "/catalog", search: `?search=${encodeURIComponent(term)}` });
     setMenuOpen(false);
   };
@@ -151,7 +152,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 overflow-x-hidden border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
+    <header className="sticky top-0 z-40 overflow-x-hidden border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
 
       <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
 
@@ -313,13 +314,13 @@ export default function Navbar() {
       </div>
 
       {menuOpen && (
-        <div className="fixed inset-0 z-[60] md:hidden">
+        <div className="fixed inset-0 z-[70] md:hidden">
           <div
             className="absolute inset-0 bg-black/45"
             onClick={() => setMenuOpen(false)}
           />
 
-          <div className="absolute inset-y-0 left-0 flex w-80 max-w-[85vw] flex-col overflow-hidden border-r border-gray-200 bg-white shadow-2xl transition-transform duration-300 ease-out translate-x-0">
+          <div className="absolute inset-y-0 left-0 z-[71] flex w-80 max-w-[85vw] flex-col overflow-hidden border-r border-gray-200 bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
               <div>
                 <p className="text-sm font-medium text-purple-600">NendoShop</p>
