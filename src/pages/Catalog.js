@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Card from "../components/Card";
 import ParticlesBackground from "../components/ParticlesBackground";
@@ -30,43 +30,51 @@ useEffect(() => {
 
   const [currentPage, setCurrentPage] = useState(1);
 
-  const [filters, setFilters] = useState({
+  const initialFilters = {
     category: "",
     brand: "",
     stock: "",
     discount: "",
+    recommended: "",
     sort: ""
-  });
+  };
+
+  const [filters, setFilters] = useState(initialFilters);
 
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const searchRef = useRef("");
 
   const productsPerPage = 8;
 
-  const clearFilters = () => {
+  const resetFiltersState = () => {
+    setFilters(initialFilters);
+    setCurrentPage(1);
+  };
 
-    setFilters({
-      category: "",
-      brand: "",
-      stock: "",
-      discount: "",
-      sort: ""
-    })
+  const clearFilters = () => {
+    resetFiltersState();
 
     localStorage.removeItem("productSearch");
     localStorage.removeItem("productSearchResults");
     localStorage.removeItem("productSearchMeta");
     setSearch("");
     setSearchResults([]);
-
-    setCurrentPage(1);
+    searchRef.current = "";
   };
 
   useEffect(() => {
     const updateSearch = () => {
       const urlQuery = new URLSearchParams(location.search).get("search") || "";
       const savedSearch = urlQuery || localStorage.getItem("productSearch") || "";
+      const hasNewSearch = savedSearch !== searchRef.current;
+
       setSearch(savedSearch);
+      searchRef.current = savedSearch;
+
+      if (hasNewSearch) {
+        resetFiltersState();
+      }
 
       const storedResults = localStorage.getItem("productSearchResults");
       if (storedResults) {
@@ -136,6 +144,10 @@ useEffect(() => {
     filteredProducts = filteredProducts.filter((p) => p.discount > 0);
   }
 
+  if (filters.recommended === "recommended") {
+    filteredProducts = filteredProducts.filter((p) => (p.likes || 0) > (p.dislikes || 0));
+  }
+
   if (filters.sort === "price-asc") {
     filteredProducts.sort((a, b) => a.price - b.price);
   }
@@ -170,7 +182,7 @@ useEffect(() => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
 
           <select
             name="category"
@@ -215,10 +227,20 @@ useEffect(() => {
           </select>
 
           <select
+            name="recommended"
+            value={filters.recommended}
+            onChange={handleFilterChange}
+            className="border p-3 rounded-lg"
+          >
+            <option value="">Relevancia</option>
+            <option value="recommended">Recomendados</option>
+          </select>
+
+          <select
             name="sort"
             value={filters.sort}
             onChange={handleFilterChange}
-            className="border p-3 rounded-lg md:col-span-4"
+            className="border p-3 rounded-lg lg:col-span-5"
           >
             <option value="">Ordenar</option>
             <option value="price-asc">

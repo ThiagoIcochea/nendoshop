@@ -26,6 +26,7 @@ export default function ProductDetail() {
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
   const [comments, setComments] = useState([]);
+  const [feedback, setFeedback] = useState(null);
   const wsRef = useRef(null);
 
   const [page, setPage] = useState(1);
@@ -106,6 +107,38 @@ export default function ProductDetail() {
 
   const getInitial = () =>
     (auth?.name || "U").charAt(0).toUpperCase();
+
+  const handleReaction = async (type) => {
+    if (!product?._id || feedback === type) return;
+
+    try {
+      const res = await fetch(
+        `https://backendproyectodf.onrender.com/api/products/${product._id}/${type === "like" ? "like" : "dislike"}`,
+        {
+          method: "POST",
+          credentials: "include"
+        }
+      );
+
+      const data = await res.json();
+      const updatedProduct = data?.product || data;
+
+      if (updatedProduct) {
+        setProduct((current) =>
+          current
+            ? {
+                ...current,
+                likes: updatedProduct.likes ?? current.likes,
+                dislikes: updatedProduct.dislikes ?? current.dislikes
+              }
+            : current
+        );
+        setFeedback(type);
+      }
+    } catch (error) {
+      Swal.fire("Error", "No se pudo registrar tu reacción", "error");
+    }
+  };
 
   const handleAddToCart = () => {
 
@@ -276,6 +309,21 @@ export default function ProductDetail() {
                 S/. {finalPrice.toFixed(2)}
               </span>
 
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <button
+                onClick={() => handleReaction("like")}
+                className={`rounded-full border px-3 py-2 text-sm transition ${feedback === "like" ? "border-brand bg-brand text-white" : "border-gray-200 bg-white text-gray-700 hover:border-brand hover:text-brand"}`}
+              >
+                👍 {product?.likes || 0}
+              </button>
+              <button
+                onClick={() => handleReaction("dislike")}
+                className={`rounded-full border px-3 py-2 text-sm transition ${feedback === "dislike" ? "border-red-500 bg-red-500 text-white" : "border-gray-200 bg-white text-gray-700 hover:border-red-400 hover:text-red-500"}`}
+              >
+                👎 {product?.dislikes || 0}
+              </button>
             </div>
 
             <p className="text-green-600 mb-4 font-medium">
