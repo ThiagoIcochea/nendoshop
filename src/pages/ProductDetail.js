@@ -96,10 +96,6 @@ export default function ProductDetail() {
     };
   }, [_id]);
 
-  if (!loading && !product) {
-    return <h1>Producto no encontrado</h1>;
-  }
-
   const finalPrice =
     product?.discount > 0
       ? product.price * (1 - product?.discount)
