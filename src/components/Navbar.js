@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
 import {
   Search,
   ShoppingCart,
@@ -151,7 +152,79 @@ export default function Navbar() {
     recognition.start();
   };
 
+  const mobileMenu = menuOpen && typeof document !== "undefined"
+    ? createPortal(
+        <div className="fixed inset-0 z-[100] md:hidden">
+          <div
+            className="absolute inset-0 bg-black/45"
+            onClick={() => setMenuOpen(false)}
+          />
+
+          <div className="absolute inset-y-0 left-0 z-[101] flex w-80 max-w-[85vw] flex-col overflow-hidden border-r border-gray-200 bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+              <div>
+                <p className="text-sm font-medium text-purple-600">NendoShop</p>
+                <h2 className="text-lg font-semibold text-gray-800">Menú</h2>
+              </div>
+              <button
+                onClick={() => setMenuOpen(false)}
+                className="rounded-full p-2 text-gray-600 hover:bg-gray-100"
+                aria-label="Cerrar menú"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <nav className="flex flex-1 flex-col gap-2 p-5">
+              <Link to="/" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                Inicio
+              </Link>
+              <Link to="/about" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                Nosotros
+              </Link>
+              <Link to="/catalog" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                Catálogo
+              </Link>
+              {auth && (
+                <Link to="/chat" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                  Chat
+                </Link>
+              )}
+
+              {auth && auth.role === "admin" && (
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    navigate("/dashboard");
+                  }}
+                  className="rounded-xl px-3 py-3 text-left text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700"
+                >
+                  Dashboard
+                </button>
+              )}
+            </nav>
+
+            <div className="border-t border-gray-200 p-5 text-sm text-gray-500">
+              {auth ? (
+                <button onClick={handleLogout} className="flex items-center gap-2 text-red-500">
+                  <LogOut className="h-4 w-4" />
+                  Cerrar sesión
+                </button>
+              ) : (
+                <Link to="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 text-purple-600">
+                  <User className="h-4 w-4" />
+                  Iniciar sesión
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )
+    : null;
+
   return (
+    <>
     <header className="sticky top-0 z-40 overflow-x-hidden border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
 
       <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
@@ -313,74 +386,8 @@ export default function Navbar() {
         {voiceError && <p className="mt-2 text-xs text-red-500">{voiceError}</p>}
       </div>
 
-      {menuOpen && (
-        <div className="fixed inset-0 z-[70] md:hidden">
-          <div
-            className="absolute inset-0 bg-black/45"
-            onClick={() => setMenuOpen(false)}
-          />
-
-          <div className="absolute inset-y-0 left-0 z-[71] flex w-80 max-w-[85vw] flex-col overflow-hidden border-r border-gray-200 bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-              <div>
-                <p className="text-sm font-medium text-purple-600">NendoShop</p>
-                <h2 className="text-lg font-semibold text-gray-800">Menú</h2>
-              </div>
-              <button
-                onClick={() => setMenuOpen(false)}
-                className="rounded-full p-2 text-gray-600 hover:bg-gray-100"
-                aria-label="Cerrar menú"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <nav className="flex flex-1 flex-col gap-2 p-5">
-              <Link to="/" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
-                Inicio
-              </Link>
-              <Link to="/about" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
-                Nosotros
-              </Link>
-              <Link to="/catalog" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
-                Catálogo
-              </Link>
-              {auth && (
-                <Link to="/chat" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
-                  Chat
-                </Link>
-              )}
-
-              {auth && auth.role === "admin" && (
-                <button
-                  onClick={() => {
-                    setMenuOpen(false);
-                    navigate("/dashboard");
-                  }}
-                  className="rounded-xl px-3 py-3 text-left text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700"
-                >
-                  Dashboard
-                </button>
-              )}
-            </nav>
-
-            <div className="border-t border-gray-200 p-5 text-sm text-gray-500">
-              {auth ? (
-                <button onClick={handleLogout} className="flex items-center gap-2 text-red-500">
-                  <LogOut className="h-4 w-4" />
-                  Cerrar sesión
-                </button>
-              ) : (
-                <Link to="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 text-purple-600">
-                  <User className="h-4 w-4" />
-                  Iniciar sesión
-                </Link>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
     </header>
+    {mobileMenu}
+    </>
   );
 }
