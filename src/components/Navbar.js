@@ -157,7 +157,7 @@ export default function Navbar() {
 
         <div className="flex h-16 items-center justify-between gap-2 sm:h-20">
 
-          <div className="flex items-center gap-4">
+          <div className="flex min-w-0 items-center gap-3">
 
             <button
               onClick={() => setMenuOpen((value) => !value)}
@@ -167,7 +167,7 @@ export default function Navbar() {
               <Menu className="w-7 h-7" />
             </button>
 
-            <Link to="/" className="flex items-center gap-3">
+            <Link to="/" className="flex min-w-0 items-center gap-3">
 
               <img
                 src={logo}
@@ -175,7 +175,7 @@ export default function Navbar() {
                 className="h-12 w-12 object-contain rounded-full border border-gray-100 shadow-sm"
               />
 
-              <span className="font-bold text-xl tracking-tight text-gray-900 hidden sm:block">
+              <span className="hidden text-xl font-bold tracking-tight text-gray-900 sm:block">
                 Nendoshop
               </span>
 
@@ -214,16 +214,16 @@ export default function Navbar() {
 
           </div>
 
-          <div className="flex items-center gap-3 flex-1 justify-end">
+          <div className="flex flex-1 items-center justify-end gap-2 sm:gap-3">
 
-            <div className="hidden md:flex items-center gap-2 flex-1 max-w-xl rounded-full border border-gray-200 bg-gray-50 px-3 py-2 shadow-sm">
+            <div className="hidden flex-1 items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-2 shadow-sm md:flex md:max-w-xl">
               <Search className="h-4 w-4 text-gray-400" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={handleSearch}
                 placeholder="Buscar figuras, precios o productos"
-                className="w-full border-0 bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-400"
+                className="w-full border-0 bg-transparent py-1 text-sm text-gray-700 outline-none placeholder:text-gray-400"
               />
               <button
                 type="button"
@@ -243,7 +243,7 @@ export default function Navbar() {
             ) : (
               <>
                 <Link to="/profile">
-                  <div className="w-10 h-10 rounded-full overflow-hidden bg-brand flex items-center justify-center text-white font-bold text-sm">
+                  <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-brand text-sm font-bold text-white">
                     {auth.profileImg ? (
                       <img src={auth.profileImg} className="w-full h-full object-cover" />
                     ) : (
@@ -263,7 +263,7 @@ export default function Navbar() {
 
             <button
               onClick={() => navigate("/cart")}
-              className="relative text-brand"
+              className="relative flex h-10 w-10 items-center justify-center rounded-full text-brand hover:bg-gray-100"
             >
               <ShoppingCart className="h-5 w-5" />
 
@@ -290,7 +290,7 @@ export default function Navbar() {
       </div>
 
       <div className="px-3 pb-3 md:hidden">
-        <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-2 shadow-sm">
+        <div className="flex min-h-[44px] items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-2 shadow-sm">
           <Search className="h-4 w-4 text-gray-400" />
           <input
             value={search}
