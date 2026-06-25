@@ -27,6 +27,10 @@ export default function Navbar() {
   const [isListening, setIsListening] = useState(false);
   const [voiceError, setVoiceError] = useState("");
 
+  const isAdmin = Boolean(
+    auth?.role === "admin" || auth?.isAdmin || auth?.user?.role === "admin"
+  );
+
   const [search, setSearch] = useState(
     localStorage.getItem("productSearch") || ""
   );
@@ -191,7 +195,7 @@ export default function Navbar() {
                 </Link>
               )}
 
-              {auth && auth.role === "admin" && (
+              {isAdmin && (
                 <button
                   onClick={() => {
                     setMenuOpen(false);
@@ -200,6 +204,18 @@ export default function Navbar() {
                   className="rounded-xl px-3 py-3 text-left text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700"
                 >
                   Dashboard
+                </button>
+              )}
+
+              {isAdmin && (
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    navigate("/api-comentarios");
+                  }}
+                  className="rounded-xl px-3 py-3 text-left text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700"
+                >
+                  Configuraciones
                 </button>
               )}
             </nav>
@@ -275,7 +291,7 @@ export default function Navbar() {
                 </Link>
               )}
 
-              {auth && auth.role === "admin" && (
+              {isAdmin && (
                 <button
                   onClick={() => navigate("/dashboard")}
                   className="text-gray-600 hover:text-brand font-medium"
@@ -349,10 +365,12 @@ export default function Navbar() {
               )}
             </button>
 
-            {auth && auth.role === "admin" && (
+            {isAdmin && (
               <Link
                 to="/api-comentarios"
-                className="hidden md:flex items-center gap-2 text-gray-600"
+                className="flex items-center gap-2 rounded-full p-2 text-gray-600 hover:bg-gray-100"
+                title="Configuraciones"
+                aria-label="Ir a configuraciones"
               >
                 <Settings className="h-5 w-5" />
               </Link>
