@@ -66,25 +66,31 @@ useEffect(() => {
   useEffect(() => {
     const updateSearch = () => {
       const urlQuery = new URLSearchParams(location.search).get("search") || "";
-      const savedSearch = urlQuery || localStorage.getItem("productSearch") || "";
+      const savedSearch = urlQuery;
       const hasNewSearch = savedSearch !== searchRef.current;
 
       setSearch(savedSearch);
       searchRef.current = savedSearch;
 
-      if (hasNewSearch) {
+      if (!savedSearch) {
         resetFiltersState();
-      }
+        setSearchResults([]);
+        localStorage.removeItem("productSearch");
+        localStorage.removeItem("productSearchResults");
+        localStorage.removeItem("productSearchMeta");
+      } else if (hasNewSearch) {
+        resetFiltersState();
 
-      const storedResults = localStorage.getItem("productSearchResults");
-      if (storedResults) {
-        try {
-          setSearchResults(JSON.parse(storedResults));
-        } catch (error) {
+        const storedResults = localStorage.getItem("productSearchResults");
+        if (storedResults) {
+          try {
+            setSearchResults(JSON.parse(storedResults));
+          } catch (error) {
+            setSearchResults([]);
+          }
+        } else {
           setSearchResults([]);
         }
-      } else {
-        setSearchResults([]);
       }
 
       setCurrentPage(1);

@@ -108,8 +108,35 @@ export default function ProductDetail() {
   const getInitial = () =>
     (auth?.name || "U").charAt(0).toUpperCase();
 
+  const currentUserId = auth?._id || auth?.id || auth?.userId || null;
+
+  useEffect(() => {
+    if (!product || !currentUserId) {
+      setFeedback(null);
+      return;
+    }
+
+    const liked = (product.likedBy || []).some((id) => String(id) === String(currentUserId));
+    const disliked = (product.dislikedBy || []).some((id) => String(id) === String(currentUserId));
+
+    if (liked) {
+      setFeedback("like");
+    } else if (disliked) {
+      setFeedback("dislike");
+    } else {
+      setFeedback(null);
+    }
+  }, [product, currentUserId]);
+
   const handleReaction = async (type) => {
-    if (!product?._id || feedback === type) return;
+    if (!product?._id) return;
+
+    if (!currentUserId) {
+      Swal.fire("Inicia sesión", "Debes iniciar sesión para valorar productos", "warning");
+      return;
+    }
+
+    if (feedback === type) return;
 
     try {
       const res = await fetch(
@@ -123,13 +150,25 @@ export default function ProductDetail() {
       const data = await res.json();
       const updatedProduct = data?.product || data;
 
+      if (!res.ok) {
+        const message = data?.message || "No se pudo registrar tu reacción";
+        if (res.status === 409) {
+          Swal.fire("Aviso", message, "info");
+        } else {
+          Swal.fire("Error", message, "error");
+        }
+        return;
+      }
+
       if (updatedProduct) {
         setProduct((current) =>
           current
             ? {
                 ...current,
                 likes: updatedProduct.likes ?? current.likes,
-                dislikes: updatedProduct.dislikes ?? current.dislikes
+                dislikes: updatedProduct.dislikes ?? current.dislikes,
+                likedBy: updatedProduct.likedBy ?? current.likedBy,
+                dislikedBy: updatedProduct.dislikedBy ?? current.dislikedBy
               }
             : current
         );
