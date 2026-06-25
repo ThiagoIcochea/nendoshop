@@ -87,7 +87,7 @@ export default function MessageInput({ sendMessage, sendTyping, disabled }) {
   };
 
   return (
-    <div className="w-full border-t border-purple-100 bg-gradient-to-t from-white via-white to-purple-50/30 px-3 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(88,28,135,0.06)] backdrop-blur-xl sm:px-4 sm:py-4">
+    <div className="mb-2 w-full border-t border-purple-100 bg-gradient-to-t from-white via-white to-purple-50/30 px-3 py-3 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(88,28,135,0.06)] backdrop-blur-xl sm:mb-3 sm:px-4 sm:py-4">
 
       <div className="mx-auto flex max-w-3xl flex-col gap-2 rounded-[22px] border border-purple-200/80 bg-white/95 px-2.5 py-2 shadow-sm transition focus-within:ring-2 focus-within:ring-purple-200 sm:flex-row sm:items-center sm:px-3 sm:py-2.5">
 
