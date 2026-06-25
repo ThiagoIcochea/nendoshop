@@ -6,7 +6,8 @@ import {
   LogOut,
   Settings,
   Menu,
-  X
+  X,
+  Mic
 } from "lucide-react";
 
 import { useEffect, useState, useContext } from "react";
@@ -22,6 +23,8 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [adminMenu, setAdminMenu] = useState(false);
   const [adminTimeout, setAdminTimeout] = useState(null);
+  const [isListening, setIsListening] = useState(false);
+  const [voiceError, setVoiceError] = useState("");
 
   const [search, setSearch] = useState(
     localStorage.getItem("productSearch") || ""
@@ -46,12 +49,78 @@ export default function Navbar() {
     navigate("/login");
   };
 
+  const submitSearch = async (value) => {
+    const term = String(value || "").trim();
+    if (!term) return;
+
+    localStorage.setItem("productSearch", term);
+    localStorage.removeItem("productSearchResults");
+
+    const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://backendproyectodf.onrender.com";
+
+    try {
+      const res = await fetch(`${backendUrl}/api/products/search?query=${encodeURIComponent(term)}`, {
+        credentials: "include"
+      });
+      const data = await res.json();
+      const products = Array.isArray(data?.products) ? data.products : [];
+      localStorage.setItem("productSearchResults", JSON.stringify(products));
+      localStorage.setItem("productSearchMeta", JSON.stringify({ query: data?.query || term, appliedBy: data?.appliedBy || "local" }));
+    } catch (error) {
+      console.error("Error al buscar productos", error);
+      localStorage.setItem("productSearchResults", JSON.stringify([]));
+    }
+
+    navigate({ pathname: "/catalog", search: `?search=${encodeURIComponent(term)}` });
+    setMenuOpen(false);
+  };
+
   const handleSearch = (e) => {
     if (e.key === "Enter") {
-      localStorage.setItem("productSearch", search);
-      navigate("/catalog");
-      setMenuOpen(false);
+      submitSearch(search);
     }
+  };
+
+  const handleVoiceSearch = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setVoiceError("El micrófono no está disponible en este navegador.");
+      return;
+    }
+
+    if (isListening) {
+      setIsListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "es-ES";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      setVoiceError("");
+    };
+
+    recognition.onerror = () => {
+      setIsListening(false);
+      setVoiceError("No se pudo escuchar tu pedido. Intenta de nuevo.");
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognition.onresult = async (event) => {
+      const transcript = event.results?.[0]?.[0]?.transcript?.trim();
+      if (transcript) {
+        setSearch(transcript);
+        await submitSearch(transcript);
+      }
+    };
+
+    recognition.start();
   };
 
   return (
@@ -117,7 +186,26 @@ export default function Navbar() {
 
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-1 justify-end">
+
+            <div className="hidden md:flex items-center gap-2 flex-1 max-w-xl rounded-full border border-gray-200 bg-gray-50 px-3 py-2 shadow-sm">
+              <Search className="h-4 w-4 text-gray-400" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={handleSearch}
+                placeholder="Buscar figuras, precios o productos"
+                className="w-full border-0 bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-400"
+              />
+              <button
+                type="button"
+                onClick={handleVoiceSearch}
+                className={`rounded-full p-1.5 ${isListening ? "bg-brand text-white" : "text-gray-500 hover:bg-gray-200"}`}
+                title="Buscar por voz"
+              >
+                <Mic className="h-4 w-4" />
+              </button>
+            </div>
 
             {!auth ? (
               <Link to="/login" className="flex items-center gap-2 text-brand">
@@ -171,6 +259,28 @@ export default function Navbar() {
 
         </div>
 
+      </div>
+
+      <div className="px-4 pb-4 md:hidden">
+        <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-2 shadow-sm">
+          <Search className="h-4 w-4 text-gray-400" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={handleSearch}
+            placeholder="Buscar figuras, precios o productos"
+            className="w-full border-0 bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-400"
+          />
+          <button
+            type="button"
+            onClick={handleVoiceSearch}
+            className={`rounded-full p-1.5 ${isListening ? "bg-brand text-white" : "text-gray-500 hover:bg-gray-200"}`}
+            title="Buscar por voz"
+          >
+            <Mic className="h-4 w-4" />
+          </button>
+        </div>
+        {voiceError && <p className="mt-2 text-xs text-red-500">{voiceError}</p>}
       </div>
 
       {menuOpen && (

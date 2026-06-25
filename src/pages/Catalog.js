@@ -39,6 +39,7 @@ useEffect(() => {
   });
 
   const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
 
   const productsPerPage = 8;
 
@@ -53,15 +54,31 @@ useEffect(() => {
     })
 
     localStorage.removeItem("productSearch");
+    localStorage.removeItem("productSearchResults");
+    localStorage.removeItem("productSearchMeta");
+    setSearch("");
+    setSearchResults([]);
 
     setCurrentPage(1);
   };
 
   useEffect(() => {
-
     const updateSearch = () => {
-      const savedSearch = localStorage.getItem("productSearch") || "";
+      const urlQuery = new URLSearchParams(location.search).get("search") || "";
+      const savedSearch = urlQuery || localStorage.getItem("productSearch") || "";
       setSearch(savedSearch);
+
+      const storedResults = localStorage.getItem("productSearchResults");
+      if (storedResults) {
+        try {
+          setSearchResults(JSON.parse(storedResults));
+        } catch (error) {
+          setSearchResults([]);
+        }
+      } else {
+        setSearchResults([]);
+      }
+
       setCurrentPage(1);
     };
 
@@ -73,7 +90,7 @@ useEffect(() => {
       window.removeEventListener("storage", updateSearch);
     };
 
-  }, [location]);
+  }, [location.search, location.pathname]);
 
   const handleFilterChange = (e) => {
     setFilters({
@@ -84,12 +101,15 @@ useEffect(() => {
     setCurrentPage(1);
   };
 
-  let filteredProducts = [...products];
+  const baseProducts = searchResults.length > 0 && search.trim() ? searchResults : products;
+  let filteredProducts = [...baseProducts];
 
   if (search.trim() !== "") {
-    filteredProducts = filteredProducts.filter((p) =>
-      p.name.toLowerCase().includes(search.toLowerCase())
-    );
+    const normalizedQuery = search.toLowerCase();
+    filteredProducts = filteredProducts.filter((p) => {
+      const haystack = `${p.name || ""} ${p.description || ""} ${p.specs?.categoria || ""} ${p.specs?.marca || ""} ${p.price || ""}`.toLowerCase();
+      return haystack.includes(normalizedQuery);
+    });
   }
 
   if (filters.category) {
@@ -143,6 +163,12 @@ useEffect(() => {
         <h1 className="text-3xl font-bold mb-6 text-gray-900">
           Catálogo de Nendoroids
         </h1>
+
+        {search.trim() && (
+          <div className="mb-4 rounded-lg border border-brand/20 bg-brand/10 px-4 py-3 text-sm text-brand">
+            Mostrando resultados para: <span className="font-semibold">{search}</span>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
 
