@@ -124,11 +124,11 @@ export default function Navbar() {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
 
-        <div className="flex items-center justify-between h-20">
+        <div className="flex h-16 items-center justify-between gap-2 sm:h-20">
 
           <div className="flex items-center gap-4">
 
@@ -261,7 +261,7 @@ export default function Navbar() {
 
       </div>
 
-      <div className="px-4 pb-4 md:hidden">
+      <div className="px-3 pb-3 md:hidden">
         <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-2 shadow-sm">
           <Search className="h-4 w-4 text-gray-400" />
           <input

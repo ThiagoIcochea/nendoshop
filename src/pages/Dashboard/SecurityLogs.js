@@ -64,7 +64,11 @@ export default function SecurityLogs() {
   const blockedUsers = users.filter((user) => user.chatBlockedUntil && new Date(user.chatBlockedUntil) > new Date());
 
   const exportLogs = () => {
-    const content = filteredLogs.map((log) => `[${new Date(log.createdAt).toLocaleString("es-ES")}] ${log.tipo} | ${log.usuario} | ${log.descripcion} | ${log.metodo} ${log.ruta}`).join("\n");
+    const content = filteredLogs.map((log) => {
+      const ip = log.ip || log.ipAddress || "unknown";
+      const ua = log.userAgent || log.user_agent || "unknown";
+      return `[${new Date(log.createdAt).toLocaleString("es-ES")}] ${log.tipo} | ${log.usuario} | ${log.descripcion} | ${log.metodo} ${log.ruta} | IP: ${ip} | User-Agent: ${ua}`;
+    }).join("\n");
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -157,8 +161,8 @@ export default function SecurityLogs() {
                   </div>
                   <p className="mt-2 text-sm text-gray-600">{log.descripcion}</p>
                   <p className="mt-1 text-xs text-gray-400">{log.metodo} {log.ruta} · {new Date(log.createdAt).toLocaleString("es-ES")}</p>
-                  <p className="mt-1 text-xs text-gray-400 break-all">IP: {log.ip || "unknown"}</p>
-                  <p className="mt-1 text-xs text-gray-400 break-all">User-Agent: {log.userAgent || "unknown"}</p>
+                  <p className="mt-1 text-xs text-gray-400 break-all">IP: {log.ip || log.ipAddress || "unknown"}</p>
+                  <p className="mt-1 text-xs text-gray-400 break-all">User-Agent: {log.userAgent || log.user_agent || "unknown"}</p>
                 </div>
               ))}
             </div>

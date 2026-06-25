@@ -33,7 +33,7 @@ export default function ChatWindow({
   const chat = chatData[currentChat];
 
   return (
-    <main className="flex flex-col h-full min-h-0 bg-gradient-to-b from-white via-purple-50/20 to-white overflow-hidden">
+    <main className="relative flex h-full min-h-0 flex-col overflow-hidden bg-gradient-to-b from-white via-purple-50/20 to-white">
 
       <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-purple-100">
 
@@ -99,7 +99,7 @@ export default function ChatWindow({
 
       <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
 
-        <div className="max-w-4xl mx-auto px-3 sm:px-8 py-4 sm:py-6 space-y-4 pb-24">
+        <div className="mx-auto max-w-4xl space-y-4 px-3 py-4 pb-28 sm:px-8 sm:py-6 sm:pb-32">
 
           {messages.length === 0 && (
 
@@ -152,9 +152,9 @@ export default function ChatWindow({
 
       </div>
 
-      <div className="bg-white/80 backdrop-blur-xl border-t border-purple-100">
+      <div className="sticky bottom-0 z-20 border-t border-purple-100 bg-white/90 backdrop-blur-xl">
 
-        <div className="max-w-4xl mx-auto">
+        <div className="mx-auto max-w-4xl">
           <MessageInput
             sendMessage={sendMessage}
             sendTyping={sendTyping}

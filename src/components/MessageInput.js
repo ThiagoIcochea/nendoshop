@@ -21,9 +21,9 @@ export default function MessageInput({ sendMessage, sendTyping, disabled }) {
   const canSend = text.trim().length > 0;
 
   return (
-    <div className="w-full px-3 py-3 border-t border-purple-100 bg-white/70 backdrop-blur-xl sm:px-4">
+    <div className="w-full border-t border-purple-100 bg-white/80 px-3 py-3 backdrop-blur-xl sm:px-4">
 
-      <div className="flex flex-col gap-2 rounded-2xl border border-purple-100 bg-purple-50/40 px-3 py-2 focus-within:ring-2 focus-within:ring-purple-200 transition sm:flex-row sm:items-center">
+      <div className="mx-auto flex max-w-3xl flex-col gap-2 rounded-2xl border border-purple-100 bg-purple-50/40 px-3 py-2 transition focus-within:ring-2 focus-within:ring-purple-200 sm:flex-row sm:items-center">
 
         <input
           type="text"

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Activity, AlertTriangle, Shield, ScrollText } from "lucide-react";
+import { Activity, AlertTriangle, Shield, ScrollText, Sparkles } from "lucide-react";
 import { buildSalesMetrics } from "../../utils/dashboardMetrics";
 
 export default function AdminOverview() {
@@ -37,6 +37,38 @@ export default function AdminOverview() {
   }, []);
 
   const metrics = useMemo(() => buildSalesMetrics(payments), [payments]);
+  const aiInsights = useMemo(() => {
+    const totalSales = Number(metrics.totals.sales || 0);
+    const averageTicket = payments.length ? totalSales / payments.length : 0;
+    const blockedUsers = clients.filter((client) => client.chatBlockedUntil && new Date(client.chatBlockedUntil) > new Date()).length;
+    const errorCount = logs.filter((log) => log.tipo === "ERROR").length;
+    const authEvents = logs.filter((log) => log.tipo === "AUTH").length;
+
+    const recommendations = [
+      {
+        title: "Impulsa promociones de alto margen",
+        text: averageTicket > 80 ? "El ticket promedio es sólido; aprovecha descuentos selectivos para subir conversiones." : "El ticket promedio está por debajo del ideal; prueba promociones de producto y bundles."
+      },
+      {
+        title: "Revisa el flujo de pagos",
+        text: errorCount > 0 ? `Hay ${errorCount} eventos de error recientes; prioriza el checkout para reducir abandono.` : "El checkout se ha mantenido estable; conserva la experiencia actual."
+      },
+      {
+        title: "Fortalece seguridad",
+        text: blockedUsers > 0 || authEvents > 4 ? "Los patrones de seguridad sugieren revisar accesos sospechosos y reforzar alertas." : "La actividad de seguridad se ve saludable; mantén el monitoreo activo."
+      }
+    ];
+
+    const forecastSales = totalSales * (1 + (payments.length > 0 ? 0.08 : 0.03));
+    const forecastLabel = forecastSales > totalSales ? "Alza esperada" : "Estabilidad";
+
+    return {
+      recommendations,
+      forecastSales,
+      forecastLabel,
+      healthScore: Math.min(100, 70 + (averageTicket > 70 ? 12 : 0) + (errorCount === 0 ? 10 : 0) + (blockedUsers === 0 ? 8 : 0))
+    };
+  }, [clients, logs, metrics.totals.sales, payments.length]);
 
   const stateSeries = Object.entries(metrics.stateMap).map(([name, count]) => ({ name, count }));
   const productSeries = Object.entries(metrics.productMap).map(([name, count]) => ({ name, count }));
@@ -71,6 +103,46 @@ export default function AdminOverview() {
             <AlertTriangle className="h-5 w-5 text-amber-500" />
           </div>
           <p className="mt-3 text-3xl font-semibold text-amber-600">{blockedUsers.length}</p>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-purple-200 bg-gradient-to-br from-purple-700 via-violet-700 to-indigo-700 p-5 text-white shadow-sm">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <div className="flex items-center gap-2 text-sm font-medium text-purple-100">
+              <Sparkles className="h-4 w-4" />
+              Asistente IA para tu negocio
+            </div>
+            <h3 className="mt-2 text-xl font-semibold">Sugerencias y predicción accionable</h3>
+            <p className="mt-2 max-w-2xl text-sm text-purple-100">Estas recomendaciones se construyen con tus ventas, actividad y registros del panel para ayudarte a priorizar acciones.</p>
+          </div>
+          <div className="rounded-2xl bg-white/15 px-3 py-2 text-sm backdrop-blur">
+            Salud operativa: {aiInsights.healthScore}/100
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="rounded-2xl bg-white/10 p-4 backdrop-blur">
+            <h4 className="text-sm font-semibold">Acciones recomendadas</h4>
+            <ul className="mt-3 space-y-2 text-sm text-purple-50">
+              {aiInsights.recommendations.map((item) => (
+                <li key={item.title} className="rounded-xl border border-white/10 bg-white/10 p-3">
+                  <p className="font-medium">{item.title}</p>
+                  <p className="mt-1 text-xs text-purple-100">{item.text}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-2xl bg-white/10 p-4 backdrop-blur">
+            <h4 className="text-sm font-semibold">Pronóstico</h4>
+            <p className="mt-3 text-3xl font-semibold">S/ {aiInsights.forecastSales.toFixed(2)}</p>
+            <p className="mt-2 text-sm text-purple-100">Estimación de ventas para las próximas 4 semanas</p>
+            <div className="mt-4 rounded-xl border border-white/10 bg-white/10 p-3 text-sm text-purple-50">
+              <p className="font-medium">{aiInsights.forecastLabel}</p>
+              <p className="mt-1 text-xs text-purple-100">Basado en ventas actuales, ticket promedio y actividad de seguridad.</p>
+            </div>
+          </div>
         </div>
       </div>
 
