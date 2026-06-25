@@ -26,6 +26,7 @@ export default function Profile() {
     city: "",
     birthdate: "",
     sex: "",
+    cardName: "",
     cardNumber: "",
     cardCVV: "",
     cardType: "visa",
@@ -110,83 +111,56 @@ export default function Profile() {
     if (form.cardNumber && !cardNumberRegex.test(form.cardNumber.replace(/\s/g, ""))) return Swal.fire("Error 630", "Número de tarjeta inválido. Usa 16 dígitos con espacios o guiones.", "error");
     if (form.cardCVV && !cvvRegex.test(form.cardCVV)) return Swal.fire("Error 630", "CVV inválido. Usa 3 o 4 dígitos.", "error");
 
-    const res = await fetch("https://backendproyectodf.onrender.com/api/auth/profile-update-request", {
-      method: "POST",
+    const payload = {
+      name: form.name,
+      lastname: form.lastname,
+      email: form.email,
+      phone: form.phone,
+      address: form.address,
+      city: form.city,
+      birthdate: form.birthdate,
+      sex: form.sex,
+      profileImg: form.avatar,
+      paymentmethod: {
+        nombretarjeta: form.cardName,
+        numerotarjeta: form.cardNumber,
+        cvv: form.cardCVV,
+        tipo: form.cardType
+      }
+    };
+
+    console.info("[PROFILE] intentando actualizar perfil", payload);
+
+    const res = await fetch("https://backendproyectodf.onrender.com/api/users/profile", {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json"
       },
       credentials: "include",
-      body: JSON.stringify({
-        name: form.name,
-        lastname: form.lastname,
-        email: form.email,
-        phone: form.phone,
-        address: form.address,
-        city: form.city,
-        birthdate: form.birthdate,
-        sex: form.sex,
-        profileImg: form.avatar,
-        paymentmethod: {
-          nombretarjeta: form.cardName,
-          numerotarjeta: form.cardNumber,
-          cvv: form.cardCVV,
-          tipo: form.cardType
-        }
-      })
+      body: JSON.stringify(payload)
     });
 
     const data = await res.json();
 
-    if (!res.ok) return Swal.fire("Error 896", data.message || "No se pudo iniciar la actualización", "error");
+    if (!res.ok) {
+      return Swal.fire("Error 896", data.message || "No se pudo actualizar el perfil", "error");
+    }
 
-    savePending2FAFlow({
-      email: form.email,
-      tempToken: data.tempToken,
-      redirectTo: "/profile",
-      pendingProfileUpdate: { email: form.email, payload: {
-          name: form.name,
-          lastname: form.lastname,
-          phone: form.phone,
-          address: form.address,
-          city: form.city,
-          birthdate: form.birthdate,
-          sex: form.sex,
-          profileImg: form.avatar,
-          paymentmethod: {
-            nombretarjeta: form.cardName,
-            numerotarjeta: form.cardNumber,
-            cvv: form.cardCVV,
-            tipo: form.cardType
-          }
-        } }
-    });
+    const updatedUser = data.user || data;
+    const savedAuth = JSON.parse(localStorage.getItem("auth") || "null");
+    const nextAuth = savedAuth
+      ? { ...savedAuth, ...updatedUser, profileImg: updatedUser.profileImg || savedAuth.profileImg }
+      : updatedUser;
 
-    navigate("/verify-2fa", {
-      state: {
-        email: form.email,
-        tempToken: data.tempToken,
-        redirectTo: "/profile",
-        pendingProfileUpdate: { email: form.email, payload: {
-          name: form.name,
-          lastname: form.lastname,
-          phone: form.phone,
-          address: form.address,
-          city: form.city,
-          birthdate: form.birthdate,
-          sex: form.sex,
-          profileImg: form.avatar,
-          paymentmethod: {
-            nombretarjeta: form.cardName,
-            numerotarjeta: form.cardNumber,
-            cvv: form.cardCVV,
-            tipo: form.cardType
-          }
-        } }
-      }
-    });
+    localStorage.setItem("auth", JSON.stringify(nextAuth));
+    setAuth(nextAuth);
+    setForm((prev) => ({ ...prev, avatar: updatedUser.profileImg || prev.avatar }));
 
+    console.info("[PROFILE] perfil actualizado", updatedUser);
+    Swal.fire("Éxito", "Perfil actualizado correctamente", "success");
   } catch (err) {
-    console.log(err);
+    console.error("[PROFILE] error al guardar", err);
+    Swal.fire("Error", "No se pudo actualizar el perfil", "error");
   }
 };
 
