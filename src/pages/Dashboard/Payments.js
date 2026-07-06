@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { jsPDF } from "jspdf";
+import { BACKEND_URL } from "../../utils/config";
 
 export default function Payments() {
 
@@ -34,9 +35,17 @@ export default function Payments() {
 
     const loadPayments = async () => {
       try {
+        const authData = JSON.parse(localStorage.getItem("auth"));
+        const token = authData?.token || localStorage.getItem("token");
 
-        const res = await fetch("https://backendproyectodf.onrender.com/api/admin/payments", {
+        const headers = {};
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const res = await fetch(`${BACKEND_URL}/api/admin/payments`, {
           method: "GET",
+          headers,
           credentials: "include"
         });
 

@@ -5,6 +5,8 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import Swal from "sweetalert2";
 import { clearPending2FAFlow, savePending2FAFlow } from "../utils/twoFactorFlow";
+import { BACKEND_URL } from "../utils/config";
+
 
 export default function Login() {
   const [user, setUser] = useState("");
@@ -22,7 +24,7 @@ export default function Login() {
   clearPending2FAFlow();
 
   try {
-    const res = await fetch("https://backendproyectodf.onrender.com/api/auth/login", {
+    const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -78,7 +80,7 @@ export default function Login() {
   setResetLoading(true);
 
   try {
-    const res = await fetch("https://backendproyectodf.onrender.com/api/auth/forgot-password", {
+    const res = await fetch(`${BACKEND_URL}/api/auth/forgot-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

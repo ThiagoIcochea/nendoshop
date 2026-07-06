@@ -16,6 +16,8 @@ import Clients from "./pages/Dashboard/Clients";
 import Products from "./pages/Dashboard/Products";
 import AdminOverview from "./pages/Dashboard/AdminOverview";
 import SecurityLogs from "./pages/Dashboard/SecurityLogs";
+import Deliveries from "./pages/Dashboard/Deliveries";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProductDetail from "./pages/ProductDetail"
 import Cart from "./pages/Cart";
@@ -67,6 +69,7 @@ function App() {
               <Route path="clients" element={<Clients />} />
               <Route path="products" element={<Products />} />
               <Route path="security" element={<SecurityLogs />} />
+              <Route path="deliveries" element={<Deliveries />} />
             </Route>
             <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Activity, AlertTriangle, Shield, ScrollText, Sparkles } from "lucide-react";
 import { buildSalesMetrics } from "../../utils/dashboardMetrics";
+import { BACKEND_URL } from "../../utils/config";
 
 export default function AdminOverview() {
   const [payments, setPayments] = useState([]);
@@ -11,10 +12,18 @@ export default function AdminOverview() {
   useEffect(() => {
     const loadData = async () => {
       try {
+        const authData = JSON.parse(localStorage.getItem("auth"));
+        const token = authData?.token || localStorage.getItem("token");
+
+        const headers = {};
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
         const [paymentsRes, clientsRes, logsRes] = await Promise.all([
-          fetch("https://backendproyectodf.onrender.com/api/admin/payments", { credentials: "include" }),
-          fetch("https://backendproyectodf.onrender.com/api/admin/clients", { credentials: "include" }),
-          fetch("https://backendproyectodf.onrender.com/api/admin/logs", { credentials: "include" })
+          fetch(`${BACKEND_URL}/api/admin/payments`, { headers, credentials: "include" }),
+          fetch(`${BACKEND_URL}/api/admin/clients`, { headers, credentials: "include" }),
+          fetch(`${BACKEND_URL}/api/admin/logs`, { headers, credentials: "include" })
         ]);
 
         const [paymentsData, clientsData, logsData] = await Promise.all([

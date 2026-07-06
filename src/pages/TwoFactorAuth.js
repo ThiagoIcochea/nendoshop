@@ -16,6 +16,7 @@ import {
   getTwoFactorSuccessTarget,
   readPending2FAFlow,
 } from "../utils/twoFactorFlow";
+import { BACKEND_URL } from "../utils/config";
 
 export default function TwoFactorAuth() {
   const [code, setCode] = useState(Array(6).fill(""));
@@ -102,7 +103,7 @@ export default function TwoFactorAuth() {
     setResendTimer(60);
 
     try {
-      const res = await fetch("https://backendproyectodf.onrender.com/api/auth/resend-2fa", {
+      const res = await fetch(`${BACKEND_URL}/api/auth/resend-2fa`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -149,7 +150,7 @@ export default function TwoFactorAuth() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://backendproyectodf.onrender.com/api/auth/verify-2fa", {
+      const res = await fetch(`${BACKEND_URL}/api/auth/verify-2fa`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -173,6 +174,14 @@ export default function TwoFactorAuth() {
         setCode(Array(6).fill(""));
         inputRefs.current[0].focus();
         return Swal.fire("Error", data.message || "Código incorrecto", "error");
+      }
+
+      // ¿CÓMO funciona?
+      // Captura y persiste el token JWT obtenido del backend tras una verificación exitosa.
+      // ¿POR QUÉ esta estructura?
+      // Permite que otras llamadas API protegidas adjunten el token en la cabecera Authorization en desarrollo.
+      if (data.token) {
+        localStorage.setItem("token", data.token);
       }
 
       clearPending2FAFlow();

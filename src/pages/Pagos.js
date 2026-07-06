@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 export default function Pagos() {
   const navigate = useNavigate();
@@ -8,8 +9,131 @@ export default function Pagos() {
   const [paymentStatus, setPaymentStatus] = useState("inactivo");
   const [paso, setPaso] = useState(1); 
   const [saveCard, setSaveCard] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("card"); // 'card' o 'paypal'
 
   const [user, setUser] = useState(null);
+
+  // ¿CÓMO funciona?
+  // Realiza una llamada POST al backend para registrar y obtener el orderID de PayPal.
+  // ¿POR QUÉ esta estructura?
+  // Se requiere que el backend cree la orden en los servidores de PayPal antes de mostrar el portal de pagos.
+  const handlePayPalCreateOrder = async (data, actions) => {
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
+      const totalFinal = envioDatos.metodoEnvio === "delivery" ? total + 15 : total;
+
+      // ¿CÓMO funciona?
+      // Obtiene el token de sesión JWT desde localStorage (buscando en el objeto 'auth' o en la clave directa 'token').
+      // ¿POR QUÉ esta estructura?
+      // Permite autenticar la petición contra el backend enviando las credenciales explícitas del JWT en el header.
+      const authData = JSON.parse(localStorage.getItem("auth"));
+      const token = authData?.token || localStorage.getItem("token");
+
+      const headers = {
+        "Content-Type": "application/json"
+      };
+
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const res = await fetch(`${backendUrl}/api/paypal/create-order`, {
+        method: "POST",
+        headers,
+        credentials: "include",
+        body: JSON.stringify({ total: totalFinal })
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Error al crear la orden de PayPal");
+      }
+
+      const orderData = await res.json();
+      return orderData.orderId;
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "No se pudo iniciar el pago con PayPal. Inténtalo de nuevo.", "error");
+      throw err;
+    }
+  };
+
+  // ¿CÓMO funciona?
+  // Obtiene el token de sesión JWT de localStorage y envía el ID de orden junto con la metadata del carrito de compras al backend.
+  // ¿POR QUÉ esta estructura?
+  // Asegura la autenticidad e integridad de la captura de pago al firmar la petición con el JWT del cliente logueado.
+  const handlePayPalApprove = async (data, actions) => {
+    setPaymentStatus("procesando");
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
+      const totalFinal = envioDatos.metodoEnvio === "delivery" ? total + 15 : total;
+
+      const authData = JSON.parse(localStorage.getItem("auth"));
+      const token = authData?.token || localStorage.getItem("token");
+
+      const headers = {
+        "Content-Type": "application/json"
+      };
+
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const paymentData = {
+        cliente: user ? `${user.name} ${user.lastname}` : "Cliente Anónimo",
+        tipo_comprobante: envioDatos.tipoComprobante,
+        documento: envioDatos.documento,
+        razon_social: envioDatos.tipoComprobante === "factura" ? envioDatos.razonSocial : undefined,
+        metodo_envio: envioDatos.metodoEnvio === "presencial" ? "recojo" : envioDatos.metodoEnvio,
+        direccion_entrega: envioDatos.metodoEnvio === "delivery"
+          ? `${envioDatos.direccionEntrega.calle}, ${envioDatos.direccionEntrega.distrito}`
+          : "Recojo en Tienda: Av. Arequipa 265, Lima - Perú",
+        referencia: envioDatos.metodoEnvio === "delivery" ? envioDatos.referencia : undefined,
+        envio: envioDatos.metodoEnvio === "delivery" ? 15.00 : 0,
+        productos: cart.map((p) => ({
+          name: p.name,
+          quantity: p.quantity,
+          price: p.price
+        })),
+        total: totalFinal,
+        deliveryType: envioDatos.metodoEnvio === "delivery" ? "shipping" : "pickup",
+        estado: "Pagado"
+      };
+
+      const res = await fetch(`${backendUrl}/api/paypal/capture-order`, {
+        method: "POST",
+        headers,
+        credentials: "include",
+        body: JSON.stringify({
+          orderId: data.orderID,
+          paymentData
+        })
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Error al capturar la orden de PayPal");
+      }
+
+      setPaymentStatus("exito");
+      localStorage.removeItem("cart");
+      window.dispatchEvent(new Event("storage"));
+
+      setTimeout(() => {
+        navigate("/", { replace: true });
+      }, 1500);
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "No se pudo confirmar el pago. Por favor contacta al soporte técnico.", "error");
+      setPaymentStatus("inactivo");
+    }
+  };
+
+  const handlePayPalError = (err) => {
+    console.error("PayPal Error:", err);
+    Swal.fire("Error en PayPal", "Ocurrió un error inesperado al procesar con PayPal. Por favor, intenta de nuevo.", "error");
+  };
+
   const [envioDatos, setEnvioDatos] = useState({
     tipoComprobante: "boleta", 
     documento: "",             
@@ -41,8 +165,18 @@ export default function Pagos() {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const res = await fetch("https://backendproyectodf.onrender.com/api/users/profile", {
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
+        const authData = JSON.parse(localStorage.getItem("auth"));
+        const token = authData?.token || localStorage.getItem("token");
+
+        const headers = {};
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const res = await fetch(`${backendUrl}/api/users/profile`, {
           method: "GET",
+          headers,
           credentials: "include"
         });
         const data = await res.json();
@@ -128,7 +262,7 @@ export default function Pagos() {
     setPaymentStatus("procesando");
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://backendproyectodf.onrender.com";
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
       const paymentData = {
   cliente: user ? `${user.name} ${user.lastname}` : "Cliente Anónimo",
 
@@ -156,6 +290,7 @@ export default function Pagos() {
     price: p.price
   })),
   total: envioDatos.metodoEnvio === "delivery" ? total + 15 : total,
+  deliveryType: envioDatos.metodoEnvio === "delivery" ? "shipping" : "pickup",
   estado: "Pagado"
 };
 
@@ -317,7 +452,7 @@ export default function Pagos() {
             )}
 
             {paso === 2 && (
-              <form onSubmit={handlePayment} className="animate__animated animate__fadeIn">
+              <div className="animate__animated animate__fadeIn">
                 <div className="flex items-center justify-between mb-6 border-b pb-2">
                   <div className="flex items-center gap-3">
                     <div className="bg-brand text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">2</div>
@@ -326,50 +461,100 @@ export default function Pagos() {
                   <button type="button" onClick={() => setPaso(1)} className="text-sm text-brand hover:underline font-medium">← Volver a Envío</button>
                 </div>
 
-                <div className="space-y-5">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Nombre en la tarjeta</label>
-                    <input name="cardName" value={card.cardName} onChange={(e) => setCard({ ...card, cardName: e.target.value })} type="text" required placeholder="Ej. Débito" className="w-full border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand" />
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between items-end mb-1">
-                      <label className="block text-sm font-medium text-gray-700">Número de Tarjeta</label>
-                      <span className={`text-xs ${card.cardNumber.length === 16 ? 'text-green-600 font-bold' : 'text-red-400'}`}>{card.cardNumber.length}/16</span>
-                    </div>
-                    <input name="cardNumber" value={card.cardNumber} onChange={(e) => setCard({ ...card, cardNumber: e.target.value.replace(/\D/g, '').slice(0, 16) })} type="text" required placeholder="0000 0000 0000 0000" className="w-full border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand" />
-                  </div>
-
-                  <div className="flex gap-4">
-                    <div className="flex-1">
-                      <div className="flex justify-between items-end mb-1">
-                        <label className="block text-sm font-medium text-gray-700">CVV</label>
-                        <span className={`text-xs ${card.cardCVV.length === 3 ? 'text-green-600 font-bold' : 'text-red-400'}`}>{card.cardCVV.length}/3</span>
-                      </div>
-                      <input name="cardCVV" value={card.cardCVV} onChange={(e) => setCard({ ...card, cardCVV: e.target.value.replace(/\D/g, '').slice(0, 3) })} type="password" required placeholder="123" className="w-full border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand" />
-                    </div>
-
-                    <div className="flex-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
-                      <select name="cardType" value={card.cardType} onChange={(e) => setCard({ ...card, cardType: e.target.value })} className="w-full border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand bg-white">
-                        <option value="visa">Visa</option>
-                        <option value="mastercard">MasterCard</option>
-                      </select>
-                    </div>
-
-                     <div className="flex items-center gap-2">
-                      <input type="checkbox" id="saveCard" name="saveCard" checked={saveCard} onChange={(e) => setSaveCard(e.target.checked)} className="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand" />
-                      <label htmlFor="saveCard" className="block text-sm font-medium text-gray-700">
-                        Guardar tarjeta para futuras compras
-                      </label>
-                    </div>
-                  </div>
+                {/* ¿CÓMO funciona?
+                    Ofrece pestañas de navegación con Tailwind CSS para cambiar el método de pago entre Tarjeta y PayPal.
+                    ¿POR QUÉ esta estructura?
+                    Separa de forma limpia la lógica de introducción de tarjeta del widget oficial de PayPal. */}
+                <div className="flex gap-4 mb-6">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("card")}
+                    className={`flex-1 py-3 px-4 rounded-xl border-2 font-bold text-sm transition-all flex items-center justify-center gap-2 ${
+                      paymentMethod === "card"
+                        ? "border-purple-600 bg-purple-50 text-purple-700 shadow-sm"
+                        : "border-gray-200 hover:border-purple-200 text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    💳 Tarjeta de Crédito/Débito
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("paypal")}
+                    className={`flex-1 py-3 px-4 rounded-xl border-2 font-bold text-sm transition-all flex items-center justify-center gap-2 ${
+                      paymentMethod === "paypal"
+                        ? "border-purple-600 bg-purple-50 text-purple-700 shadow-sm"
+                        : "border-gray-200 hover:border-purple-200 text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    🟡 PayPal
+                  </button>
                 </div>
 
-                <button type="submit" className="w-full mt-8 bg-brand text-white font-bold text-lg py-4 rounded-xl shadow-lg hover:bg-brand/90 transition-colors">
-                  Confirmar y Pagar
-                </button>
-              </form>
+                {paymentMethod === "card" ? (
+                  <form onSubmit={handlePayment} className="space-y-5">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Nombre en la tarjeta</label>
+                      <input name="cardName" value={card.cardName} onChange={(e) => setCard({ ...card, cardName: e.target.value })} type="text" required placeholder="Ej. Débito" className="w-full border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand" />
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between items-end mb-1">
+                        <label className="block text-sm font-medium text-gray-700">Número de Tarjeta</label>
+                        <span className={`text-xs ${card.cardNumber.length === 16 ? 'text-green-600 font-bold' : 'text-red-400'}`}>{card.cardNumber.length}/16</span>
+                      </div>
+                      <input name="cardNumber" value={card.cardNumber} onChange={(e) => setCard({ ...card, cardNumber: e.target.value.replace(/\D/g, '').slice(0, 16) })} type="text" required placeholder="0000 0000 0000 0000" className="w-full border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand" />
+                    </div>
+
+                    <div className="flex gap-4">
+                      <div className="flex-1">
+                        <div className="flex justify-between items-end mb-1">
+                          <label className="block text-sm font-medium text-gray-700">CVV</label>
+                          <span className={`text-xs ${card.cardCVV.length === 3 ? 'text-green-600 font-bold' : 'text-red-400'}`}>{card.cardCVV.length}/3</span>
+                        </div>
+                        <input name="cardCVV" value={card.cardCVV} onChange={(e) => setCard({ ...card, cardCVV: e.target.value.replace(/\D/g, '').slice(0, 3) })} type="password" required placeholder="123" className="w-full border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand" />
+                      </div>
+
+                      <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                        <select name="cardType" value={card.cardType} onChange={(e) => setCard({ ...card, cardType: e.target.value })} className="w-full border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand bg-white">
+                          <option value="visa">Visa</option>
+                          <option value="mastercard">MasterCard</option>
+                        </select>
+                      </div>
+
+                       <div className="flex items-center gap-2">
+                        <input type="checkbox" id="saveCard" name="saveCard" checked={saveCard} onChange={(e) => setSaveCard(e.target.checked)} className="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand" />
+                        <label htmlFor="saveCard" className="block text-sm font-medium text-gray-700">
+                          Guardar tarjeta para futuras compras
+                        </label>
+                      </div>
+                    </div>
+
+                    <button type="submit" className="w-full mt-8 bg-brand text-white font-bold text-lg py-4 rounded-xl shadow-lg hover:bg-brand/90 transition-colors">
+                      Confirmar y Pagar
+                    </button>
+                  </form>
+                ) : (
+                  <div className="mt-4 space-y-4">
+                    <p className="text-sm text-gray-500 mb-4">
+                      Serás redirigido a la ventana segura de PayPal para autorizar el pago.
+                    </p>
+                    <PayPalScriptProvider
+                      options={{
+                        "client-id": process.env.REACT_APP_PAYPAL_CLIENT_ID || "test",
+                        currency: "USD"
+                      }}
+                    >
+                      <PayPalButtons
+                        style={{ layout: "vertical", shape: "rect", label: "pay" }}
+                        createOrder={handlePayPalCreateOrder}
+                        onApprove={handlePayPalApprove}
+                        onError={handlePayPalError}
+                      />
+                    </PayPalScriptProvider>
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
