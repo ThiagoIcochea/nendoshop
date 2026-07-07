@@ -19,7 +19,7 @@ export default function Pagos() {
   // Se requiere que el backend cree la orden en los servidores de PayPal antes de mostrar el portal de pagos.
   const handlePayPalCreateOrder = async (data, actions) => {
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://backendproyectodf.onrender.com";
       const totalFinal = envioDatos.metodoEnvio === "delivery" ? total + 15 : total;
 
       // ¿CÓMO funciona?
@@ -65,7 +65,7 @@ export default function Pagos() {
   const handlePayPalApprove = async (data, actions) => {
     setPaymentStatus("procesando");
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://backendproyectodf.onrender.com";
       const totalFinal = envioDatos.metodoEnvio === "delivery" ? total + 15 : total;
 
       const authData = JSON.parse(localStorage.getItem("auth"));
@@ -165,7 +165,7 @@ export default function Pagos() {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://backendproyectodf.onrender.com";
         const authData = JSON.parse(localStorage.getItem("auth"));
         const token = authData?.token || localStorage.getItem("token");
 
@@ -262,7 +262,7 @@ export default function Pagos() {
     setPaymentStatus("procesando");
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://backendproyectodf.onrender.com";
       const paymentData = {
   cliente: user ? `${user.name} ${user.lastname}` : "Cliente Anónimo",
 
