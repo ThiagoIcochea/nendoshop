@@ -28,6 +28,7 @@ const fetchRoomMessages = async (roomKey) => {
   const response = await fetch(`${BACKEND_URL}/api/chat/rooms/${roomKey}/messages?limit=200`, {
     credentials: "include"
   });
+  
   if (!response.ok) {
     throw new Error("No se pudieron cargar los mensajes");
   }
@@ -156,7 +157,7 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
         clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = null;
       }
-      if (socketRef.current) {
+      if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
         socketRef.current.close();
         socketRef.current = null;
       }

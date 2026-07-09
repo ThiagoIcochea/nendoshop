@@ -8,7 +8,10 @@ const getUserInitials = (username = "") => {
   return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
 };
 
-export default function ChatInfo({ users, onReportUser }) {
+export default function ChatInfo({ users, onReportUser, currentChat = "community" }) {
+
+  // Los canales de soporte son privados: solo el usuario y NendoBot participan.
+  const isSupportChat = currentChat.startsWith("support");
 
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [reportText, setReportText] = useState("");
@@ -33,49 +36,61 @@ export default function ChatInfo({ users, onReportUser }) {
 
       <div className="p-5 border-b border-purple-100">
 
-        <div className="flex items-center justify-between mb-4">
-
-          <div>
-            <h4 className="text-sm font-semibold text-gray-800">
-              👥 Usuarios activos
-            </h4>
-
-            <p className="text-xs text-gray-400">
-              {users.length} conectados
+        {isSupportChat ? (
+          // Canal privado: oculta lista de usuarios y muestra aviso
+          <div className="rounded-2xl bg-purple-50 border border-purple-100 p-4 text-sm text-purple-700">
+            <p className="font-semibold mb-1">🔒 Canal privado</p>
+            <p className="text-xs text-purple-500 leading-relaxed">
+              Este chat es exclusivo entre tú y NendoBot. Nadie más puede ver ni unirse a esta conversación.
             </p>
           </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between mb-4">
 
-          <div className="flex -space-x-3">
+              <div>
+                <h4 className="text-sm font-semibold text-gray-800">
+                  👥 Usuarios activos
+                </h4>
 
-            {users.slice(0, 4).map((u, i) => {
-              const username = u?.username || u?.name || "Usuario";
-              const avatarSrc = u?.profileImg || u?.avatar || "";
-              const showImage = Boolean(avatarSrc) && !brokenImages[i];
+                <p className="text-xs text-gray-400">
+                  {users.length} conectados
+                </p>
+              </div>
 
-              return (
-                <div
-                  key={i}
-                  className="w-9 h-9 rounded-full border-2 border-white shadow-sm overflow-hidden bg-gradient-to-br from-purple-500 to-fuchsia-500 text-white flex items-center justify-center text-[11px] font-semibold"
-                >
-                  {showImage ? (
-                    <img
-                      src={avatarSrc}
-                      alt={username}
-                      onError={() => setBrokenImages((prev) => ({ ...prev, [i]: true }))}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    getUserInitials(username)
-                  )}
-                </div>
-              );
-            })}
+              <div className="flex -space-x-3">
 
-          </div>
+                {users.slice(0, 4).map((u, i) => {
+                  const username = u?.username || u?.name || "Usuario";
+                  const avatarSrc = u?.profileImg || u?.avatar || "";
+                  const showImage = Boolean(avatarSrc) && !brokenImages[i];
 
-        </div>
+                  return (
+                    <div
+                      key={i}
+                      className="w-9 h-9 rounded-full border-2 border-white shadow-sm overflow-hidden bg-gradient-to-br from-purple-500 to-fuchsia-500 text-white flex items-center justify-center text-[11px] font-semibold"
+                    >
+                      {showImage ? (
+                        <img
+                          src={avatarSrc}
+                          alt={username}
+                          onError={() => setBrokenImages((prev) => ({ ...prev, [i]: true }))}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        getUserInitials(username)
+                      )}
+                    </div>
+                  );
+                })}
 
-        <OnlineUsers onlineUsers={users} onSelectUser={setSelectedUser} />
+              </div>
+
+            </div>
+
+            <OnlineUsers onlineUsers={users} onSelectUser={setSelectedUser} />
+          </>
+        )}
 
       </div>
 
