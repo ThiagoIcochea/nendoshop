@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { BACKEND_URL } from "../utils/config";
 
+/* 
 const getBackendUrl = () => {
   if (process.env.REACT_APP_BACKEND_URL) {
     return process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "");
@@ -15,7 +17,10 @@ const getBackendUrl = () => {
   return "https://backendproyectodf.onrender.com";
 };
 
-const BACKEND_URL = getBackendUrl();
+const BACKEND_URL = getBackendUrl();*/
+ 
+
+
 const getWebSocketUrl = () => {
   if (!BACKEND_URL) return null;
   if (BACKEND_URL.startsWith("https://")) return BACKEND_URL.replace("https://", "wss://");
