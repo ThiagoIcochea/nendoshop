@@ -43,7 +43,7 @@ export default function ChatPage() {
           <SidebarChats
             currentChat={currentChat}
             setCurrentChat={(chat) => {
-              setCurrentChat(chat);
+              setCurrentChat(chat+"_"+ userId);
               setMenuOpen(false);
             }}
           />
