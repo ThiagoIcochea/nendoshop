@@ -16,6 +16,11 @@ export default function ChatPage() {
 
   const userId = auth?._id || auth?.id || auth?.userId || null;
 
+  // Si el canal seleccionado es "support", construye un roomKey privado
+  // con el formato que el backend espera: "support_<userId>"
+  const effectiveRoomKey =
+    currentChat === "support" && userId ? `support_${userId}` : currentChat;
+
   const {
     messages,
     onlineUsers,
@@ -24,7 +29,7 @@ export default function ChatPage() {
     sendTyping,
     reportUser,
     connected
-  } = useChatSocket(currentChat, username, userId, auth?.profileImg || "");
+  } = useChatSocket(effectiveRoomKey, username, userId, auth?.profileImg || "");
 
   return (
     <div className="h-[calc(100dvh-64px)] md:h-[calc(100vh-64px)] bg-gradient-to-br from-white via-purple-50/30 to-white overflow-hidden">
@@ -69,7 +74,7 @@ export default function ChatPage() {
         </main>
 
         <aside className={`${infoOpen ? "block" : "hidden"} w-full border-t border-purple-100 bg-white shadow-sm md:block md:w-[340px] md:shrink-0 md:border-l md:border-t-0 xl:block md:max-h-full`}>
-          <ChatInfo users={onlineUsers} onReportUser={reportUser} />
+          <ChatInfo users={onlineUsers} onReportUser={reportUser} currentChat={currentChat} />
         </aside>
 
       </div>

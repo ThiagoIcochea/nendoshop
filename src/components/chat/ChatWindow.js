@@ -30,7 +30,10 @@ export default function ChatWindow({
     },
   };
 
-  const chat = chatData[currentChat];
+  // Normaliza la clave de display: cualquier canal que empiece con "support"
+  // (e.g. "support_abc123") debe usar la entrada visual de soporte.
+  const chatKey = currentChat.startsWith("support") ? "support" : currentChat;
+  const chat = chatData[chatKey] ?? chatData.community;
 
   return (
     <main className="relative flex h-full min-h-0 flex-col overflow-hidden bg-gradient-to-b from-white via-purple-50/20 to-white">

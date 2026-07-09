@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { BACKEND_URL } from "../utils/config";
 
+/* 
 const getBackendUrl = () => {
   if (process.env.REACT_APP_BACKEND_URL) {
     return process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "");
@@ -15,7 +17,10 @@ const getBackendUrl = () => {
   return "https://backendproyectodf.onrender.com";
 };
 
-const BACKEND_URL = getBackendUrl();
+const BACKEND_URL = getBackendUrl();*/
+ 
+
+
 const getWebSocketUrl = () => {
   if (!BACKEND_URL) return null;
   if (BACKEND_URL.startsWith("https://")) return BACKEND_URL.replace("https://", "wss://");
@@ -28,6 +33,7 @@ const fetchRoomMessages = async (roomKey) => {
   const response = await fetch(`${BACKEND_URL}/api/chat/rooms/${roomKey}/messages?limit=200`, {
     credentials: "include"
   });
+  
   if (!response.ok) {
     throw new Error("No se pudieron cargar los mensajes");
   }
@@ -156,7 +162,7 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
         clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = null;
       }
-      if (socketRef.current) {
+      if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
         socketRef.current.close();
         socketRef.current = null;
       }
