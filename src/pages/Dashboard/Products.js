@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Pencil } from "lucide-react";
 import Swal from "sweetalert2";
+import { BACKEND_URL } from "../../utils/config";
+
 
 export default function Products() {
 
@@ -14,7 +16,7 @@ export default function Products() {
 
   useEffect(() => {
     const load = async () => {
-      const res = await fetch("https://backendproyectodf.onrender.com/api/products");
+      const res = await fetch(`${BACKEND_URL}/api/products`);
       const data = await res.json();
 
       if (res.ok) {
@@ -62,9 +64,20 @@ export default function Products() {
       return;
     }
 
-    const res = await fetch(`https://backendproyectodf.onrender.com/api/admin/products/${id}/${field}`, {
+    const authData = JSON.parse(localStorage.getItem("auth"));
+    const token = authData?.token || localStorage.getItem("token");
+
+    const headers = {
+      "Content-Type": "application/json"
+    };
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${BACKEND_URL}/api/admin/products/${id}/${field}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers,
       credentials: "include",
       body: JSON.stringify({ [field]: validated })
     });

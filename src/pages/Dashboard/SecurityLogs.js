@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Filter, Search, ShieldAlert, Unlock, Download } from "lucide-react";
 import Swal from "sweetalert2";
+import { BACKEND_URL } from "../../utils/config";
+
 
 export default function SecurityLogs() {
   const [users, setUsers] = useState([]);
@@ -9,9 +11,17 @@ export default function SecurityLogs() {
   const [type, setType] = useState("all");
 
   const loadData = async () => {
+    const authData = JSON.parse(localStorage.getItem("auth"));
+    const token = authData?.token || localStorage.getItem("token");
+
+    const headers = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     const [usersRes, logsRes] = await Promise.all([
-      fetch("https://backendproyectodf.onrender.com/api/admin/clients", { credentials: "include" }),
-      fetch("https://backendproyectodf.onrender.com/api/admin/logs", { credentials: "include" })
+      fetch(`${BACKEND_URL}/api/admin/clients`, { headers, credentials: "include" }),
+      fetch(`${BACKEND_URL}/api/admin/logs`, { headers, credentials: "include" })
     ]);
 
     const [usersData, logsData] = await Promise.all([usersRes.json(), logsRes.json()]);
@@ -46,9 +56,20 @@ export default function SecurityLogs() {
 
     const reason = result.value ?? "Sin motivo";
 
-    const res = await fetch(`https://backendproyectodf.onrender.com/api/admin/clients/${user._id}/block`, {
+    const authData = JSON.parse(localStorage.getItem("auth"));
+    const token = authData?.token || localStorage.getItem("token");
+
+    const headers = {
+      "Content-Type": "application/json"
+    };
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${BACKEND_URL}/api/admin/clients/${user._id}/block`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers,
       credentials: "include",
       body: JSON.stringify({ blocked, reason })
     });

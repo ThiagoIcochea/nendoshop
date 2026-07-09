@@ -16,7 +16,8 @@ export default function DashboardLayout() {
     { to: "/dashboard/payments", label: "Pagos" },
     { to: "/dashboard/clients", label: "Clientes" },
     { to: "/dashboard/products", label: "Productos" },
-    { to: "/dashboard/security", label: "Seguridad y logs" }
+    { to: "/dashboard/security", label: "Seguridad y logs" },
+    { to: "/dashboard/deliveries", label: "Entregas" }
   ];
 
   return (

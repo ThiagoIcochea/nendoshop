@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Pencil, Eye, EyeOff } from "lucide-react";
 import Swal from "sweetalert2";
+import { BACKEND_URL } from "../../utils/config";
+
 
 export default function Clients() {
 
@@ -20,7 +22,16 @@ export default function Clients() {
 
   useEffect(() => {
     const load = async () => {
-      const res = await fetch("https://backendproyectodf.onrender.com/api/admin/clients", {
+      const authData = JSON.parse(localStorage.getItem("auth"));
+      const token = authData?.token || localStorage.getItem("token");
+
+      const headers = {};
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const res = await fetch(`${BACKEND_URL}/api/admin/clients`, {
+        headers,
         credentials: "include"
       });
 
@@ -73,9 +84,20 @@ export default function Clients() {
       return;
     }
 
-    const res = await fetch(`https://backendproyectodf.onrender.com/api/admin/clients/${id}/${field}`, {
+    const authData = JSON.parse(localStorage.getItem("auth"));
+    const token = authData?.token || localStorage.getItem("token");
+
+    const headers = {
+      "Content-Type": "application/json"
+    };
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${BACKEND_URL}/api/admin/clients/${id}/${field}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers,
       credentials: "include",
       body: JSON.stringify({ [field]: value })
     });
