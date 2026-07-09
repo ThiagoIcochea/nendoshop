@@ -16,6 +16,11 @@ export default function ChatPage() {
 
   const userId = auth?._id || auth?.id || auth?.userId || null;
 
+  const roomKey =
+  currentChat === "community" && userId
+    ? `chat_${userId}`
+    : currentChat;
+
   const {
     messages,
     onlineUsers,
@@ -24,7 +29,7 @@ export default function ChatPage() {
     sendTyping,
     reportUser,
     connected
-  } = useChatSocket(currentChat, username, userId, auth?.profileImg || "");
+  } = useChatSocket(roomKey, username, userId, auth?.profileImg || "");
 
   return (
     <div className="h-[calc(100dvh-64px)] md:h-[calc(100vh-64px)] bg-gradient-to-br from-white via-purple-50/30 to-white overflow-hidden">
@@ -43,7 +48,7 @@ export default function ChatPage() {
           <SidebarChats
             currentChat={currentChat}
             setCurrentChat={(chat) => {
-              setCurrentChat(chat+"_"+ userId);
+              setCurrentChat(chat);
               setMenuOpen(false);
             }}
           />
