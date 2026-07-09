@@ -44,6 +44,12 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
   const reconnectTimeoutRef = useRef(null);
   const isMountedRef = useRef(true);
 
+    const finalRoomKey =
+    roomKey === "support"
+      ? `support_${userId}`
+      : roomKey;
+
+
   const connectWebSocket = useCallback(() => {
     if (socketRef.current) return;
 
@@ -134,7 +140,7 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
     let active = true;
 
     setMessages([]);
-    fetchRoomMessages(roomKey)
+    fetchRoomMessages(finalRoomKey)
       .then((data) => {
         if (!active) return;
         setMessages(data);
