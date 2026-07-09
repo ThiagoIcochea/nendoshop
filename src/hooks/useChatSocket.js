@@ -63,8 +63,8 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
         clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = null;
       }
-      if (finalRoomKey && username) {
-        socket.send(JSON.stringify({ type: "join", finalRoomKey, username, userId, profileImg }));
+      if (roomKey && username) {
+        socket.send(JSON.stringify({ type: "join", roomKey, username, userId, profileImg }));
       }
     });
 
@@ -131,11 +131,11 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
     socket.addEventListener("error", () => {
       setConnected(false);
     });
-  }, [finalRoomKey, username, userId]);
+  }, [roomKey, username, userId]);
 
   useEffect(() => {
     isMountedRef.current = true;
-    if (!finalRoomKey || !username) return;
+    if (!roomKey || !username) return;
 
     let active = true;
 
@@ -152,7 +152,7 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
       connectWebSocket();
     } else {
-      socketRef.current.send(JSON.stringify({ type: "join",roomKey: finalRoomKey, username, userId, profileImg }));
+      socketRef.current.send(JSON.stringify({ type: "join", roomKey, username, userId, profileImg }));
     }
 
     return () => {
@@ -169,25 +169,25 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
       setTypingUser("");
       setOnlineUsers([]);
     };
-  }, [finalRoomKey, username, userId, profileImg, connectWebSocket]);
+  }, [roomKey, username, userId, profileImg, connectWebSocket]);
 
   const sendMessage = useCallback((text) => {
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
       console.warn("Socket no conectado");
       return;
     }
-    socketRef.current.send(JSON.stringify({ type: "message", roomKey:finalRoomKey , text, username, userId, profileImg }));
-  }, [finalRoomKey, username, userId, profileImg]);
+    socketRef.current.send(JSON.stringify({ type: "message", roomKey, text, username, userId, profileImg }));
+  }, [roomKey, username, userId, profileImg]);
 
   const sendTyping = useCallback(() => {
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
-    socketRef.current.send(JSON.stringify({ type: "typing", roomKey:finalRoomKey }));
-  }, [finalRoomKey]);
+    socketRef.current.send(JSON.stringify({ type: "typing", roomKey }));
+  }, [roomKey]);
 
   const reportUser = useCallback((payload) => {
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
-    socketRef.current.send(JSON.stringify({ type: "report-user",roomKey: finalRoomKey, ...payload }));
-  }, [finalRoomKey]);
+    socketRef.current.send(JSON.stringify({ type: "report-user", roomKey, ...payload }));
+  }, [roomKey]);
 
   return {
     messages,
