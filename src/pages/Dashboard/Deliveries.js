@@ -73,15 +73,24 @@ export default function Deliveries() {
       return;
     }
 
-    loadDeliveries();
-    loadClaims();
+    let isMounted = true;
+
+    const refreshData = async () => {
+      if (!isMounted) return;
+      await loadDeliveries();
+      await loadClaims();
+    };
+
+    refreshData();
 
     const intervalId = window.setInterval(() => {
-      loadDeliveries();
-      loadClaims();
-    }, 5000);
+      refreshData();
+    }, 15000);
 
-    return () => window.clearInterval(intervalId);
+    return () => {
+      isMounted = false;
+      window.clearInterval(intervalId);
+    };
   }, [loadDeliveries, loadClaims, navigate]);
 
   const handleUpdateStatus = async (id, status, deliveryCode = '') => {
@@ -533,6 +542,20 @@ export default function Deliveries() {
               <div><span className="font-semibold">Código de confirmación:</span> {selectedDelivery.deliveryCode || '—'}</div>
               <div><span className="font-semibold">Código de seguimiento:</span> {selectedDelivery.trackingCode || '—'}</div>
               <div><span className="font-semibold">Fecha estimada:</span> {selectedDelivery.estimatedDate ? new Date(selectedDelivery.estimatedDate).toLocaleDateString('es-PE') : '—'}</div>
+            </div>
+
+            <div className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+              <h4 className="text-sm font-semibold text-gray-800">Productos del pedido</h4>
+              <ul className="mt-3 space-y-2">
+                {(selectedDelivery.paymentId?.productos || []).length === 0 ? (
+                  <li className="text-sm text-gray-500">No hay productos registrados para este pedido.</li>
+                ) : (selectedDelivery.paymentId?.productos || []).map((product, index) => (
+                  <li key={`${product?.name || 'producto'}-${index}`} className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700">
+                    <span>{product?.name || 'Producto sin nombre'}</span>
+                    <span className="font-semibold text-gray-500">x{product?.quantity || 0}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
