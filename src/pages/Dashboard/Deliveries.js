@@ -14,6 +14,7 @@ export default function Deliveries() {
   const [claims, setClaims] = useState([]);
   const [selectedClaim, setSelectedClaim] = useState(null);
   const [selectedDelivery, setSelectedDelivery] = useState(null);
+  const [statusDrafts, setStatusDrafts] = useState({});
   const [claimAction, setClaimAction] = useState({ status: 'resolved', resolution: 'approved', newDeliveryStatus: '', cancellationReason: '', deliveryCode: '' });
 
   const [formData, setFormData] = useState({
@@ -323,6 +324,8 @@ export default function Deliveries() {
                     statusText = "Cancelado";
                   }
 
+                  const currentDraftStatus = statusDrafts[delivery._id] || delivery.status;
+
                   return (
                     <tr key={delivery._id} className={`${rowBg} transition-colors`}>
                       <td className="p-4 pl-6">
@@ -369,6 +372,33 @@ export default function Deliveries() {
 
                       <td className="p-4 text-center">
                         <div className="flex items-center justify-center gap-2">
+                          <select
+                            value={currentDraftStatus}
+                            onChange={(e) => setStatusDrafts((prev) => ({ ...prev, [delivery._id]: e.target.value }))}
+                            className="rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-xs font-semibold text-gray-700 outline-none"
+                          >
+                            <option value="pending">Pendiente</option>
+                            <option value="ready_for_pickup">Listo para recojo</option>
+                            <option value="shipped">Enviado</option>
+                            <option value="delivered">Entregado</option>
+                            <option value="cancelled">Cancelado</option>
+                            <option value="returned">Devuelto</option>
+                          </select>
+                          <button
+                            onClick={() => {
+                              const nextStatus = currentDraftStatus;
+                              if (nextStatus === "delivered") {
+                                const code = window.prompt("Ingresa el código de validación de entrega:");
+                                if (code) handleUpdateStatus(delivery._id, nextStatus, code);
+                                return;
+                              }
+                              handleUpdateStatus(delivery._id, nextStatus);
+                            }}
+                            disabled={isProcessing}
+                            className="rounded-lg bg-purple-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-purple-700 disabled:opacity-50"
+                          >
+                            Aplicar
+                          </button>
                           <button
                             onClick={() => setSelectedDelivery(delivery)}
                             className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100"
