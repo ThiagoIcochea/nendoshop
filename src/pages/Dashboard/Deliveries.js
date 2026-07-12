@@ -22,6 +22,20 @@ export default function Deliveries() {
     agency: "Olva Courier"
   });
 
+  const loadClaims = useCallback(async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const headers = {};
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const res = await fetch(`${BACKEND_URL}/api/claims`, { method: "GET", headers, credentials: "include" });
+      if (!res.ok) return;
+      const data = await res.json();
+      setClaims(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
   const loadDeliveries = useCallback(async () => {
     setLoading(true);
     try {
@@ -68,20 +82,6 @@ export default function Deliveries() {
 
     return () => window.clearInterval(intervalId);
   }, [loadDeliveries, loadClaims, navigate]);
-
-  const loadClaims = useCallback(async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const headers = {};
-      if (token) headers.Authorization = `Bearer ${token}`;
-      const res = await fetch(`${BACKEND_URL}/api/claims`, { method: "GET", headers, credentials: "include" });
-      if (!res.ok) return;
-      const data = await res.json();
-      setClaims(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
 
   const handleUpdateStatus = async (id, status, deliveryCode = '') => {
     setIsProcessing(true);
