@@ -1,27 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { BACKEND_URL } from "../utils/config";
 
 const getProductUrl = (productId) => {
   if (!productId) return null;
   return `/#/product/${productId}`;
 };
 
-const getBackendUrl = () => {
-  if (process.env.REACT_APP_BACKEND_URL) {
-    return process.env.REACT_APP_BACKEND_URL.replace(/\/$/, "");
-  }
-
-  if (typeof window !== "undefined") {
-    const hostname = window.location.hostname;
-    if (hostname === "localhost" || hostname === "127.0.0.1") {
-      return "http://localhost:4000";
-    }
-  }
-
-  return "https://backendproyectodf.onrender.com";
-};
-
-const BACKEND_URL = getBackendUrl();
 const getWebSocketUrl = () => {
   if (!BACKEND_URL) return null;
   if (BACKEND_URL.startsWith("https://")) return BACKEND_URL.replace("https://", "wss://");

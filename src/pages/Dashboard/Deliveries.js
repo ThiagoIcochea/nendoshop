@@ -10,6 +10,7 @@ export default function Deliveries() {
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const [formData, setFormData] = useState({
     paymentId: "",
@@ -18,10 +19,6 @@ export default function Deliveries() {
     agency: "Olva Courier"
   });
 
-  // ¿CÓMO funciona?
-  // Carga todas las órdenes de entrega llamando al endpoint protegido del backend con cabeceras de autorización.
-  // ¿POR QUÉ esta estructura?
-  // Asegura que el backend reconozca al operador autenticado enviando el JWT de sesión desde localStorage.
   const loadDeliveries = useCallback(async () => {
     setLoading(true);
     try {
@@ -45,7 +42,6 @@ export default function Deliveries() {
       const data = await res.json();
       setDeliveries(data);
     } catch (err) {
-      console.error(err);
       Swal.fire("Error", err.message || "Error al cargar entregas", "error");
     } finally {
       setLoading(false);
@@ -59,24 +55,11 @@ export default function Deliveries() {
       return;
     }
     loadDeliveries();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    // ¿CÓMO funciona?
-    // Establece un intervalo recurrente (cada 10 segundos) para ejecutar la consulta de entregas al backend.
-    // ¿POR QUÉ esta estructura?
-    // Hace que el panel se actualice y renderice automáticamente los nuevos pedidos y despachos 
-    // generados por compras en tiempo real, sin requerir refrescos manuales.
-    const interval = setInterval(() => {
-      loadDeliveries();
-    }, 10000);
-
-    return () => clearInterval(interval);
-  }, [navigate, loadDeliveries]);
-
-  // ¿CÓMO funciona?
-  // Envía una petición PATCH rápida para cambiar únicamente el estado logístico del despacho.
-  // ¿POR QUÉ esta estructura?
-  // Permite un flujo de trabajo ágil para actualizar a 'ready_for_pickup', 'shipped' y 'delivered' sin alterar otros datos.
   const handleUpdateStatus = async (id, status) => {
+    setIsProcessing(true);
     try {
       const token = localStorage.getItem("token");
 
@@ -102,17 +85,14 @@ export default function Deliveries() {
       }
 
       Swal.fire("Éxito", `Estado de entrega actualizado a '${status}' con éxito.`, "success");
-      loadDeliveries();
+      await loadDeliveries();
     } catch (err) {
-      console.error(err);
       Swal.fire("Error", err.message, "error");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  // ¿CÓMO funciona?
-  // Envía el formulario de nueva entrega (solo para tipo shipping) al backend mediante POST.
-  // ¿POR QUÉ esta estructura?
-  // Protege la creación de nuevos envíos bajo el rol de administrador y valida los datos de entrega correspondientes.
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -162,18 +142,12 @@ export default function Deliveries() {
       });
       loadDeliveries();
     } catch (err) {
-      console.error(err);
       Swal.fire("Error", err.message, "error");
     } finally {
       setSubmitting(false);
     }
   };
 
-  // ¿CÓMO funciona?
-  // Abre el Modal de registro para envíos a domicilio cargando dinámicamente los datos de entrega.
-  // ¿POR QUÉ esta estructura?
-  // Extrae y auto-rellena la dirección y referencia que el usuario configuró en el checkout
-  // para evitar tener que digitarlos manualmente y acelerar el flujo de trabajo.
   const openRegisterModal = (delivery) => {
     const payment = delivery.paymentId;
     setFormData({
@@ -202,7 +176,6 @@ export default function Deliveries() {
 
   return (
     <div className="space-y-6">
-      {/* Cabecera del Panel */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
         <div>
           <h2 className="text-xl font-bold text-gray-800">Control de Entregas Omnicanal</h2>
@@ -210,7 +183,6 @@ export default function Deliveries() {
         </div>
       </div>
 
-      {/* Barra de Filtros */}
       <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center">
         <div className="relative flex-1 max-w-md">
           <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
@@ -228,7 +200,6 @@ export default function Deliveries() {
         </div>
       </div>
 
-      {/* Listado de Entregas */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
@@ -262,11 +233,6 @@ export default function Deliveries() {
                   const paymentId = payment?._id || delivery.paymentId || "—";
                   const deliveryType = payment?.deliveryType || "shipping";
                   
-                  // ¿CÓMO funciona?
-                  // Verifica si la información de despacho a domicilio ya ha sido registrada por el administrador.
-                  // ¿POR QUÉ esta estructura?
-                  // El backend reactivo inicializa estos campos como "Pendiente de registro" al recibir el pago.
-                  // Considerar dicho string como no completado evita ocultar erróneamente el botón "Registrar Entrega".
                   const isShippingInfoFilled = Boolean(
                     delivery.destinationAddress &&
                     delivery.destinationAddress !== "Pendiente de registro" &&
@@ -274,12 +240,10 @@ export default function Deliveries() {
                     delivery.agency !== "Pendiente de registro"
                   );
 
-                  // Renderizado Condicional de Fondo según Tipo
                   const rowBg = deliveryType === "pickup"
                     ? "bg-amber-50/40 hover:bg-amber-100/40"
                     : "bg-blue-50/10 hover:bg-blue-100/20";
 
-                  // Estilos para Badge de Estado
                   let statusBadgeClass = "bg-gray-100 text-gray-800";
                   let statusText = "Pendiente";
                   if (delivery.status === "ready_for_pickup") {
@@ -295,13 +259,11 @@ export default function Deliveries() {
 
                   return (
                     <tr key={delivery._id} className={`${rowBg} transition-colors`}>
-                      {/* Cliente e ID Pago */}
                       <td className="p-4 pl-6">
                         <div className="font-semibold text-gray-800">{clientName}</div>
                         <div className="font-mono text-xs text-purple-700 mt-0.5">{paymentId}</div>
                       </td>
 
-                      {/* Tipo de Entrega */}
                       <td className="p-4">
                         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
                           deliveryType === "pickup" ? "bg-amber-100 text-amber-900 border border-amber-200" : "bg-blue-100 text-blue-900 border border-blue-200"
@@ -310,7 +272,6 @@ export default function Deliveries() {
                         </span>
                       </td>
 
-                      {/* Destino o Retiro */}
                       <td className="p-4">
                         {deliveryType === "pickup" ? (
                           <div className="text-gray-500 text-xs italic">Retiro presencial en tienda principal</div>
@@ -328,29 +289,25 @@ export default function Deliveries() {
                         )}
                       </td>
 
-                      {/* Agencia */}
                       <td className="p-4 font-medium text-gray-700">
                         {deliveryType === "pickup" ? "—" : (delivery.agency || "No asignada")}
                       </td>
 
-                      {/* Estado */}
                       <td className="p-4">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadgeClass}`}>
                           {statusText}
                         </span>
                       </td>
 
-                      {/* Acciones */}
                       <td className="p-4 text-center">
                         <div className="flex items-center justify-center gap-2">
-                          
-                          {/* Acciones para Pickup */}
                           {deliveryType === "pickup" && (
                             <>
                               {delivery.status === "pending" && (
                                 <button
                                   onClick={() => handleUpdateStatus(delivery._id, "ready_for_pickup")}
-                                  className="bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
+                                  disabled={isProcessing}
+                                  className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
                                 >
                                   Listo para Recojo
                                 </button>
@@ -358,7 +315,8 @@ export default function Deliveries() {
                               {delivery.status === "ready_for_pickup" && (
                                 <button
                                   onClick={() => handleUpdateStatus(delivery._id, "delivered")}
-                                  className="bg-green-600 hover:bg-green-700 text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
+                                  disabled={isProcessing}
+                                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
                                 >
                                   Entregado
                                 </button>
@@ -366,13 +324,13 @@ export default function Deliveries() {
                             </>
                           )}
 
-                          {/* Acciones para Shipping */}
                           {deliveryType === "shipping" && (
                             <>
                               {delivery.status === "pending" && !isShippingInfoFilled && (
                                 <button
                                   onClick={() => openRegisterModal(delivery)}
-                                  className="bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
+                                  disabled={isProcessing}
+                                  className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
                                 >
                                   Registrar Entrega
                                 </button>
@@ -380,7 +338,8 @@ export default function Deliveries() {
                               {delivery.status === "pending" && isShippingInfoFilled && (
                                 <button
                                   onClick={() => handleUpdateStatus(delivery._id, "shipped")}
-                                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
+                                  disabled={isProcessing}
+                                  className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
                                 >
                                   Marcar Enviado
                                 </button>
@@ -388,7 +347,8 @@ export default function Deliveries() {
                               {delivery.status === "shipped" && (
                                 <button
                                   onClick={() => handleUpdateStatus(delivery._id, "delivered")}
-                                  className="bg-green-600 hover:bg-green-700 text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
+                                  disabled={isProcessing}
+                                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
                                 >
                                   Entregado
                                 </button>
@@ -396,7 +356,6 @@ export default function Deliveries() {
                             </>
                           )}
 
-                          {/* Estado Final */}
                           {delivery.status === "delivered" && (
                             <span className="text-gray-400 text-xs font-semibold flex items-center gap-1">
                               <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -405,7 +364,6 @@ export default function Deliveries() {
                               Logística Finalizada
                             </span>
                           )}
-
                         </div>
                       </td>
                     </tr>
@@ -417,7 +375,6 @@ export default function Deliveries() {
         )}
       </div>
 
-      {/* Modal de Registro (Solo Shipping) */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate__animated animate__fadeIn">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-100">

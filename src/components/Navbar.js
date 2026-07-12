@@ -14,6 +14,7 @@ import {
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import logo from "./Assets/logo.png";
+import { BACKEND_URL } from "../utils/config";
 
 export default function Navbar() {
 
@@ -22,8 +23,6 @@ export default function Navbar() {
 
   const [cartCount, setCartCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [adminMenu, setAdminMenu] = useState(false);
-  const [adminTimeout, setAdminTimeout] = useState(null);
   const [isListening, setIsListening] = useState(false);
   const [voiceError, setVoiceError] = useState("");
 
@@ -88,10 +87,8 @@ export default function Navbar() {
     localStorage.setItem("productSearch", term);
     localStorage.removeItem("productSearchResults");
 
-    const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://backendproyectodf.onrender.com";
-
     try {
-      const res = await fetch(`${backendUrl}/api/products/search?query=${encodeURIComponent(term)}`, {
+      const res = await fetch(`${BACKEND_URL}/api/products/search?query=${encodeURIComponent(term)}`, {
         credentials: "include"
       });
       const data = await res.json();
@@ -99,7 +96,6 @@ export default function Navbar() {
       localStorage.setItem("productSearchResults", JSON.stringify(products));
       localStorage.setItem("productSearchMeta", JSON.stringify({ query: data?.query || term, appliedBy: data?.appliedBy || "local" }));
     } catch (error) {
-      console.error("Error al buscar productos", error);
       localStorage.setItem("productSearchResults", JSON.stringify([]));
     }
 
@@ -190,9 +186,14 @@ export default function Navbar() {
                 Catálogo
               </Link>
               {auth && (
-                <Link to="/chat" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
-                  Chat
-                </Link>
+                <>
+                  <Link to="/chat" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                    Chat
+                  </Link>
+                  <Link to="/pedidos" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                    Mis Pedidos
+                  </Link>
+                </>
               )}
 
               {isAdmin && (
@@ -286,9 +287,14 @@ export default function Navbar() {
               </Link>
 
               {auth && (
-                <Link to="/chat" className="text-gray-600 hover:text-brand font-medium">
-                  Chat
-                </Link>
+                <>
+                  <Link to="/chat" className="text-gray-600 hover:text-brand font-medium">
+                    Chat
+                  </Link>
+                  <Link to="/pedidos" className="text-gray-600 hover:text-brand font-medium">
+                    Mis Pedidos
+                  </Link>
+                </>
               )}
 
               {isAdmin && (
