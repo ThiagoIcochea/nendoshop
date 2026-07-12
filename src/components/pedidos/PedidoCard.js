@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 import { BACKEND_URL } from "../../utils/config";
+import ClaimModal from "./ClaimModal";
 
 /**
  * Componente PedidoCard
@@ -8,6 +9,7 @@ import { BACKEND_URL } from "../../utils/config";
  */
 export default function PedidoCard({ order, onReturnSuccess }) {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showClaim, setShowClaim] = useState(false);
 
   const formatDate = (dateString) => {
     if (!dateString) return "Fecha no disponible";
@@ -161,12 +163,26 @@ export default function PedidoCard({ order, onReturnSuccess }) {
       </div>
 
       <div>
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-4">
           <span className="text-sm font-semibold text-gray-500">Total Pagado:</span>
           <span className="text-lg font-black text-brand">
             {formatCurrency(payment.total || 0)}
           </span>
         </div>
+
+        {order.estimatedDate && (
+          <div className="mb-3 rounded-xl border border-amber-100 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            <div className="font-semibold">Entrega máxima estimada</div>
+            <div>{formatDate(order.estimatedDate)}</div>
+          </div>
+        )}
+
+        {order.trackingCode && (
+          <div className="mb-3 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-blue-800">
+            <div className="font-semibold">Tracking</div>
+            <div>{order.trackingCode}</div>
+          </div>
+        )}
 
         {order.status === "delivered" && (
           <button
@@ -177,6 +193,18 @@ export default function PedidoCard({ order, onReturnSuccess }) {
             {isProcessing && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
             {isProcessing ? "Procesando..." : "Devolver Pedido"}
           </button>
+        )}
+
+        {order.status !== "returned" && (
+          <>
+            <button
+              onClick={() => setShowClaim((prev) => !prev)}
+              className="mt-3 w-full rounded-xl border border-brand/20 bg-white px-4 py-2 text-sm font-semibold text-brand transition hover:bg-brand hover:text-white"
+            >
+              {showClaim ? 'Ocultar reclamo' : 'Generar reclamo'}
+            </button>
+            {showClaim && <ClaimModal order={order} onSubmitted={() => setShowClaim(false)} />}
+          </>
         )}
 
         {order.status === "returned" && (

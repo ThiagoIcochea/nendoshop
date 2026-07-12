@@ -11,6 +11,9 @@ export default function Deliveries() {
   const [submitting, setSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [claims, setClaims] = useState([]);
+  const [selectedClaim, setSelectedClaim] = useState(null);
+  const [claimAction, setClaimAction] = useState({ status: 'resolved', resolution: 'approved', newDeliveryStatus: '', cancellationReason: '', deliveryCode: '' });
 
   const [formData, setFormData] = useState({
     paymentId: "",
@@ -55,10 +58,25 @@ export default function Deliveries() {
       return;
     }
     loadDeliveries();
+    loadClaims();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleUpdateStatus = async (id, status) => {
+  const loadClaims = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const headers = {};
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const res = await fetch(`${BACKEND_URL}/api/claims`, { method: "GET", headers, credentials: "include" });
+      if (!res.ok) return;
+      const data = await res.json();
+      setClaims(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleUpdateStatus = async (id, status, deliveryCode = '') => {
     setIsProcessing(true);
     try {
       const token = localStorage.getItem("token");
@@ -75,7 +93,7 @@ export default function Deliveries() {
         method: "PATCH",
         headers,
         credentials: "include",
-        body: JSON.stringify({ status })
+        body: JSON.stringify({ status, deliveryCode })
       });
 
       const data = await res.json();
@@ -86,6 +104,34 @@ export default function Deliveries() {
 
       Swal.fire("Éxito", `Estado de entrega actualizado a '${status}' con éxito.`, "success");
       await loadDeliveries();
+    } catch (err) {
+      Swal.fire("Error", err.message, "error");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleResolveClaim = async (e) => {
+    e.preventDefault();
+    if (!selectedClaim) return;
+    setIsProcessing(true);
+    try {
+      const token = localStorage.getItem("token");
+      const headers = { "Content-Type": "application/json" };
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const res = await fetch(`${BACKEND_URL}/api/claims/${selectedClaim._id}/resolve`, {
+        method: "PATCH",
+        headers,
+        credentials: "include",
+        body: JSON.stringify(claimAction)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "No se pudo resolver el reclamo.");
+      Swal.fire("Éxito", "Reclamo actualizado correctamente.", "success");
+      setSelectedClaim(null);
+      setClaimAction({ status: 'resolved', resolution: 'approved', newDeliveryStatus: '', cancellationReason: '', deliveryCode: '' });
+      loadClaims();
+      loadDeliveries();
     } catch (err) {
       Swal.fire("Error", err.message, "error");
     } finally {
@@ -314,7 +360,10 @@ export default function Deliveries() {
                               )}
                               {delivery.status === "ready_for_pickup" && (
                                 <button
-                                  onClick={() => handleUpdateStatus(delivery._id, "delivered")}
+                                  onClick={() => {
+                                    const code = window.prompt("Ingresa el código de validación de entrega:");
+                                    if (code) handleUpdateStatus(delivery._id, "delivered", code);
+                                  }}
                                   disabled={isProcessing}
                                   className="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
                                 >
@@ -346,7 +395,10 @@ export default function Deliveries() {
                               )}
                               {delivery.status === "shipped" && (
                                 <button
-                                  onClick={() => handleUpdateStatus(delivery._id, "delivered")}
+                                  onClick={() => {
+                                    const code = window.prompt("Ingresa el código de validación de entrega:");
+                                    if (code) handleUpdateStatus(delivery._id, "delivered", code);
+                                  }}
                                   disabled={isProcessing}
                                   className="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
                                 >
@@ -374,6 +426,74 @@ export default function Deliveries() {
           </div>
         )}
       </div>
+
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-lg font-bold text-gray-800">Reclamos pendientes</h3>
+            <p className="text-sm text-gray-500">Resuelve los reclamos y decide el siguiente estado del pedido.</p>
+          </div>
+        </div>
+        <div className="space-y-3">
+          {claims.length === 0 ? (
+            <p className="text-sm text-gray-500">No hay reclamos registrados.</p>
+          ) : claims.filter((claim) => claim.status === 'pending').map((claim) => (
+            <div key={claim._id} className="rounded-xl border border-gray-200 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="font-semibold text-gray-800">{claim.category}</p>
+                  <p className="text-sm text-gray-500">{claim.description}</p>
+                </div>
+                <button onClick={() => setSelectedClaim(claim)} className="rounded-lg bg-purple-600 px-3 py-2 text-sm font-semibold text-white">Resolver</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {selectedClaim && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl">
+            <h3 className="text-lg font-bold text-gray-800">Resolver reclamo</h3>
+            <p className="mt-1 text-sm text-gray-500">Categoría: {selectedClaim.category}</p>
+            <form onSubmit={handleResolveClaim} className="mt-4 space-y-4">
+              <div>
+                <label className="mb-1 block text-sm font-semibold text-gray-700">Resolución</label>
+                <select value={claimAction.status} onChange={(e) => setClaimAction({ ...claimAction, status: e.target.value })} className="w-full rounded-xl border border-gray-300 px-3 py-2">
+                  <option value="resolved">Aprobar</option>
+                  <option value="rejected">Rechazar</option>
+                </select>
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-semibold text-gray-700">Observación</label>
+                <input value={claimAction.resolution} onChange={(e) => setClaimAction({ ...claimAction, resolution: e.target.value })} className="w-full rounded-xl border border-gray-300 px-3 py-2" placeholder="Ej. Se aprobó el reembolso" />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-semibold text-gray-700">Nuevo estado del pedido</label>
+                <select value={claimAction.newDeliveryStatus} onChange={(e) => setClaimAction({ ...claimAction, newDeliveryStatus: e.target.value })} className="w-full rounded-xl border border-gray-300 px-3 py-2">
+                  <option value="">Sin cambio</option>
+                  <option value="cancelled">Cancelado</option>
+                  <option value="delivered">Entregado</option>
+                  <option value="shipped">Enviado</option>
+                  <option value="ready_for_pickup">Listo para recojo</option>
+                </select>
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-semibold text-gray-700">Motivo de cancelación (si aplica)</label>
+                <input value={claimAction.cancellationReason} onChange={(e) => setClaimAction({ ...claimAction, cancellationReason: e.target.value })} className="w-full rounded-xl border border-gray-300 px-3 py-2" placeholder="Ej. Pedido cancelado por falta de stock" />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-semibold text-gray-700">Código de validación (si aplica)</label>
+                <input value={claimAction.deliveryCode} onChange={(e) => setClaimAction({ ...claimAction, deliveryCode: e.target.value })} className="w-full rounded-xl border border-gray-300 px-3 py-2" placeholder="Código de entrega" />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button type="button" onClick={() => setSelectedClaim(null)} className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-600">Cancelar</button>
+                <button type="submit" disabled={isProcessing} className="rounded-xl bg-purple-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">Guardar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate__animated animate__fadeIn">
