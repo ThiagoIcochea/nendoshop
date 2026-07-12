@@ -14,7 +14,6 @@ export default function Deliveries() {
   const [claims, setClaims] = useState([]);
   const [selectedClaim, setSelectedClaim] = useState(null);
   const [selectedDelivery, setSelectedDelivery] = useState(null);
-  const [statusDrafts, setStatusDrafts] = useState({});
   const [claimAction, setClaimAction] = useState({ status: 'resolved', resolution: 'approved', newDeliveryStatus: '', cancellationReason: '', deliveryCode: '' });
 
   const [formData, setFormData] = useState({
@@ -324,8 +323,6 @@ export default function Deliveries() {
                     statusText = "Cancelado";
                   }
 
-                  const currentDraftStatus = statusDrafts[delivery._id] || delivery.status;
-
                   return (
                     <tr key={delivery._id} className={`${rowBg} transition-colors`}>
                       <td className="p-4 pl-6">
@@ -372,96 +369,6 @@ export default function Deliveries() {
 
                       <td className="p-4 text-center">
                         <div className="flex items-center justify-center gap-2">
-                          {deliveryType === "pickup" && (
-                            <>
-                              {delivery.status === "pending" && (
-                                <button
-                                  onClick={() => handleUpdateStatus(delivery._id, "ready_for_pickup")}
-                                  disabled={isProcessing}
-                                  className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
-                                >
-                                  Listo para Recojo
-                                </button>
-                              )}
-                              {delivery.status === "ready_for_pickup" && (
-                                <button
-                                  onClick={() => {
-                                    const code = window.prompt("Ingresa el código de validación de entrega:");
-                                    if (code) handleUpdateStatus(delivery._id, "delivered", code);
-                                  }}
-                                  disabled={isProcessing}
-                                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
-                                >
-                                  Entregado
-                                </button>
-                              )}
-                            </>
-                          )}
-
-                          {deliveryType === "shipping" && (
-                            <>
-                              {delivery.status === "pending" && !isShippingInfoFilled && (
-                                <button
-                                  onClick={() => openRegisterModal(delivery)}
-                                  disabled={isProcessing}
-                                  className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
-                                >
-                                  Registrar Entrega
-                                </button>
-                              )}
-                              {delivery.status === "pending" && isShippingInfoFilled && (
-                                <button
-                                  onClick={() => handleUpdateStatus(delivery._id, "shipped")}
-                                  disabled={isProcessing}
-                                  className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
-                                >
-                                  Marcar Enviado
-                                </button>
-                              )}
-                              {delivery.status === "shipped" && (
-                                <button
-                                  onClick={() => {
-                                    const code = window.prompt("Ingresa el código de validación de entrega:");
-                                    if (code) handleUpdateStatus(delivery._id, "delivered", code);
-                                  }}
-                                  disabled={isProcessing}
-                                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow-sm transition-all"
-                                >
-                                  Entregado
-                                </button>
-                              )}
-                            </>
-                          )}
-
-                          <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-2 py-1.5">
-                            <select
-                              value={currentDraftStatus}
-                              onChange={(e) => setStatusDrafts((prev) => ({ ...prev, [delivery._id]: e.target.value }))}
-                              className="rounded-md border border-gray-200 bg-white px-2 py-1 text-xs font-semibold text-gray-700 outline-none"
-                            >
-                              <option value="pending">Pendiente</option>
-                              <option value="ready_for_pickup">Listo para recojo</option>
-                              <option value="shipped">Enviado</option>
-                              <option value="delivered">Entregado</option>
-                              <option value="cancelled">Cancelado</option>
-                            </select>
-                            <button
-                              onClick={() => {
-                                const selectedStatus = currentDraftStatus;
-                                if (selectedStatus === "delivered") {
-                                  const code = window.prompt("Ingresa el código de validación de entrega:");
-                                  if (code) handleUpdateStatus(delivery._id, selectedStatus, code);
-                                  return;
-                                }
-                                handleUpdateStatus(delivery._id, selectedStatus);
-                              }}
-                              disabled={isProcessing}
-                              className="rounded-md bg-purple-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-purple-700 disabled:opacity-50"
-                            >
-                              Aplicar
-                            </button>
-                          </div>
-
                           <button
                             onClick={() => setSelectedDelivery(delivery)}
                             className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100"
@@ -533,10 +440,12 @@ export default function Deliveries() {
                 <label className="mb-1 block text-sm font-semibold text-gray-700">Nuevo estado del pedido</label>
                 <select value={claimAction.newDeliveryStatus} onChange={(e) => setClaimAction({ ...claimAction, newDeliveryStatus: e.target.value })} className="w-full rounded-xl border border-gray-300 px-3 py-2">
                   <option value="">Sin cambio</option>
-                  <option value="cancelled">Cancelado</option>
-                  <option value="delivered">Entregado</option>
-                  <option value="shipped">Enviado</option>
+                  <option value="pending">Pendiente</option>
                   <option value="ready_for_pickup">Listo para recojo</option>
+                  <option value="shipped">Enviado</option>
+                  <option value="delivered">Entregado</option>
+                  <option value="cancelled">Cancelado</option>
+                  <option value="returned">Devuelto</option>
                 </select>
               </div>
               <div>
