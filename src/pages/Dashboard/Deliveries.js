@@ -13,6 +13,7 @@ export default function Deliveries() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [claims, setClaims] = useState([]);
   const [selectedClaim, setSelectedClaim] = useState(null);
+  const [selectedDelivery, setSelectedDelivery] = useState(null);
   const [claimAction, setClaimAction] = useState({ status: 'resolved', resolution: 'approved', newDeliveryStatus: '', cancellationReason: '', deliveryCode: '' });
 
   const [formData, setFormData] = useState({
@@ -271,7 +272,7 @@ export default function Deliveries() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  <th className="p-4 pl-6">Cliente / ID Pago</th>
+                  <th className="p-4 pl-6">Pedido / Cliente</th>
                   <th className="p-4">Tipo</th>
                   <th className="p-4">Destino / Retiro</th>
                   <th className="p-4">Agencia</th>
@@ -314,7 +315,9 @@ export default function Deliveries() {
                     <tr key={delivery._id} className={`${rowBg} transition-colors`}>
                       <td className="p-4 pl-6">
                         <div className="font-semibold text-gray-800">{clientName}</div>
-                        <div className="font-mono text-xs text-purple-700 mt-0.5">{paymentId}</div>
+                        <div className="font-mono text-xs text-purple-700 mt-0.5">Pedido: {delivery._id || '—'}</div>
+                        <div className="font-mono text-[11px] text-gray-500 mt-0.5">Pago: {paymentId}</div>
+                        <div className="text-[11px] text-gray-500 mt-1">ID de orden: {delivery._id || '—'}</div>
                       </td>
 
                       <td className="p-4">
@@ -415,6 +418,13 @@ export default function Deliveries() {
                             </>
                           )}
 
+                          <button
+                            onClick={() => setSelectedDelivery(delivery)}
+                            className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100"
+                          >
+                            Detalle
+                          </button>
+
                           {delivery.status === "delivered" && (
                             <span className="text-gray-400 text-xs font-semibold flex items-center gap-1">
                               <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -498,6 +508,32 @@ export default function Deliveries() {
                 <button type="submit" disabled={isProcessing} className="rounded-xl bg-purple-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">Guardar</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {selectedDelivery && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">Detalle del pedido</h3>
+                <p className="text-sm text-gray-500">Pedido: {selectedDelivery._id}</p>
+              </div>
+              <button onClick={() => setSelectedDelivery(null)} className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-600">Cerrar</button>
+            </div>
+            <div className="mt-4 grid gap-3 text-sm text-gray-700 md:grid-cols-2">
+              <div><span className="font-semibold">Cliente:</span> {selectedDelivery.paymentId?.cliente || 'Cliente anónimo'}</div>
+              <div><span className="font-semibold">Pago:</span> {selectedDelivery.paymentId?._id || selectedDelivery.paymentId || '—'}</div>
+              <div><span className="font-semibold">Tipo:</span> {selectedDelivery.deliveryType === 'pickup' ? 'Recojo' : 'Envío'}</div>
+              <div><span className="font-semibold">Estado:</span> {selectedDelivery.status}</div>
+              <div><span className="font-semibold">Dirección:</span> {selectedDelivery.destinationAddress || '—'}</div>
+              <div><span className="font-semibold">Referencia:</span> {selectedDelivery.reference || '—'}</div>
+              <div><span className="font-semibold">Agencia:</span> {selectedDelivery.agency || '—'}</div>
+              <div><span className="font-semibold">Código de confirmación:</span> {selectedDelivery.deliveryCode || '—'}</div>
+              <div><span className="font-semibold">Código de seguimiento:</span> {selectedDelivery.trackingCode || '—'}</div>
+              <div><span className="font-semibold">Fecha estimada:</span> {selectedDelivery.estimatedDate ? new Date(selectedDelivery.estimatedDate).toLocaleDateString('es-PE') : '—'}</div>
+            </div>
           </div>
         </div>
       )}

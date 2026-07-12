@@ -1,6 +1,4 @@
 import React, { useState, useMemo } from "react";
-import Swal from "sweetalert2";
-import { BACKEND_URL } from "../../utils/config";
 import ClaimModal from "./ClaimModal";
 
 /**
@@ -50,67 +48,6 @@ export default function PedidoCard({ order, onReturnSuccess }) {
         {config.text}
       </span>
     );
-  };
-
-  const handleReturn = async () => {
-    const result = await Swal.fire({
-      title: "¿Estás seguro de solicitar la devolución de este pedido?",
-      text: "Esta acción no se puede deshacer y repondrá el stock de los productos de forma automática.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#ef4444",
-      cancelButtonColor: "#6b7280",
-      confirmButtonText: "Sí, devolver",
-      cancelButtonText: "Cancelar",
-    });
-
-    if (!result.isConfirmed) {
-      return;
-    }
-
-    setIsProcessing(true);
-    try {
-      const token = localStorage.getItem("token");
-      const headers = {
-        "Content-Type": "application/json",
-      };
-
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
-      const res = await fetch(`${BACKEND_URL}/api/deliveries/my-orders/${order._id}/return`, {
-        method: "PUT",
-        headers,
-        credentials: "include",
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || data.message || "No se pudo procesar la devolución.");
-      }
-
-      await Swal.fire({
-        title: "¡Devolución Procesada!",
-        text: "La orden ha sido devuelta con éxito y el stock de los productos ha sido repuesto.",
-        icon: "success",
-        confirmButtonColor: "#7c3aed",
-      });
-
-      if (onReturnSuccess) {
-        onReturnSuccess();
-      }
-    } catch (err) {
-      Swal.fire({
-        title: "Error",
-        text: err.message,
-        icon: "error",
-        confirmButtonColor: "#7c3aed",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
   };
 
   const payment = order.paymentId || {};
@@ -208,12 +145,16 @@ export default function PedidoCard({ order, onReturnSuccess }) {
 
         {order.status === "delivered" && (
           <button
-            onClick={handleReturn}
-            disabled={isProcessing}
-            className="w-full bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 text-white font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all text-sm flex items-center justify-center gap-2"
+            onClick={() => {
+              setShowClaim(true);
+              setTimeout(() => {
+                const modal = document.querySelector('[data-claim-modal]');
+                if (modal) modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }, 50);
+            }}
+            className="w-full bg-red-500 hover:bg-red-600 active:scale-95 text-white font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all text-sm flex items-center justify-center gap-2"
           >
-            {isProcessing && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
-            {isProcessing ? "Procesando..." : "Devolver Pedido"}
+            Solicitar devolución
           </button>
         )}
 

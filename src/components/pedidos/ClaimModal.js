@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import { BACKEND_URL } from '../../utils/config';
 
 export default function ClaimModal({ order, onSubmitted }) {
-  const [form, setForm] = useState({ category: 'delay', description: '' });
+  const [form, setForm] = useState({ category: order?.status === 'delivered' ? 'return' : 'delay', description: '' });
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    setForm((prev) => ({
+      ...prev,
+      category: order?.status === 'delivered' ? 'return' : prev.category === 'return' ? 'delay' : prev.category
+    }));
+  }, [order?.status]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,13 +49,14 @@ export default function ClaimModal({ order, onSubmitted }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 p-4 space-y-3">
+    <form data-claim-modal onSubmit={handleSubmit} className="mt-4 rounded-2xl border border-gray-200 bg-gray-50 p-4 space-y-3">
       <div>
         <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500">Categoría</label>
         <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm">
           <option value="delay">Demora</option>
           <option value="incomplete">Pedido incompleto</option>
           <option value="damaged">Producto dañado</option>
+          <option value="return">Devolución</option>
           <option value="cancellation">Cancelación</option>
         </select>
       </div>
