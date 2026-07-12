@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import ParticlesBackground from "../components/ParticlesBackground";
 import CommentCard from "../components/CommentCard";
 import Swal from "sweetalert2";
+import NotFound from "./NotFound";
 
 export default function ProductDetail() {
 
@@ -160,12 +161,12 @@ export default function ProductDetail() {
         setProduct((current) =>
           current
             ? {
-                ...current,
-                likes: updatedProduct.likes ?? current.likes,
-                dislikes: updatedProduct.dislikes ?? current.dislikes,
-                likedBy: updatedProduct.likedBy ?? current.likedBy,
-                dislikedBy: updatedProduct.dislikedBy ?? current.dislikedBy
-              }
+              ...current,
+              likes: updatedProduct.likes ?? current.likes,
+              dislikes: updatedProduct.dislikes ?? current.dislikes,
+              likedBy: updatedProduct.likedBy ?? current.likedBy,
+              dislikedBy: updatedProduct.dislikedBy ?? current.dislikedBy
+            }
             : current
         );
         setFeedback(type);
@@ -176,6 +177,7 @@ export default function ProductDetail() {
   };
 
   const handleAddToCart = () => {
+    if (!product) return;
 
     const cart =
       JSON.parse(localStorage.getItem("cart")) || [];
@@ -204,14 +206,14 @@ export default function ProductDetail() {
 
     window.dispatchEvent(new Event("storage"));
 
-   Swal.fire("Carrito"," Producto agregado al carrito","success");
+    Swal.fire("Carrito", " Producto agregado al carrito", "success");
 
   };
 
   const handleComment = async () => {
 
     if (!auth) {
-      Swal.fire("Error 230","Debes iniciar sesión","error");
+      Swal.fire("Error 230", "Debes iniciar sesión", "error");
       return;
     }
 
@@ -264,7 +266,7 @@ export default function ProductDetail() {
       setComment("");
       setRating(5);
 
-      Swal.fire("Registro exitoso","Comentario publicado","success");
+      Swal.fire("Registro exitoso", "Comentario publicado", "success");
 
     } catch (error) {
       Swal.fire("Error 678", `Error conectando con el servidor: ${error.message || error}`, "error");
@@ -279,6 +281,19 @@ export default function ProductDetail() {
     (page - 1) * pageSize,
     page * pageSize
   );
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 min-h-screen bg-white">
+        <div className="w-12 h-12 border-4 border-brand border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-gray-500 text-sm font-semibold">Cargando detalles del producto...</p>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return <NotFound />;
+  }
 
   return (
 
@@ -522,11 +537,10 @@ export default function ProductDetail() {
                         <span
                           key={star}
                           onClick={() => setRating(star)}
-                          className={`cursor-pointer text-xl ${
-                            star <= rating
+                          className={`cursor-pointer text-xl ${star <= rating
                               ? "text-yellow-400 scale-110"
                               : "text-gray-300"
-                          }`}
+                            }`}
                         >
                           ★
                         </span>
@@ -564,31 +578,31 @@ export default function ProductDetail() {
 
               ? Array.from({ length: 5 }).map((_, i) => (
 
-                  <CommentCard
-                    key={i}
-                    loading={true}
-                  />
+                <CommentCard
+                  key={i}
+                  loading={true}
+                />
 
-                ))
+              ))
 
               : paginatedComments.map((c, i) => (
 
-                  <div
-                    key={c._id || i}
-                    className="animate__animated animate__fadeInUp"
-                    style={{
-                      animationDelay: `${i * 0.08}s`
-                    }}
-                  >
+                <div
+                  key={c._id || i}
+                  className="animate__animated animate__fadeInUp"
+                  style={{
+                    animationDelay: `${i * 0.08}s`
+                  }}
+                >
 
-                    <CommentCard
-                      comment={c}
-                      loading={false}
-                    />
+                  <CommentCard
+                    comment={c}
+                    loading={false}
+                  />
 
-                  </div>
+                </div>
 
-                ))}
+              ))}
 
           </div>
 
