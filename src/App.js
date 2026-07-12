@@ -28,6 +28,7 @@ import NotFound from "./pages/NotFound";
 import TwoFactorAuth from "./pages/TwoFactorAuth";
 import ChatPage from "./pages/ChatPage";
 import PurchaseAlertModal from "./components/PurchaseAlertModal";
+import MisPedidos from "./pages/MisPedidos";
 
 function App() {
   return (
@@ -58,6 +59,7 @@ function App() {
 
             <Route path="/cart" element={<Cart />} />
             <Route path="/pagos" element={<ProtectedRoute><Pagos/></ProtectedRoute>}/>
+            <Route path="/pedidos" element={<ProtectedRoute><MisPedidos/></ProtectedRoute>}/>
             
           <Route
               path="/dashboard"

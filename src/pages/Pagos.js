@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { BACKEND_URL } from "../utils/config";
 
 export default function Pagos() {
   const navigate = useNavigate();
@@ -13,19 +14,11 @@ export default function Pagos() {
 
   const [user, setUser] = useState(null);
 
-  // ¿CÓMO funciona?
-  // Realiza una llamada POST al backend para registrar y obtener el orderID de PayPal.
-  // ¿POR QUÉ esta estructura?
-  // Se requiere que el backend cree la orden en los servidores de PayPal antes de mostrar el portal de pagos.
   const handlePayPalCreateOrder = async (data, actions) => {
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://backendproyectodf.onrender.com";
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
       const totalFinal = envioDatos.metodoEnvio === "delivery" ? total + 15 : total;
 
-      // ¿CÓMO funciona?
-      // Obtiene el token de sesión JWT desde localStorage (buscando en el objeto 'auth' o en la clave directa 'token').
-      // ¿POR QUÉ esta estructura?
-      // Permite autenticar la petición contra el backend enviando las credenciales explícitas del JWT en el header.
       const authData = JSON.parse(localStorage.getItem("auth"));
       const token = authData?.token || localStorage.getItem("token");
 
@@ -37,7 +30,7 @@ export default function Pagos() {
         headers["Authorization"] = `Bearer ${token}`;
       }
 
-      const res = await fetch(`${backendUrl}/api/paypal/create-order`, {
+      const res = await fetch(`${BACKEND_URL}/api/paypal/create-order`, {
         method: "POST",
         headers,
         credentials: "include",
@@ -52,20 +45,15 @@ export default function Pagos() {
       const orderData = await res.json();
       return orderData.orderId;
     } catch (err) {
-      console.error(err);
       Swal.fire("Error", "No se pudo iniciar el pago con PayPal. Inténtalo de nuevo.", "error");
       throw err;
     }
   };
 
-  // ¿CÓMO funciona?
-  // Obtiene el token de sesión JWT de localStorage y envía el ID de orden junto con la metadata del carrito de compras al backend.
-  // ¿POR QUÉ esta estructura?
-  // Asegura la autenticidad e integridad de la captura de pago al firmar la petición con el JWT del cliente logueado.
   const handlePayPalApprove = async (data, actions) => {
     setPaymentStatus("procesando");
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://backendproyectodf.onrender.com";
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
       const totalFinal = envioDatos.metodoEnvio === "delivery" ? total + 15 : total;
 
       const authData = JSON.parse(localStorage.getItem("auth"));
@@ -100,7 +88,7 @@ export default function Pagos() {
         estado: "Pagado"
       };
 
-      const res = await fetch(`${backendUrl}/api/paypal/capture-order`, {
+      const res = await fetch(`${BACKEND_URL}/api/paypal/capture-order`, {
         method: "POST",
         headers,
         credentials: "include",
@@ -123,14 +111,12 @@ export default function Pagos() {
         navigate("/", { replace: true });
       }, 1500);
     } catch (err) {
-      console.error(err);
       Swal.fire("Error", "No se pudo confirmar el pago. Por favor contacta al soporte técnico.", "error");
       setPaymentStatus("inactivo");
     }
   };
 
   const handlePayPalError = (err) => {
-    console.error("PayPal Error:", err);
     Swal.fire("Error en PayPal", "Ocurrió un error inesperado al procesar con PayPal. Por favor, intenta de nuevo.", "error");
   };
 
@@ -165,7 +151,7 @@ export default function Pagos() {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://backendproyectodf.onrender.com";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
         const authData = JSON.parse(localStorage.getItem("auth"));
         const token = authData?.token || localStorage.getItem("token");
 
@@ -174,7 +160,7 @@ export default function Pagos() {
           headers["Authorization"] = `Bearer ${token}`;
         }
 
-        const res = await fetch(`${backendUrl}/api/users/profile`, {
+        const res = await fetch(`${BACKEND_URL}/api/users/profile`, {
           method: "GET",
           headers,
           credentials: "include"
@@ -183,7 +169,6 @@ export default function Pagos() {
         if (!res.ok) return;
         setUser(data);
       } catch (err) {
-        console.log(err);
       }
     };
     loadUser();
@@ -262,7 +247,7 @@ export default function Pagos() {
     setPaymentStatus("procesando");
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://backendproyectodf.onrender.com";
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
       const paymentData = {
   cliente: user ? `${user.name} ${user.lastname}` : "Cliente Anónimo",
 
@@ -297,7 +282,7 @@ export default function Pagos() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 18000);
 
-      const res = await fetch(`${backendUrl}/api/payments`, {
+      const res = await fetch(`${BACKEND_URL}/api/payments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -320,7 +305,6 @@ export default function Pagos() {
         navigate("/", { replace: true });
       }, 1500);
     } catch (err) {
-      console.error(err);
       Swal.fire("Error 420", err.name === "AbortError" ? "La solicitud tardó demasiado. Intenta nuevamente." : "No se pudo procesar el pago. Verifica la conexión e intenta otra vez.", "error");
       setPaymentStatus("inactivo");
     }
@@ -461,10 +445,6 @@ export default function Pagos() {
                   <button type="button" onClick={() => setPaso(1)} className="text-sm text-brand hover:underline font-medium">← Volver a Envío</button>
                 </div>
 
-                {/* ¿CÓMO funciona?
-                    Ofrece pestañas de navegación con Tailwind CSS para cambiar el método de pago entre Tarjeta y PayPal.
-                    ¿POR QUÉ esta estructura?
-                    Separa de forma limpia la lógica de introducción de tarjeta del widget oficial de PayPal. */}
                 <div className="flex gap-4 mb-6">
                   <button
                     type="button"

@@ -66,7 +66,6 @@ export default function Login() {
      
 
   } catch (error) {
-    console.error(error);
     Swal.fire("Error 794","Error en login","error");
   }
 };
