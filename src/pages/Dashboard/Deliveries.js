@@ -539,7 +539,7 @@ export default function Deliveries() {
               <div><span className="font-semibold">Dirección:</span> {selectedDelivery.destinationAddress || '—'}</div>
               <div><span className="font-semibold">Referencia:</span> {selectedDelivery.reference || '—'}</div>
               <div><span className="font-semibold">Agencia:</span> {selectedDelivery.agency || '—'}</div>
-              <div><span className="font-semibold">Código de confirmación:</span> {selectedDelivery.deliveryCode || '—'}</div>
+              <div><span className="font-semibold">Código de confirmación:</span> {selectedDelivery.deliveryCode ? 'Privado y visible solo al confirmar la entrega' : '—'}</div>
               <div><span className="font-semibold">Código de seguimiento:</span> {selectedDelivery.trackingCode || '—'}</div>
               <div><span className="font-semibold">Fecha estimada:</span> {selectedDelivery.estimatedDate ? new Date(selectedDelivery.estimatedDate).toLocaleDateString('es-PE') : '—'}</div>
             </div>
