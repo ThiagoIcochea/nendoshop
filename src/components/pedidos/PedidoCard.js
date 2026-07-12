@@ -145,21 +145,6 @@ export default function PedidoCard({ order, onReturnSuccess }) {
           )}
         </div>
 
-        {order.status === "delivered" && (
-          <button
-            onClick={() => {
-              setShowClaim(true);
-              setTimeout(() => {
-                const modal = document.querySelector('[data-claim-modal]');
-                if (modal) modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              }, 50);
-            }}
-            className="w-full bg-red-500 hover:bg-red-600 active:scale-95 text-white font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all text-sm flex items-center justify-center gap-2"
-          >
-            Solicitar devolución
-          </button>
-        )}
-
         {order.status !== "returned" && (
           <>
             {claimEligibility.canClaim && (
