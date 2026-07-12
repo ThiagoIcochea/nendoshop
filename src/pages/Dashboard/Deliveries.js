@@ -57,12 +57,19 @@ export default function Deliveries() {
       navigate("/");
       return;
     }
+
     loadDeliveries();
     loadClaims();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
-  const loadClaims = async () => {
+    const intervalId = window.setInterval(() => {
+      loadDeliveries();
+      loadClaims();
+    }, 5000);
+
+    return () => window.clearInterval(intervalId);
+  }, [loadDeliveries, loadClaims, navigate]);
+
+  const loadClaims = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       const headers = {};
@@ -74,7 +81,7 @@ export default function Deliveries() {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, []);
 
   const handleUpdateStatus = async (id, status, deliveryCode = '') => {
     setIsProcessing(true);

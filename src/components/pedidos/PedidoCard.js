@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Swal from "sweetalert2";
 import { BACKEND_URL } from "../../utils/config";
 import ClaimModal from "./ClaimModal";
@@ -116,6 +116,23 @@ export default function PedidoCard({ order, onReturnSuccess }) {
   const payment = order.paymentId || {};
   const products = payment.productos || [];
 
+  const claimEligibility = useMemo(() => {
+    const status = String(order.status || '').toLowerCase();
+    const hasDeadline = Boolean(order.estimatedDate);
+    const deadlinePassed = hasDeadline && new Date(order.estimatedDate).getTime() < Date.now();
+    const isDeliveredOrReturned = ['delivered', 'returned'].includes(status);
+    const isCancelled = status === 'cancelled';
+    const isDelayEligible = ['pending', 'ready_for_pickup', 'shipped'].includes(status) && deadlinePassed;
+    const canClaim = isDeliveredOrReturned || isCancelled || isDelayEligible;
+
+    return {
+      canClaim,
+      message: canClaim
+        ? 'Puedes generar un reclamo para este pedido.'
+        : 'Los reclamos estarán disponibles cuando el pedido haya sido entregado, devuelto o cancelado, o cuando haya pasado la fecha estimada de entrega.'
+    };
+  }, [order.estimatedDate, order.status]);
+
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-full animate__animated animate__fadeInUp">
       <div>
@@ -177,12 +194,17 @@ export default function PedidoCard({ order, onReturnSuccess }) {
           </div>
         )}
 
-        {order.trackingCode && (
-          <div className="mb-3 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-blue-800">
-            <div className="font-semibold">Tracking</div>
-            <div>{order.trackingCode}</div>
-          </div>
-        )}
+        <div className="mb-3 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-blue-800">
+          <div className="font-semibold">Historial de estados</div>
+          <ul className="mt-2 space-y-1">
+            <li>• Pedido registrado</li>
+            <li>• {order.status === 'delivered' || order.status === 'returned' ? 'Entregado o devuelto' : order.status === 'cancelled' ? 'Cancelado' : 'En proceso'}</li>
+            <li>• {order.status === 'delivered' ? 'Confirmado por el cliente' : order.status === 'returned' ? 'Devuelto' : 'Pendiente de cierre'}</li>
+          </ul>
+          {order.deliveryCode && (
+            <div className="mt-2 font-semibold text-green-700">Código de confirmación: {order.deliveryCode}</div>
+          )}
+        </div>
 
         {order.status === "delivered" && (
           <button
@@ -197,12 +219,17 @@ export default function PedidoCard({ order, onReturnSuccess }) {
 
         {order.status !== "returned" && (
           <>
-            <button
-              onClick={() => setShowClaim((prev) => !prev)}
-              className="mt-3 w-full rounded-xl border border-brand/20 bg-white px-4 py-2 text-sm font-semibold text-brand transition hover:bg-brand hover:text-white"
-            >
-              {showClaim ? 'Ocultar reclamo' : 'Generar reclamo'}
-            </button>
+            {claimEligibility.canClaim && (
+              <button
+                onClick={() => setShowClaim((prev) => !prev)}
+                className="mt-3 w-full rounded-xl border border-brand/20 bg-white px-4 py-2 text-sm font-semibold text-brand transition hover:bg-brand hover:text-white"
+              >
+                {showClaim ? 'Ocultar reclamo' : 'Generar reclamo'}
+              </button>
+            )}
+            {!claimEligibility.canClaim && (
+              <p className="mt-3 text-center text-xs text-gray-500">{claimEligibility.message}</p>
+            )}
             {showClaim && <ClaimModal order={order} onSubmitted={() => setShowClaim(false)} />}
           </>
         )}
