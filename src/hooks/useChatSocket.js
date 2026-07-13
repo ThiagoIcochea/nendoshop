@@ -28,6 +28,43 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
   const reconnectTimeoutRef = useRef(null);
   const isMountedRef = useRef(true);
 
+  const syncBotCartAction = useCallback((message) => {
+    const action = message?.meta?.action;
+    if (!action || action.type !== "cart_add") return;
+
+    const product = action.product || {};
+    let cart = [];
+
+    try {
+      const storedCart = localStorage.getItem("cart");
+      cart = storedCart ? JSON.parse(storedCart) : [];
+    } catch (error) {
+      cart = [];
+    }
+
+    if (!Array.isArray(cart)) cart = [];
+
+    const normalizedProduct = {
+      id: product.id || product._id || product.name,
+      _id: product.id || product._id || product.name,
+      name: product.name || "Producto",
+      price: Number(product.price || 0),
+      quantity: Number(product.quantity || 1),
+      stock: Number(product.stock || 1),
+      image: product.image || ""
+    };
+
+    const existing = cart.find((item) => String(item.id) === String(normalizedProduct.id) || String(item._id) === String(normalizedProduct._id));
+    if (existing) {
+      existing.quantity = Number(existing.quantity || 1) + Number(normalizedProduct.quantity || 1);
+    } else {
+      cart.push(normalizedProduct);
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+    window.dispatchEvent(new Event("storage"));
+  }, []);
+
     const finalRoomKey =
     roomKey === "support"
       ? `support_${userId}`
@@ -59,6 +96,9 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
           case "joined":
             break;
           case "room-message":
+            if (payload.message?.role === "assistant") {
+              syncBotCartAction(payload.message);
+            }
             setMessages((prev) => [...prev, payload.message]);
             break;
           case "typing":
