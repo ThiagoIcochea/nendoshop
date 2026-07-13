@@ -17,6 +17,7 @@ import Products from "./pages/Dashboard/Products";
 import AdminOverview from "./pages/Dashboard/AdminOverview";
 import SecurityLogs from "./pages/Dashboard/SecurityLogs";
 import Deliveries from "./pages/Dashboard/Deliveries";
+import Claims from "./pages/Dashboard/Claims";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProductDetail from "./pages/ProductDetail"
@@ -72,6 +73,7 @@ function App() {
               <Route path="products" element={<Products />} />
               <Route path="security" element={<SecurityLogs />} />
               <Route path="deliveries" element={<Deliveries />} />
+              <Route path="claims" element={<Claims />} />
             </Route>
             <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />

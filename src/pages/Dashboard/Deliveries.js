@@ -425,6 +425,8 @@ export default function Deliveries() {
         )}
       </div>
 
+      {false && (
+      <>
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -493,6 +495,9 @@ export default function Deliveries() {
             </form>
           </div>
         </div>
+      )}
+
+      </>
       )}
 
       {selectedDelivery && (
