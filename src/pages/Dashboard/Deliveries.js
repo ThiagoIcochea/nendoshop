@@ -361,7 +361,8 @@ export default function Deliveries() {
             <p className="text-gray-500 font-medium">No se encontraron entregas registradas</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+            <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -508,6 +509,119 @@ export default function Deliveries() {
               </tbody>
             </table>
           </div>
+
+          <div className="md:hidden p-4 space-y-4">
+            {filteredDeliveries.map((delivery) => {
+              const payment = delivery.paymentId;
+              const clientName = payment?.cliente || "Cliente Anónimo";
+              const paymentId = payment?._id || delivery.paymentId || "—";
+              const deliveryType = payment?.deliveryType || "shipping";
+
+              let statusBadgeClass = "bg-gray-100 text-gray-800";
+              let statusText = "Pendiente";
+              if (delivery.status === "ready_for_pickup") {
+                statusBadgeClass = "bg-amber-100 text-amber-800";
+                statusText = "Listo para Recojo";
+              } else if (delivery.status === "shipped") {
+                statusBadgeClass = "bg-blue-100 text-blue-800";
+                statusText = "Enviado";
+              } else if (delivery.status === "delivered") {
+                statusBadgeClass = "bg-green-100 text-green-800";
+                statusText = "Entregado";
+              } else if (delivery.status === "cancelled") {
+                statusBadgeClass = "bg-red-100 text-red-800";
+                statusText = "Cancelado";
+              }
+
+              const currentDraftStatus = statusDrafts[delivery._id] || delivery.status;
+              const allowedNextStatuses = getNextStatuses(delivery.status, deliveryType);
+              const statusOptions = [
+                <option key="current" value={delivery.status} disabled>Actual ({statusText})</option>,
+                ...allowedNextStatuses.map((nextStatus) => (
+                  <option key={nextStatus} value={nextStatus}>{nextStatus === "ready_for_pickup" ? "Listo para recojo" : nextStatus === "shipped" ? "Enviado" : nextStatus === "delivered" ? "Entregado" : nextStatus === "cancelled" ? "Cancelado" : nextStatus === "returned" ? "Devuelto" : nextStatus}</option>
+                ))
+              ];
+
+              return (
+                <div key={delivery._id} className="bg-gray-50 border border-gray-100 rounded-xl p-4 shadow-sm space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="font-bold text-gray-800 text-sm">{clientName}</h4>
+                      <p className="font-mono text-[10px] text-purple-700">Pedido: {delivery._id || '—'}</p>
+                    </div>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                      deliveryType === "pickup" ? "bg-amber-100 text-amber-900" : "bg-blue-100 text-blue-900"
+                    }`}>
+                      {deliveryType === "pickup" ? "🏪 Recojo" : "🚚 Envío"}
+                    </span>
+                  </div>
+
+                  <div className="text-xs space-y-1">
+                    <div>
+                      <span className="font-semibold text-gray-500">Destino: </span>
+                      <span className="text-gray-700">
+                        {deliveryType === "pickup" ? "Retiro en tienda principal" : (delivery.destinationAddress || "No registrado")}
+                      </span>
+                    </div>
+                    {deliveryType !== "pickup" && delivery.agency && (
+                      <div>
+                        <span className="font-semibold text-gray-500">Agencia: </span>
+                        <span className="text-gray-700">{delivery.agency}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 pt-1">
+                      <span className="font-semibold text-gray-500">Estado: </span>
+                      <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold ${statusBadgeClass}`}>
+                        {statusText}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-gray-200 flex flex-wrap gap-2 items-center">
+                    <select
+                      value={currentDraftStatus}
+                      onChange={(e) => setStatusDrafts((prev) => ({ ...prev, [delivery._id]: e.target.value }))}
+                      className="flex-1 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-xs font-semibold text-gray-700 outline-none"
+                    >
+                      {statusOptions}
+                    </select>
+                    <button
+                      onClick={async () => {
+                        const nextStatus = currentDraftStatus;
+                        if (nextStatus === "delivered") {
+                          const codeResult = await promptDeliveryCode();
+                          const code = codeResult?.value;
+                          if (code) handleUpdateStatus(delivery._id, nextStatus, code);
+                          return;
+                        }
+                        handleUpdateStatus(delivery._id, nextStatus);
+                      }}
+                      disabled={isProcessing}
+                      className="rounded-lg bg-purple-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-purple-700 disabled:opacity-50"
+                    >
+                      Aplicar
+                    </button>
+                    <button
+                      onClick={() => setSelectedDelivery(delivery)}
+                      className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100"
+                    >
+                      Detalle
+                    </button>
+                  </div>
+
+                  {delivery.status === "delivered" && (
+                    <div className="pt-1 text-[10px] text-green-600 font-semibold flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                      Logística Finalizada
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          </>
         )}
       </div>
 

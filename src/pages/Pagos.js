@@ -362,22 +362,25 @@ export default function Pagos() {
 
                   {envioDatos.tipoComprobante === "boleta" ? (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">DNI</label> 
-                      <span className={`text-xs ${envioDatos.documento.length === 8 ? 'text-green-600 font-bold' : 'text-red-400'}`}>
-                    {envioDatos.documento.length}/8
-                  </span>
+                      <div className="flex justify-between items-end mb-1">
+                        <label className="block text-sm font-medium text-gray-700">DNI</label> 
+                        <span className={`text-xs ${envioDatos.documento.length === 8 ? 'text-green-600 font-bold' : 'text-red-400'}`}>
+                          {envioDatos.documento.length}/8
+                        </span>
+                      </div>
                       <input type="text" value={envioDatos.documento} onChange={(e) => setEnvioDatos({ ...envioDatos, documento: e.target.value.replace(/\D/g, '').slice(0, 8) })} required placeholder="Ej. 76543210" className="w-full border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand" />
                     </div>
                   ) : (
-                    <div className="flex gap-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
                       <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">RUC</label>
-
+                        <div className="flex justify-between items-end mb-1">
+                          <label className="block text-sm font-medium text-gray-700">RUC</label>
+                          <span className={`text-xs ${envioDatos.documento.length === 11 ? 'text-green-600 font-bold' : 'text-red-400'}`}>
+                            {envioDatos.documento.length}/11
+                          </span>
+                        </div>
                         <input type="text" value={envioDatos.documento} onChange={(e) => setEnvioDatos({ ...envioDatos, documento: e.target.value.replace(/\D/g, '').slice(0, 11) })} required placeholder="Ej. 20123456789" className="w-full border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand" />
                       </div>
-                      <span className={`text-xs ${envioDatos.documento.length === 11 ? 'text-green-600 font-bold' : 'text-red-400'}`}>
-                    {envioDatos.documento.length}/11
-                  </span>
                       <div className="flex-[2]">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Razón Social</label>
                         <input type="text" value={envioDatos.razonSocial} onChange={(e) => setEnvioDatos({ ...envioDatos, razonSocial: e.target.value })} required placeholder="Ej. Inversiones Nendo S.A.C." className="w-full border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand" />
@@ -399,7 +402,7 @@ export default function Pagos() {
 
                   {envioDatos.metodoEnvio === "delivery" ? (
                     <div className="space-y-4">
-                      <div className="flex gap-4">
+                      <div className="flex flex-col sm:flex-row gap-4">
                         <div className="flex-[2]">
                           <label className="block text-sm font-medium text-gray-700 mb-1">Avenida / Calle y Número</label>
                           <input type="text" name="calle" value={envioDatos.direccionEntrega.calle} onChange={handleDireccionChange} required placeholder="Ej. Av. Los Postes 123" className="w-full border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand" />
@@ -485,7 +488,7 @@ export default function Pagos() {
                       <input name="cardNumber" value={card.cardNumber} onChange={(e) => setCard({ ...card, cardNumber: e.target.value.replace(/\D/g, '').slice(0, 16) })} type="text" required placeholder="0000 0000 0000 0000" className="w-full border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand" />
                     </div>
 
-                    <div className="flex gap-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
                       <div className="flex-1">
                         <div className="flex justify-between items-end mb-1">
                           <label className="block text-sm font-medium text-gray-700">CVV</label>
@@ -501,13 +504,13 @@ export default function Pagos() {
                           <option value="mastercard">MasterCard</option>
                         </select>
                       </div>
+                    </div>
 
-                       <div className="flex items-center gap-2">
-                        <input type="checkbox" id="saveCard" name="saveCard" checked={saveCard} onChange={(e) => setSaveCard(e.target.checked)} className="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand" />
-                        <label htmlFor="saveCard" className="block text-sm font-medium text-gray-700">
-                          Guardar tarjeta para futuras compras
-                        </label>
-                      </div>
+                    <div className="flex items-center gap-2 pt-2">
+                      <input type="checkbox" id="saveCard" name="saveCard" checked={saveCard} onChange={(e) => setSaveCard(e.target.checked)} className="h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand" />
+                      <label htmlFor="saveCard" className="block text-sm font-medium text-gray-700">
+                        Guardar tarjeta para futuras compras
+                      </label>
                     </div>
 
                     <button type="submit" className="w-full mt-8 bg-brand text-white font-bold text-lg py-4 rounded-xl shadow-lg hover:bg-brand/90 transition-colors">

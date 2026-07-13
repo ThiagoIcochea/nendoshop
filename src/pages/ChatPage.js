@@ -29,19 +29,19 @@ export default function ChatPage() {
   } = useChatSocket(currentChat, username, userId, auth?.profileImg || "");
 
   return (
-    <div className="h-[calc(100dvh-64px)] md:h-[calc(100vh-64px)] bg-gradient-to-br from-white via-purple-50/30 to-white overflow-hidden">
-      <div className="flex items-center justify-between border-b border-purple-100 bg-white/90 px-4 py-3 md:hidden">
-        <button onClick={() => setMenuOpen((v) => !v)} className="rounded-xl border border-purple-200 p-2 text-purple-700">
+    <div className="h-[calc(100dvh-64px)] md:h-[calc(100vh-64px)] bg-gradient-to-br from-white via-purple-50/30 to-white overflow-hidden flex flex-col">
+      <div className="flex items-center justify-between border-b border-purple-100 bg-white/90 px-4 py-3 md:hidden flex-shrink-0">
+        <button onClick={() => { setMenuOpen((v) => !v); setInfoOpen(false); }} className="rounded-xl border border-purple-200 p-2 text-purple-700">
           {menuOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
         <span className="text-sm font-semibold text-gray-700">Chat</span>
-        <button onClick={() => setInfoOpen((v) => !v)} className="rounded-xl border border-purple-200 px-3 py-2 text-sm text-purple-700">
-          Info
+        <button onClick={() => { setInfoOpen((v) => !v); setMenuOpen(false); }} className="rounded-xl border border-purple-200 px-3 py-2 text-sm text-purple-700">
+          {infoOpen ? "Cerrar Info" : "Info"}
         </button>
       </div>
 
-      <div className="flex h-full min-h-0 flex-col md:flex-row">
-        <aside className={`${menuOpen ? "block" : "hidden"} w-full border-b border-purple-100 bg-white shadow-sm md:block md:w-[300px] md:shrink-0 md:border-b-0 md:border-r md:max-h-full`}>
+      <div className="flex-grow flex h-full min-h-0 flex-col md:flex-row relative">
+        <aside className={`${menuOpen ? "absolute inset-y-0 left-0 w-full z-20 block" : "hidden"} border-r border-purple-100 bg-white shadow-sm md:relative md:block md:w-[300px] md:shrink-0 md:border-r md:max-h-full`}>
           <SidebarChats
             currentChat={currentChat}
             setCurrentChat={(chat) => {
@@ -70,7 +70,7 @@ export default function ChatPage() {
 
         </main>
 
-        <aside className={`${infoOpen ? "block" : "hidden"} w-full border-t border-purple-100 bg-white shadow-sm md:block md:w-[340px] md:shrink-0 md:border-l md:border-t-0 xl:block md:max-h-full`}>
+        <aside className={`${infoOpen ? "absolute inset-y-0 right-0 w-full z-20 block" : "hidden"} border-l border-purple-100 bg-white shadow-sm md:relative md:block md:w-[340px] md:shrink-0 md:border-l xl:block md:max-h-full`}>
           <ChatInfo users={onlineUsers} onReportUser={reportUser} />
         </aside>
 

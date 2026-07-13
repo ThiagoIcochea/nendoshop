@@ -287,7 +287,7 @@ export default function Payments() {
 
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="hidden md:block overflow-x-auto">
 
           <table className="w-full min-w-[600px]">
 
@@ -337,6 +337,29 @@ export default function Payments() {
 
           </table>
 
+        </div>
+
+        <div className="md:hidden space-y-4">
+          {currentPagos.map((pago) => (
+            <div key={pago._id || pago.id} className="bg-gray-50 rounded-xl p-4 shadow-sm border border-gray-100">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-bold text-gray-800">{pago.cliente}</span>
+                <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-semibold">
+                  {pago.estado}
+                </span>
+              </div>
+              <div className="text-sm text-gray-600 mb-2">
+                <span className="font-semibold">Productos: </span>
+                {pago.productos
+                  ? pago.productos.map(p => p.name).join(", ")
+                  : pago.producto}
+              </div>
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>{new Date(pago.fecha).toLocaleDateString("es-ES")}</span>
+                <span className="font-bold text-green-600 text-sm">S/ {pago.total}</span>
+              </div>
+            </div>
+          ))}
         </div>
 
         <div className="flex flex-wrap justify-center gap-2 mt-6">

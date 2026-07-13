@@ -256,16 +256,48 @@ export default function TwoFactorAuth() {
               </div>
             ) : (
               <div className="mt-4 grid grid-cols-2 gap-3">
-                <button onClick={() => setVerificationMethod("email")} className="p-2 border rounded-xl flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setVerificationMethod("email")}
+                  className={`p-2 border rounded-xl flex items-center gap-2 transition-all ${
+                    verificationMethod === "email"
+                      ? "border-brand bg-purple-50 text-brand font-semibold shadow-sm"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
                   <Mail size={16} /> Correo
                 </button>
-                <button onClick={() => setVerificationMethod("sms")} className="p-2 border rounded-xl flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setVerificationMethod("sms")}
+                  className={`p-2 border rounded-xl flex items-center gap-2 transition-all ${
+                    verificationMethod === "sms"
+                      ? "border-brand bg-purple-50 text-brand font-semibold shadow-sm"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
                   <Smartphone size={16} /> SMS
                 </button>
-                <button onClick={() => setVerificationMethod("call")} className="p-2 border rounded-xl flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setVerificationMethod("call")}
+                  className={`p-2 border rounded-xl flex items-center gap-2 transition-all ${
+                    verificationMethod === "call"
+                      ? "border-brand bg-purple-50 text-brand font-semibold shadow-sm"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
                   <Phone size={16} /> Llamada
                 </button>
-                <button onClick={() => setVerificationMethod("whatsapp")} className="p-2 border rounded-xl flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setVerificationMethod("whatsapp")}
+                  className={`p-2 border rounded-xl flex items-center gap-2 transition-all ${
+                    verificationMethod === "whatsapp"
+                      ? "border-brand bg-purple-50 text-brand font-semibold shadow-sm"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
                   <MessageCircle size={16} /> WhatsApp
                 </button>
               </div>
