@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import { BACKEND_URL } from '../../utils/config';
+import { readJsonResponse } from '../../utils/api';
 
 export default function ClaimModal({ order, onSubmitted }) {
   const [form, setForm] = useState({ category: order?.status === 'delivered' ? 'return' : 'delay', description: '' });
   const [submitting, setSubmitting] = useState(false);
+  const categoryOptions = [
+    { value: 'delay', label: 'Demora' },
+    { value: 'incomplete', label: 'Pedido incompleto' },
+    { value: 'damaged', label: 'Producto dañado' },
+    { value: 'return', label: 'Devolución' },
+    { value: 'cancellation', label: 'Cancelación' }
+  ];
 
   useEffect(() => {
     setForm((prev) => ({
@@ -36,8 +44,8 @@ export default function ClaimModal({ order, onSubmitted }) {
           description: form.description
         })
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'No se pudo registrar el reclamo');
+      const data = await readJsonResponse(res);
+      if (!res.ok) throw new Error(data?.message || 'No se pudo registrar el reclamo');
       Swal.fire('Éxito', 'Reclamo registrado correctamente.', 'success');
       setForm({ category: 'delay', description: '' });
       onSubmitted?.();
@@ -53,11 +61,9 @@ export default function ClaimModal({ order, onSubmitted }) {
       <div>
         <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500">Categoría</label>
         <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm">
-          <option value="delay">Demora</option>
-          <option value="incomplete">Pedido incompleto</option>
-          <option value="damaged">Producto dañado</option>
-          <option value="return">Devolución</option>
-          <option value="cancellation">Cancelación</option>
+          {categoryOptions.map((option) => (
+            <option key={option.value} value={option.value}>{option.label}</option>
+          ))}
         </select>
       </div>
       <div>

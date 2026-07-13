@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import PedidoCard from "../components/pedidos/PedidoCard";
 import ParticlesBackground from "../components/ParticlesBackground";
 import { BACKEND_URL } from "../utils/config";
+import { readJsonResponse } from "../utils/api";
 
 /**
  * Vista de Mis Pedidos del Cliente Final
@@ -34,7 +35,7 @@ export default function MisPedidos() {
         throw new Error("No se pudo obtener el historial de tus pedidos.");
       }
 
-      const data = await res.json();
+      const data = await readJsonResponse(res);
       setOrders(Array.isArray(data) ? data : []);
     } catch (err) {
       // Error de red controlado de forma silenciosa

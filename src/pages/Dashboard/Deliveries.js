@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { BACKEND_URL } from "../../utils/config";
+import { readJsonResponse } from "../../utils/api";
 
 export default function Deliveries() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export default function Deliveries() {
   const [selectedClaim, setSelectedClaim] = useState(null);
   const [selectedDelivery, setSelectedDelivery] = useState(null);
   const [statusDrafts, setStatusDrafts] = useState({});
+  const [activeView, setActiveView] = useState("deliveries");
   const [claimAction, setClaimAction] = useState({ status: 'resolved', resolution: 'approved', newDeliveryStatus: '', cancellationReason: '', deliveryCode: '' });
 
   const [formData, setFormData] = useState({
@@ -31,7 +33,7 @@ export default function Deliveries() {
       if (token) headers.Authorization = `Bearer ${token}`;
       const res = await fetch(`${BACKEND_URL}/api/claims`, { method: "GET", headers, credentials: "include" });
       if (!res.ok) return;
-      const data = await res.json();
+      const data = await readJsonResponse(res);
       setClaims(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
@@ -58,8 +60,8 @@ export default function Deliveries() {
         throw new Error("No se pudo obtener el listado de entregas.");
       }
 
-      const data = await res.json();
-      setDeliveries(data);
+      const data = await readJsonResponse(res);
+      setDeliveries(Array.isArray(data) ? data : []);
     } catch (err) {
       Swal.fire("Error", err.message || "Error al cargar entregas", "error");
     } finally {
@@ -98,26 +100,40 @@ export default function Deliveries() {
     setIsProcessing(true);
     try {
       const token = localStorage.getItem("token");
+      const headers = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const headers = {
-        "Content-Type": "application/json"
-      };
-
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
-      const res = await fetch(`${BACKEND_URL}/api/deliveries/${id}/status`, {
+      let res = await fetch(`${BACKEND_URL}/api/deliveries/${id}/status`, {
         method: "PATCH",
         headers,
         credentials: "include",
         body: JSON.stringify({ status, deliveryCode })
       });
+      let data = await readJsonResponse(res);
 
-      const data = await res.json();
+      if (res.status === 202 && data?.twoFactorRequired) {
+        const { value } = await Swal.fire({
+          title: "Confirmar cancelación",
+          input: "text",
+          inputLabel: "Código MFA",
+          inputPlaceholder: "Ingresa el código recibido",
+          showCancelButton: true,
+          confirmButtonText: "Confirmar",
+          cancelButtonText: "Cancelar"
+        });
+        if (!value) return;
+
+        res = await fetch(`${BACKEND_URL}/api/deliveries/${id}/status`, {
+          method: "PATCH",
+          headers,
+          credentials: "include",
+          body: JSON.stringify({ status, deliveryCode, mfaCode: value, tempToken: data.tempToken })
+        });
+        data = await readJsonResponse(res);
+      }
 
       if (!res.ok) {
-        throw new Error(data.message || "No se pudo actualizar el estado de la entrega.");
+        throw new Error(data?.message || "No se pudo actualizar el estado de la entrega.");
       }
 
       Swal.fire("Éxito", `Estado de entrega actualizado a '${status}' con éxito.`, "success");
@@ -143,8 +159,8 @@ export default function Deliveries() {
         credentials: "include",
         body: JSON.stringify(claimAction)
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "No se pudo resolver el reclamo.");
+      const data = await readJsonResponse(res);
+      if (!res.ok) throw new Error(data?.message || "No se pudo resolver el reclamo.");
       Swal.fire("Éxito", "Reclamo actualizado correctamente.", "success");
       setSelectedClaim(null);
       setClaimAction({ status: 'resolved', resolution: 'approved', newDeliveryStatus: '', cancellationReason: '', deliveryCode: '' });
@@ -190,10 +206,10 @@ export default function Deliveries() {
         body: JSON.stringify(formData)
       });
 
-      const data = await res.json();
+      const data = await readJsonResponse(res);
 
       if (!res.ok) {
-        throw new Error(data.message || "Error al registrar la entrega");
+        throw new Error(data?.message || "Error al registrar la entrega");
       }
 
       Swal.fire("Éxito", "Entrega registrada correctamente.", "success");
@@ -427,28 +443,155 @@ export default function Deliveries() {
 
       {false && (
       <>
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-lg font-bold text-gray-800">Reclamos pendientes</h3>
-            <p className="text-sm text-gray-500">Resuelve los reclamos y decide el siguiente estado del pedido.</p>
-          </div>
+      <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div className="mb-4 flex flex-wrap gap-2">
+          <button onClick={() => setActiveView("deliveries")} className={`rounded-full px-4 py-2 text-sm font-semibold ${activeView === "deliveries" ? "bg-purple-600 text-white" : "bg-gray-100 text-gray-700"}`}>
+            Entregas
+          </button>
+          <button onClick={() => setActiveView("claims")} className={`rounded-full px-4 py-2 text-sm font-semibold ${activeView === "claims" ? "bg-purple-600 text-white" : "bg-gray-100 text-gray-700"}`}>
+            Reclamos
+          </button>
         </div>
-        <div className="space-y-3">
-          {claims.length === 0 ? (
-            <p className="text-sm text-gray-500">No hay reclamos registrados.</p>
-          ) : claims.filter((claim) => claim.status === 'pending').map((claim) => (
-            <div key={claim._id} className="rounded-xl border border-gray-200 p-4">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-semibold text-gray-800">{claim.category}</p>
-                  <p className="text-sm text-gray-500">{claim.description}</p>
+
+        {activeView === "deliveries" ? (
+          <div className="space-y-6">
+            <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+              {loading ? (
+                <div className="flex flex-col items-center justify-center py-20">
+                  <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+                  <p className="text-gray-500 text-sm">Cargando registros de logística...</p>
                 </div>
-                <button onClick={() => setSelectedClaim(claim)} className="rounded-lg bg-purple-600 px-3 py-2 text-sm font-semibold text-white">Resolver</button>
-              </div>
+              ) : filteredDeliveries.length === 0 ? (
+                <div className="text-center py-20">
+                  <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                  </svg>
+                  <p className="text-gray-500 font-medium">No se encontraron entregas registradas</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        <th className="p-4 pl-6">Pedido / Cliente</th>
+                        <th className="p-4">Tipo</th>
+                        <th className="p-4">Destino / Retiro</th>
+                        <th className="p-4">Agencia</th>
+                        <th className="p-4">Estado</th>
+                        <th className="p-4 text-center">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 text-sm text-gray-600">
+                      {filteredDeliveries.map((delivery) => {
+                        const payment = delivery.paymentId;
+                        const clientName = payment?.cliente || "Cliente Anónimo";
+                        const paymentId = payment?._id || delivery.paymentId || "—";
+                        const deliveryType = payment?.deliveryType || "shipping";
+                        const isShippingInfoFilled = Boolean(
+                          delivery.destinationAddress &&
+                          delivery.destinationAddress !== "Pendiente de registro" &&
+                          delivery.agency &&
+                          delivery.agency !== "Pendiente de registro"
+                        );
+                        const rowBg = deliveryType === "pickup"
+                          ? "bg-amber-50/40 hover:bg-amber-100/40"
+                          : "bg-blue-50/10 hover:bg-blue-100/20";
+                        let statusBadgeClass = "bg-gray-100 text-gray-800";
+                        let statusText = "Pendiente";
+                        if (delivery.status === "ready_for_pickup") {
+                          statusBadgeClass = "bg-amber-100 text-amber-800";
+                          statusText = "Listo para Recojo";
+                        } else if (delivery.status === "shipped") {
+                          statusBadgeClass = "bg-blue-100 text-blue-800";
+                          statusText = "Enviado";
+                        } else if (delivery.status === "delivered") {
+                          statusBadgeClass = "bg-green-100 text-green-800";
+                          statusText = "Entregado";
+                        } else if (delivery.status === "cancelled") {
+                          statusBadgeClass = "bg-red-100 text-red-800";
+                          statusText = "Cancelado";
+                        }
+                        const currentDraftStatus = statusDrafts[delivery._id] || delivery.status;
+                        return (
+                          <tr key={delivery._id} className={`${rowBg} transition-colors`}>
+                            <td className="p-4 pl-6">
+                              <div className="font-semibold text-gray-800">{clientName}</div>
+                              <div className="font-mono text-xs text-purple-700 mt-0.5">Pedido: {delivery._id || '—'}</div>
+                              <div className="font-mono text-[11px] text-gray-500 mt-0.5">Pago: {paymentId}</div>
+                            </td>
+                            <td className="p-4">
+                              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${deliveryType === "pickup" ? "bg-amber-100 text-amber-900 border border-amber-200" : "bg-blue-100 text-blue-900 border border-blue-200"}`}>
+                                {deliveryType === "pickup" ? "🏪 Recojo" : "🚚 Envío"}
+                              </span>
+                            </td>
+                            <td className="p-4">
+                              {deliveryType === "pickup" ? (
+                                <div className="text-gray-500 text-xs italic">Retiro presencial en tienda principal</div>
+                              ) : (
+                                <>
+                                  <div className="text-gray-800 font-medium max-w-xs truncate" title={delivery.destinationAddress}>{delivery.destinationAddress || "No registrado"}</div>
+                                  {delivery.reference && (
+                                    <div className="text-gray-400 text-xs italic max-w-xs truncate" title={delivery.reference}>Ref: {delivery.reference}</div>
+                                  )}
+                                </>
+                              )}
+                            </td>
+                            <td className="p-4 font-medium text-gray-700">{deliveryType === "pickup" ? "—" : (delivery.agency || "No asignada")}</td>
+                            <td className="p-4"><span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadgeClass}`}>{statusText}</span></td>
+                            <td className="p-4 text-center">
+                              <div className="flex items-center justify-center gap-2">
+                                <select value={currentDraftStatus} onChange={(e) => setStatusDrafts((prev) => ({ ...prev, [delivery._id]: e.target.value }))} className="rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-xs font-semibold text-gray-700 outline-none">
+                                  <option value="pending">Pendiente</option>
+                                  <option value="ready_for_pickup">Listo para recojo</option>
+                                  <option value="shipped">Enviado</option>
+                                  <option value="delivered">Entregado</option>
+                                  <option value="cancelled">Cancelado</option>
+                                  <option value="returned">Devuelto</option>
+                                </select>
+                                <button onClick={() => {
+                                  const nextStatus = currentDraftStatus;
+                                  if (nextStatus === "delivered") {
+                                    const code = window.prompt("Ingresa el código de validación de entrega:");
+                                    if (code) handleUpdateStatus(delivery._id, nextStatus, code);
+                                    return;
+                                  }
+                                  handleUpdateStatus(delivery._id, nextStatus);
+                                }} disabled={isProcessing} className="rounded-lg bg-purple-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-purple-700 disabled:opacity-50">Aplicar</button>
+                                <button onClick={() => setSelectedDelivery(delivery)} className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100">Detalle</button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <div className="mb-4">
+              <h3 className="text-lg font-bold text-gray-800">Reclamos pendientes</h3>
+              <p className="text-sm text-gray-500">Resuelve los reclamos y decide el siguiente estado del pedido.</p>
+            </div>
+            <div className="space-y-3">
+              {claims.length === 0 ? (
+                <p className="text-sm text-gray-500">No hay reclamos registrados.</p>
+              ) : claims.filter((claim) => claim.status === 'pending').map((claim) => (
+                <div key={claim._id} className="rounded-xl border border-gray-200 p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="font-semibold text-gray-800">{(claim.category === 'delay' ? 'Demora' : claim.category === 'incomplete' ? 'Pedido incompleto' : claim.category === 'damaged' ? 'Producto dañado' : claim.category === 'return' ? 'Devolución' : claim.category === 'cancellation' ? 'Cancelación' : claim.category)}</p>
+                      <p className="text-sm text-gray-500">{claim.description}</p>
+                    </div>
+                    <button onClick={() => setSelectedClaim(claim)} className="rounded-lg bg-purple-600 px-3 py-2 text-sm font-semibold text-white">Resolver</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {selectedClaim && (

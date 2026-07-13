@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import Swal from "sweetalert2";
 import ClaimModal from "./ClaimModal";
 import { BACKEND_URL } from "../../utils/config";
+import { readJsonResponse } from "../../utils/api";
 
 export default function PedidoCard({ order, onReturnSuccess }) {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -12,7 +13,7 @@ export default function PedidoCard({ order, onReturnSuccess }) {
   const products = payment.productos || [];
   const statusHistory = Array.isArray(order.statusHistory) && order.statusHistory.length
     ? order.statusHistory
-    : [{ status: order.status || "pending", timestamp: order.updatedAt || order.createdAt, note: "Estado actual del pedido" }];
+    : [{ status: order.status || "pending", timestamp: order.updatedAt || order.createdAt, note: "Pedido registrado" }];
 
   const formatDate = (dateString) => {
     if (!dateString) return "Fecha no disponible";
@@ -68,8 +69,8 @@ export default function PedidoCard({ order, onReturnSuccess }) {
         headers,
         credentials: "include"
       });
-      const requestData = await requestRes.json();
-      if (!requestRes.ok) throw new Error(requestData.message || "No se pudo iniciar la verificación MFA.");
+      const requestData = await readJsonResponse(requestRes);
+      if (!requestRes.ok) throw new Error(requestData?.message || "No se pudo iniciar la verificación MFA.");
 
       const { value } = await Swal.fire({
         title: "Confirmar cancelación",
@@ -90,8 +91,8 @@ export default function PedidoCard({ order, onReturnSuccess }) {
         credentials: "include",
         body: JSON.stringify({ tempToken: requestData.tempToken, code: value.code, reason: value.reason })
       });
-      const confirmData = await confirmRes.json();
-      if (!confirmRes.ok) throw new Error(confirmData.message || "No se pudo cancelar el pedido.");
+      const confirmData = await readJsonResponse(confirmRes);
+      if (!confirmRes.ok) throw new Error(confirmData?.message || "No se pudo cancelar el pedido.");
 
       await Swal.fire("Pedido cancelado", "La cancelación fue confirmada con MFA.", "success");
       onReturnSuccess?.();
