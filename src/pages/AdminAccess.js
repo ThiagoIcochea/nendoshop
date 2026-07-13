@@ -116,6 +116,7 @@ export default function AdminAccess() {
         email: resetEmail.trim().toLowerCase(),
         tempToken: data.tempToken,
         forgotPassword: true,
+        loginFlow: true,
         newPassword: resetPassword,
         redirectTo: ROUTES.dashboard,
         requireAdmin: true,

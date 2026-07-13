@@ -101,6 +101,7 @@ export default function Login() {
       email: resetEmail.trim().toLowerCase(),
       tempToken: data.tempToken,
       forgotPassword: true,
+      loginFlow: true,
       newPassword: resetPassword,
       redirectTo: "/",
       pendingPasswordChange: {

@@ -31,7 +31,8 @@ export const getTwoFactorSuccessTarget = ({
 }) => {
   if (redirectTo) return redirectTo;
   if (pendingProfileUpdate) return SECURE_ROUTES.profile;
-  if (pendingPasswordChange || forgotPassword) return requireAdmin ? SECURE_ROUTES.adminLogin : SECURE_ROUTES.login;
+  if (forgotPassword) return "/";
+  if (pendingPasswordChange) return requireAdmin ? SECURE_ROUTES.adminLogin : SECURE_ROUTES.login;
   if (requireAdmin && user?.role !== "admin") return SECURE_ROUTES.login;
   if (user?.role === "admin") return SECURE_ROUTES.adminLogin;
   return "/";
