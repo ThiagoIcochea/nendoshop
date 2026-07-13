@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BACKEND_URL } from "../utils/config";
+import { ROUTES } from "../utils/secureRoutes";
 const getWebSocketUrl = () => {
   if (!BACKEND_URL) return null;
   if (BACKEND_URL.startsWith("https://")) return BACKEND_URL.replace("https://", "wss://");
@@ -79,8 +80,12 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
     const action = message?.meta?.action;
     if (!action) return;
 
-    if (action.type === "navigate" && action.path === "/pagos") {
-      window.location.hash = "#/pagos";
+    if (action.type === "navigate" && action.path) {
+      const routeMap = {
+        "/pagos": ROUTES.payments,
+        "/pedidos": ROUTES.orders
+      };
+      window.location.hash = `#${routeMap[action.path] || action.path}`;
     }
   }, []);
 

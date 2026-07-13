@@ -5,11 +5,18 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import Swal from "sweetalert2";
 import logo from "../components/Assets/logo.png";
+import { BACKEND_URL } from "../utils/config";
+import { clearPending2FAFlow, savePending2FAFlow } from "../utils/twoFactorFlow";
+import { ROUTES } from "../utils/secureRoutes";
 
 export default function AdminAccess() {
 
   const [user, setUser] = useState("");
   const [pass, setPass] = useState("");
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetPassword, setResetPassword] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -18,11 +25,12 @@ export default function AdminAccess() {
   const handleLogin = async (e) => {
 
     e.preventDefault();
+    clearPending2FAFlow();
 
     try {
 
       const res = await fetch(
-        "https://backendproyectodf.onrender.com/api/auth/login",
+        `${BACKEND_URL}/api/auth/login`,
         {
           method: "POST",
           headers: {
@@ -44,12 +52,20 @@ export default function AdminAccess() {
       }
 
       if (data.twoFactorRequired) {
-        return navigate("/verify-2fa", {
+        savePending2FAFlow({
+          email: user,
+          tempToken: data.tempToken,
+          redirectTo: ROUTES.dashboard,
+          requireAdmin: true,
+          loginFlow: true
+        });
+        return navigate(ROUTES.verify2fa, {
           state: {
             email: user,
             tempToken: data.tempToken,
-            redirectTo: "/dashboard",
-            requireAdmin: true
+            redirectTo: ROUTES.dashboard,
+            requireAdmin: true,
+            loginFlow: true
           }
         });
       }
@@ -63,7 +79,7 @@ export default function AdminAccess() {
       }
 
       setAuth(data.user);
-      navigate("/dashboard");
+      navigate(ROUTES.dashboard);
 
     } catch (error) {
 
@@ -73,6 +89,60 @@ export default function AdminAccess() {
 
     }
 
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if (!resetEmail || !resetPassword) {
+      return Swal.fire("Completa los campos", "Ingresa el correo administrador y una nueva contrasena.", "warning");
+    }
+
+    setResetLoading(true);
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/auth/admin/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email: resetEmail, newPassword: resetPassword })
+      });
+      const data = await res.json();
+      setResetLoading(false);
+
+      if (!res.ok) {
+        return Swal.fire("Error", data.message || "No se pudo iniciar la recuperacion", "error");
+      }
+
+      savePending2FAFlow({
+        email: resetEmail.trim().toLowerCase(),
+        tempToken: data.tempToken,
+        forgotPassword: true,
+        newPassword: resetPassword,
+        redirectTo: ROUTES.dashboard,
+        requireAdmin: true,
+        pendingPasswordChange: {
+          email: resetEmail.trim().toLowerCase(),
+          newPassword: resetPassword
+        }
+      });
+
+      navigate(ROUTES.verify2fa, {
+        state: {
+          email: resetEmail.trim().toLowerCase(),
+          tempToken: data.tempToken,
+          forgotPassword: true,
+          newPassword: resetPassword,
+          redirectTo: ROUTES.dashboard,
+          requireAdmin: true,
+          pendingPasswordChange: {
+            email: resetEmail.trim().toLowerCase(),
+            newPassword: resetPassword
+          }
+        }
+      });
+    } catch (error) {
+      setResetLoading(false);
+      Swal.fire("Error", "No se pudo completar la recuperacion", "error");
+    }
   };
 
   return (
@@ -135,6 +205,17 @@ export default function AdminAccess() {
 
           <button
             type="button"
+            onClick={() => {
+              setResetEmail(user);
+              setShowResetModal(true);
+            }}
+            className="w-full mt-3 text-sm text-brand hover:underline"
+          >
+            Olvidaste tu contrasena de administrador?
+          </button>
+
+          <button
+            type="button"
             onClick={() => navigate("/")}
             className="w-full mt-3 border border-gray-300 py-3 rounded-xl font-medium hover:bg-gray-100 transition"
           >
@@ -142,6 +223,25 @@ export default function AdminAccess() {
           </button>
 
         </form>
+
+        {showResetModal && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4">
+            <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+              <h3 className="text-lg font-semibold text-gray-900">Recuperar acceso admin</h3>
+              <p className="mt-2 text-sm text-gray-500">Este flujo solo acepta cuentas administrador y envia verificacion en dos pasos.</p>
+              <form onSubmit={handleForgotPassword} className="mt-4 space-y-3">
+                <input className="w-full rounded-xl border border-gray-300 p-3" placeholder="Correo administrador" value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} />
+                <input type="password" className="w-full rounded-xl border border-gray-300 p-3" placeholder="Nueva contrasena" value={resetPassword} onChange={(e) => setResetPassword(e.target.value)} />
+                <div className="flex justify-end gap-2 pt-2">
+                  <button type="button" onClick={() => setShowResetModal(false)} className="rounded-lg border px-3 py-2 text-sm">Cancelar</button>
+                  <button type="submit" className="rounded-lg bg-brand px-3 py-2 text-sm text-white" disabled={resetLoading}>
+                    {resetLoading ? "Enviando..." : "Recuperar acceso"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
       </div>
 

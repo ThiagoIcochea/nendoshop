@@ -15,6 +15,7 @@ import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import logo from "./Assets/logo.png";
 import { BACKEND_URL } from "../utils/config";
+import { ROUTES } from "../utils/secureRoutes";
 
 export default function Navbar() {
 
@@ -77,7 +78,7 @@ export default function Navbar() {
   const handleLogout = () => {
     setAuth(null);
     localStorage.removeItem("auth");
-    navigate("/login");
+    navigate(ROUTES.login);
   };
 
   const submitSearch = async (value) => {
@@ -100,7 +101,7 @@ export default function Navbar() {
     }
 
     setSearch("");
-    navigate({ pathname: "/catalog", search: `?search=${encodeURIComponent(term)}` });
+    navigate({ pathname: ROUTES.catalog, search: `?search=${encodeURIComponent(term)}` });
     setMenuOpen(false);
   };
 

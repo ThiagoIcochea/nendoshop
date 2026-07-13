@@ -1,4 +1,9 @@
 const STORAGE_KEY = "pending2faFlow";
+const SECURE_ROUTES = {
+  login: "/s/nc-login-a9p",
+  adminLogin: "/access-panel-admin",
+  profile: "/s/nc-profile-h3u"
+};
 
 export const savePending2FAFlow = (payload) => {
   if (typeof window === "undefined") return;
@@ -25,10 +30,10 @@ export const getTwoFactorSuccessTarget = ({
   requireAdmin,
 }) => {
   if (redirectTo) return redirectTo;
-  if (pendingProfileUpdate) return "/profile";
-  if (pendingPasswordChange || forgotPassword) return "/login";
-  if (requireAdmin && user?.role !== "admin") return "/login";
-  if (user?.role === "admin") return "/admin-access-panel";
+  if (pendingProfileUpdate) return SECURE_ROUTES.profile;
+  if (pendingPasswordChange || forgotPassword) return requireAdmin ? SECURE_ROUTES.adminLogin : SECURE_ROUTES.login;
+  if (requireAdmin && user?.role !== "admin") return SECURE_ROUTES.login;
+  if (user?.role === "admin") return SECURE_ROUTES.adminLogin;
   return "/";
 };
 

@@ -17,6 +17,7 @@ import {
   readPending2FAFlow,
 } from "../utils/twoFactorFlow";
 import { BACKEND_URL } from "../utils/config";
+import { ROUTES } from "../utils/secureRoutes";
 
 export default function TwoFactorAuth() {
   const [code, setCode] = useState(Array(6).fill(""));
@@ -44,7 +45,7 @@ export default function TwoFactorAuth() {
 
   useEffect(() => {
     if (!email || !tempToken) {
-      navigate("/login");
+      navigate(ROUTES.login);
     }
   }, [email, tempToken, navigate]);
 
@@ -212,7 +213,7 @@ export default function TwoFactorAuth() {
 
         if (requireAdmin && data.user?.role !== "admin") {
           Swal.fire("Permisos Insuficientes", "Acceso denegado", "error");
-          return navigate("/login");
+          return navigate(ROUTES.login);
         }
 
         navigate(targetPath);
@@ -236,7 +237,7 @@ export default function TwoFactorAuth() {
       <div className="relative z-10 w-full max-w-md px-4">
         <div className="bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl border p-8">
 
-          <button onClick={() => navigate("/login")} className="flex items-center text-sm mb-6">
+          <button onClick={() => navigate(ROUTES.login)} className="flex items-center text-sm mb-6">
             <ArrowLeft size={16} /> Volver
           </button>
 

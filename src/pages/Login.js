@@ -6,6 +6,7 @@ import { AuthContext } from "../context/AuthContext";
 import Swal from "sweetalert2";
 import { clearPending2FAFlow, savePending2FAFlow } from "../utils/twoFactorFlow";
 import { BACKEND_URL } from "../utils/config";
+import { ROUTES } from "../utils/secureRoutes";
 
 
 export default function Login() {
@@ -49,7 +50,7 @@ export default function Login() {
 
     if (data.twoFactorRequired) {
       savePending2FAFlow({ email: user, tempToken: data.tempToken, redirectTo: "/", requireAdmin: false, loginFlow: true });
-      return navigate("/verify-2fa", { state: { email: user, tempToken: data.tempToken, redirectTo: "/", requireAdmin: false, loginFlow: true } });
+      return navigate(ROUTES.verify2fa, { state: { email: user, tempToken: data.tempToken, redirectTo: "/", requireAdmin: false, loginFlow: true } });
     }
 
     if (!data.user) {
@@ -61,7 +62,7 @@ export default function Login() {
       navigate("/");
     } else if (data.user.role === "admin") {
       Swal.fire("Acceso restringido", "El acceso de administradores se realiza desde el panel dedicado.", "warning");
-      navigate("/admin-access-panel");
+      navigate(ROUTES.adminLogin);
     }
      
 
@@ -108,7 +109,7 @@ export default function Login() {
       }
     });
 
-    navigate("/verify-2fa", {
+    navigate(ROUTES.verify2fa, {
       state: {
         email: resetEmail.trim().toLowerCase(),
         tempToken: data.tempToken,
@@ -168,7 +169,7 @@ export default function Login() {
             ¿No tienes una cuenta?{" "}
             <span
               className="text-blue-500 cursor-pointer hover:underline"
-              onClick={() => navigate("/register")}
+              onClick={() => navigate(ROUTES.register)}
             >
               Regístrate
             </span>

@@ -30,6 +30,7 @@ import TwoFactorAuth from "./pages/TwoFactorAuth";
 import ChatPage from "./pages/ChatPage";
 import PurchaseAlertModal from "./components/PurchaseAlertModal";
 import MisPedidos from "./pages/MisPedidos";
+import { ROUTES } from "./utils/secureRoutes";
 
 function App() {
   return (
@@ -45,23 +46,49 @@ function App() {
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path={ROUTES.catalog} element={<Catalog />} />
             <Route path="/catalog" element={<Catalog />} />
+            <Route path={ROUTES.about} element={<About />} />
             <Route path="/about" element={<About />} />
+            <Route path={ROUTES.login} element={<Login />} />
             <Route path="/login" element={<Login />} />
+            <Route path={ROUTES.verify2fa} element={<TwoFactorAuth />} />
             <Route path="/verify-2fa" element={<TwoFactorAuth />} />
+            <Route path="/access-panel-admin" element={<AdminAccess />} />
+            <Route path={ROUTES.adminLogin} element={<AdminAccess />} />
             <Route path="/admin-access-panel" element={<AdminAccess />} />
+            <Route path={ROUTES.register} element={<Register />} />
             <Route path="/register" element={<Register />} />
 
+            <Route path={`${ROUTES.product}/:_id`} element={<ProductDetail />} />
             <Route path="/product/:_id" element={<ProductDetail />} />
+            <Route path={ROUTES.apiComments} element={<ProtectedRoute><ApiComentarios /></ProtectedRoute>} />
             <Route path="/api-comentarios" element={<ProtectedRoute><ApiComentarios /></ProtectedRoute>} />
+            <Route path={ROUTES.profile} element = {<Profile />} />
             <Route path="/profile" element = {<Profile />} />
 
       
 
+            <Route path={ROUTES.cart} element={<Cart />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path={ROUTES.payments} element={<ProtectedRoute><Pagos/></ProtectedRoute>}/>
             <Route path="/pagos" element={<ProtectedRoute><Pagos/></ProtectedRoute>}/>
+            <Route path={ROUTES.orders} element={<ProtectedRoute><MisPedidos/></ProtectedRoute>}/>
             <Route path="/pedidos" element={<ProtectedRoute><MisPedidos/></ProtectedRoute>}/>
             
+          <Route
+              path={ROUTES.dashboard}
+              element={<DashboardLayout />}
+            >
+              <Route index element={<AdminOverview />} />
+              <Route path="ov" element={<AdminOverview />} />
+              <Route path="py" element={<Payments />} />
+              <Route path="cl" element={<Clients />} />
+              <Route path="pr" element={<Products />} />
+              <Route path="sc" element={<SecurityLogs />} />
+              <Route path="dl" element={<Deliveries />} />
+              <Route path="cr" element={<Claims />} />
+            </Route>
           <Route
               path="/dashboard"
               element={<DashboardLayout />}
@@ -75,6 +102,7 @@ function App() {
               <Route path="deliveries" element={<Deliveries />} />
               <Route path="claims" element={<Claims />} />
             </Route>
+            <Route path={ROUTES.chat} element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
             <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>

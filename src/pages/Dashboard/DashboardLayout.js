@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { ROUTES } from "../../utils/secureRoutes";
 
 export default function DashboardLayout() {
   const navigate = useNavigate();
@@ -7,18 +8,18 @@ export default function DashboardLayout() {
   useEffect(() => {
     const auth = JSON.parse(localStorage.getItem("auth"));
 
-    if (!auth) navigate("/login");
+    if (!auth) navigate(ROUTES.login);
     if (auth?.role !== "admin") navigate("/");
   }, []);
 
   const links = [
-    { to: "/dashboard/overview", label: "Resumen" },
-    { to: "/dashboard/payments", label: "Pagos" },
-    { to: "/dashboard/clients", label: "Clientes" },
-    { to: "/dashboard/products", label: "Productos" },
-    { to: "/dashboard/security", label: "Seguridad y logs" },
-    { to: "/dashboard/deliveries", label: "Entregas" },
-    { to: "/dashboard/claims", label: "Reclamos" }
+    { to: ROUTES.dashboardOverview, label: "Resumen" },
+    { to: ROUTES.dashboardPayments, label: "Pagos" },
+    { to: ROUTES.dashboardClients, label: "Clientes" },
+    { to: ROUTES.dashboardProducts, label: "Productos" },
+    { to: ROUTES.dashboardSecurity, label: "Seguridad y logs" },
+    { to: ROUTES.dashboardDeliveries, label: "Entregas" },
+    { to: ROUTES.dashboardClaims, label: "Reclamos" }
   ];
 
   return (
