@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { BACKEND_URL } from "../../utils/config";
 import { readJsonResponse } from "../../utils/api";
+import { promptDeliveryCode, promptMfaCode, promptMfaMethodSelection } from "../../utils/mfaFlow";
 
 export default function Deliveries() {
   const navigate = useNavigate();
@@ -129,47 +130,11 @@ export default function Deliveries() {
 
       let mfaSelection;
       if (status === "cancelled") {
-        const selectionResult = await Swal.fire({
+        const selectionResult = await promptMfaMethodSelection({
           title: "Confirmar cancelación",
-          html: `
-            <div class="text-left">
-              <p class="mb-3 text-sm text-gray-600">Elige cómo recibir el código para confirmar la cancelación.</p>
-              <div class="grid grid-cols-2 gap-3">
-                <button type="button" data-method="email" class="swal2-method-btn flex items-center gap-2 rounded-xl border border-purple-200 bg-white p-2 text-sm font-medium text-gray-700 transition hover:border-purple-500 hover:bg-purple-50">
-                  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 text-purple-700"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></span>
-                  Correo
-                </button>
-                <button type="button" data-method="sms" class="swal2-method-btn flex items-center gap-2 rounded-xl border border-purple-200 bg-white p-2 text-sm font-medium text-gray-700 transition hover:border-purple-500 hover:bg-purple-50">
-                  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 text-purple-700"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"></rect><path d="M12 18h.01"></path></svg></span>
-                  SMS
-                </button>
-                <button type="button" data-method="call" class="swal2-method-btn flex items-center gap-2 rounded-xl border border-purple-200 bg-white p-2 text-sm font-medium text-gray-700 transition hover:border-purple-500 hover:bg-purple-50">
-                  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 text-purple-700"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.08 4.18 2 2 0 0 1 4.06 2h3a2 2 0 0 1 2 1.72c.12.89.33 1.76.63 2.59a2 2 0 0 1-.45 2.11L7.6 8.6a16 16 0 0 0 6.8 6.8l1.18-1.18a2 2 0 0 1 2.11-.45c.83.3 1.7.51 2.59.63A2 2 0 0 1 22 16.92z"></path></svg></span>
-                  Llamada
-                </button>
-                <button type="button" data-method="whatsapp" class="swal2-method-btn flex items-center gap-2 rounded-xl border border-purple-200 bg-white p-2 text-sm font-medium text-gray-700 transition hover:border-purple-500 hover:bg-purple-50">
-                  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 text-purple-700"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.56 8.56 0 0 1-1.5 4.7A8.5 8.5 0 0 1 12.5 21a8.56 8.56 0 0 1-4.7-1.5L3 21l2.5-4.8A8.56 8.56 0 0 1 4 11.5a8.5 8.5 0 0 1 4.8-7.5A8.5 8.5 0 0 1 21 11.5z"></path></svg></span>
-                  WhatsApp
-                </button>
-              </div>
-              <input id="cancel-mfa-method" type="hidden" value="email" />
-            </div>
-          `,
-          showCancelButton: true,
+          description: "Elige cómo recibir el código para confirmar la cancelación.",
           confirmButtonText: "Continuar",
-          cancelButtonText: "Volver",
-          preConfirm: () => document.getElementById("cancel-mfa-method").value,
-          didOpen: () => {
-            const buttons = document.querySelectorAll(".swal2-method-btn");
-            buttons.forEach((button) => {
-              button.addEventListener("click", () => {
-                const selected = button.getAttribute("data-method");
-                document.getElementById("cancel-mfa-method").value = selected;
-                buttons.forEach((item) => item.classList.remove("border-purple-500", "bg-purple-50", "ring-2", "ring-purple-500"));
-                button.classList.add("border-purple-500", "bg-purple-50", "ring-2", "ring-purple-500");
-              });
-            });
-          }
+          cancelButtonText: "Volver"
         });
         mfaSelection = selectionResult.value;
         if (!mfaSelection) return;
@@ -184,15 +149,13 @@ export default function Deliveries() {
       let data = await readJsonResponse(res);
 
       if (res.status === 202 && data?.twoFactorRequired) {
-        const { value } = await Swal.fire({
+        const codeResult = await promptMfaCode({
           title: "Confirmar cancelación",
-          input: "text",
-          inputLabel: "Código MFA",
-          inputPlaceholder: "Ingresa el código recibido",
-          showCancelButton: true,
+          description: "Ingresa el código que recibiste por la vía seleccionada.",
           confirmButtonText: "Confirmar",
           cancelButtonText: "Cancelar"
         });
+        const value = codeResult.value;
         if (!value) return;
 
         res = await fetch(`${BACKEND_URL}/api/deliveries/${id}/status`, {
@@ -227,47 +190,11 @@ export default function Deliveries() {
       if (token) headers.Authorization = `Bearer ${token}`;
       let mfaSelection;
       if (claimAction.newDeliveryStatus === "cancelled") {
-        const selectionResult = await Swal.fire({
-          title: "Confirmar cancelación",
-          html: `
-            <div class="text-left">
-              <p class="mb-3 text-sm text-gray-600">Elige cómo recibir el código para confirmar la cancelación desde el reclamo.</p>
-              <div class="grid grid-cols-2 gap-3">
-                <button type="button" data-method="email" class="swal2-method-btn flex items-center gap-2 rounded-xl border border-purple-200 bg-white p-2 text-sm font-medium text-gray-700 transition hover:border-purple-500 hover:bg-purple-50">
-                  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 text-purple-700"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></span>
-                  Correo
-                </button>
-                <button type="button" data-method="sms" class="swal2-method-btn flex items-center gap-2 rounded-xl border border-purple-200 bg-white p-2 text-sm font-medium text-gray-700 transition hover:border-purple-500 hover:bg-purple-50">
-                  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 text-purple-700"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"></rect><path d="M12 18h.01"></path></svg></span>
-                  SMS
-                </button>
-                <button type="button" data-method="call" class="swal2-method-btn flex items-center gap-2 rounded-xl border border-purple-200 bg-white p-2 text-sm font-medium text-gray-700 transition hover:border-purple-500 hover:bg-purple-50">
-                  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 text-purple-700"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.08 4.18 2 2 0 0 1 4.06 2h3a2 2 0 0 1 2 1.72c.12.89.33 1.76.63 2.59a2 2 0 0 1-.45 2.11L7.6 8.6a16 16 0 0 0 6.8 6.8l1.18-1.18a2 2 0 0 1 2.11-.45c.83.3 1.7.51 2.59.63A2 2 0 0 1 22 16.92z"></path></svg></span>
-                  Llamada
-                </button>
-                <button type="button" data-method="whatsapp" class="swal2-method-btn flex items-center gap-2 rounded-xl border border-purple-200 bg-white p-2 text-sm font-medium text-gray-700 transition hover:border-purple-500 hover:bg-purple-50">
-                  <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 text-purple-700"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.56 8.56 0 0 1-1.5 4.7A8.5 8.5 0 0 1 12.5 21a8.56 8.56 0 0 1-4.7-1.5L3 21l2.5-4.8A8.56 8.56 0 0 1 4 11.5a8.5 8.5 0 0 1 4.8-7.5A8.5 8.5 0 0 1 21 11.5z"></path></svg></span>
-                  WhatsApp
-                </button>
-              </div>
-              <input id="cancel-mfa-method" type="hidden" value="email" />
-            </div>
-          `,
-          showCancelButton: true,
+        const selectionResult = await promptMfaMethodSelection({
+          title: "Confirmar cancelación desde reclamo",
+          description: "Elige cómo recibir el código para confirmar la cancelación desde el reclamo.",
           confirmButtonText: "Continuar",
-          cancelButtonText: "Volver",
-          preConfirm: () => document.getElementById("cancel-mfa-method").value,
-          didOpen: () => {
-            const buttons = document.querySelectorAll(".swal2-method-btn");
-            buttons.forEach((button) => {
-              button.addEventListener("click", () => {
-                const selected = button.getAttribute("data-method");
-                document.getElementById("cancel-mfa-method").value = selected;
-                buttons.forEach((item) => item.classList.remove("border-purple-500", "bg-purple-50", "ring-2", "ring-purple-500"));
-                button.classList.add("border-purple-500", "bg-purple-50", "ring-2", "ring-purple-500");
-              });
-            });
-          }
+          cancelButtonText: "Volver"
         });
         mfaSelection = selectionResult.value;
         if (!mfaSelection) return;
@@ -282,15 +209,13 @@ export default function Deliveries() {
       let data = await readJsonResponse(res);
 
       if (res.status === 202 && data?.twoFactorRequired) {
-        const { value } = await Swal.fire({
+        const codeResult = await promptMfaCode({
           title: "Confirmar cancelación desde reclamo",
-          input: "text",
-          inputLabel: "Código MFA",
-          inputPlaceholder: "Ingresa el código recibido",
-          showCancelButton: true,
+          description: "Ingresa el código que recibiste para confirmar esta acción.",
           confirmButtonText: "Confirmar",
           cancelButtonText: "Cancelar"
         });
+        const value = codeResult.value;
         if (!value) return;
 
         res = await fetch(`${BACKEND_URL}/api/claims/${selectedClaim._id}/resolve`, {
@@ -545,10 +470,11 @@ export default function Deliveries() {
                             {statusOptions}
                           </select>
                           <button
-                            onClick={() => {
+                            onClick={async () => {
                               const nextStatus = currentDraftStatus;
                               if (nextStatus === "delivered") {
-                                const code = window.prompt("Ingresa el código de validación de entrega:");
+                                const codeResult = await promptDeliveryCode();
+                                const code = codeResult?.value;
                                 if (code) handleUpdateStatus(delivery._id, nextStatus, code);
                                 return;
                               }
