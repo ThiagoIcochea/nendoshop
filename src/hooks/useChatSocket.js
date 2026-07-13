@@ -18,6 +18,16 @@ const fetchRoomMessages = async (roomKey) => {
   return response.json();
 };
 
+const readLocalCart = () => {
+  try {
+    const storedCart = localStorage.getItem("cart");
+    const cart = storedCart ? JSON.parse(storedCart) : [];
+    return Array.isArray(cart) ? cart : [];
+  } catch (error) {
+    return [];
+  }
+};
+
 export default function useChatSocket(roomKey, username, userId, profileImg = "") {
   const [messages, setMessages] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -65,6 +75,15 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
     window.dispatchEvent(new Event("storage"));
   }, []);
 
+  const handleBotAction = useCallback((message) => {
+    const action = message?.meta?.action;
+    if (!action) return;
+
+    if (action.type === "navigate" && action.path === "/pagos") {
+      window.location.hash = "#/pagos";
+    }
+  }, []);
+
   const finalRoomKey = roomKey === "support" ? (userId ? `support_${userId}` : roomKey) : roomKey;
 
 
@@ -95,6 +114,7 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
           case "room-message":
             if (payload.message?.role === "assistant") {
               syncBotCartAction(payload.message);
+              handleBotAction(payload.message);
             }
             setMessages((prev) => [...prev, payload.message]);
             break;
@@ -152,7 +172,7 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
     socket.addEventListener("error", () => {
       setConnected(false);
     });
-  }, [roomKey, username, userId, finalRoomKey]);
+  }, [roomKey, username, userId, finalRoomKey, syncBotCartAction, handleBotAction]);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -197,7 +217,8 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
       console.warn("Socket no conectado");
       return;
     }
-    socketRef.current.send(JSON.stringify({ type: "message", roomKey: finalRoomKey, text, username, userId, profileImg }));
+    const cartItems = finalRoomKey?.startsWith("support") ? readLocalCart() : [];
+    socketRef.current.send(JSON.stringify({ type: "message", roomKey: finalRoomKey, text, username, userId, profileImg, cartItems }));
   }, [roomKey, username, userId, profileImg, finalRoomKey]);
 
   const sendTyping = useCallback(() => {
