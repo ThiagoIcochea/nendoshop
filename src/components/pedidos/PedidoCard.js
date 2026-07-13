@@ -88,14 +88,14 @@ export default function PedidoCard({ order, onReturnSuccess }) {
         confirmButtonText: "Cancelar pedido",
         cancelButtonText: "Volver"
       });
-      const value = codeResult?.value;
+      const value = typeof codeResult?.value === "string" ? codeResult.value : codeResult?.value?.code || "";
       if (!value) return;
 
       const confirmRes = await fetch(`${BACKEND_URL}/api/deliveries/my-orders/${order._id}/cancel/confirm`, {
         method: "POST",
         headers,
         credentials: "include",
-        body: JSON.stringify({ tempToken: requestData.tempToken, code: value.code, reason: value.reason, method: mfaSelection.value })
+        body: JSON.stringify({ tempToken: requestData.tempToken, code: value, method: mfaSelection.value })
       });
       const confirmData = await readJsonResponse(confirmRes);
       if (!confirmRes.ok) throw new Error(confirmData?.message || "No se pudo cancelar el pedido.");

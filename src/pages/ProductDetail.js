@@ -179,35 +179,30 @@ export default function ProductDetail() {
   const handleAddToCart = () => {
     if (!product) return;
 
-    const cart =
-      JSON.parse(localStorage.getItem("cart")) || [];
+    let cart = [];
+    try {
+      const storedCart = localStorage.getItem("cart");
+      cart = storedCart ? JSON.parse(storedCart) : [];
+      cart = Array.isArray(cart) ? cart : [];
+    } catch (error) {
+      cart = [];
+    }
 
-    const exist = cart.find(
-      p => p._id === product._id
-    );
+    const exist = cart.find((p) => p._id === product._id);
 
     if (exist) {
-
       exist.quantity += quantity;
-
     } else {
-
       cart.push({
         ...product,
         quantity
       });
-
     }
 
-    localStorage.setItem(
-      "cart",
-      JSON.stringify(cart)
-    );
-
+    localStorage.setItem("cart", JSON.stringify(cart));
     window.dispatchEvent(new Event("storage"));
 
-    Swal.fire("Carrito", " Producto agregado al carrito", "success");
-
+    Swal.fire("Carrito", "Producto agregado al carrito", "success");
   };
 
   const handleComment = async () => {

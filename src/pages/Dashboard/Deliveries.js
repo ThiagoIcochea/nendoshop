@@ -155,7 +155,7 @@ export default function Deliveries() {
           confirmButtonText: "Confirmar",
           cancelButtonText: "Cancelar"
         });
-        const value = codeResult.value;
+        const value = typeof codeResult?.value === "string" ? codeResult.value : codeResult?.value?.code || "";
         if (!value) return;
 
         res = await fetch(`${BACKEND_URL}/api/deliveries/${id}/status`, {
@@ -215,7 +215,7 @@ export default function Deliveries() {
           confirmButtonText: "Confirmar",
           cancelButtonText: "Cancelar"
         });
-        const value = codeResult.value;
+        const value = typeof codeResult?.value === "string" ? codeResult.value : codeResult?.value?.code || "";
         if (!value) return;
 
         res = await fetch(`${BACKEND_URL}/api/claims/${selectedClaim._id}/resolve`, {
