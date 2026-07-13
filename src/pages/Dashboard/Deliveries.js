@@ -96,6 +96,18 @@ export default function Deliveries() {
     };
   }, [loadDeliveries, loadClaims, navigate]);
 
+  const getNextStatuses = (currentStatus) => {
+    const transitions = {
+      pending: ["ready_for_pickup", "cancelled"],
+      ready_for_pickup: ["shipped", "cancelled"],
+      shipped: ["delivered", "cancelled"],
+      delivered: ["returned"],
+      cancelled: [],
+      returned: []
+    };
+    return transitions[currentStatus] || [];
+  };
+
   const handleUpdateStatus = async (id, status, deliveryCode = '') => {
     setIsProcessing(true);
     try {
@@ -103,11 +115,30 @@ export default function Deliveries() {
       const headers = { "Content-Type": "application/json" };
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
+      let mfaSelection;
+      if (status === "cancelled") {
+        const selectionResult = await Swal.fire({
+          title: "Verificación MFA",
+          text: "Elige cómo recibir el código de confirmación antes de cancelar el pedido.",
+          input: "select",
+          inputOptions: {
+            email: "Correo electrónico",
+            console: "Consola"
+          },
+          inputValue: "email",
+          showCancelButton: true,
+          confirmButtonText: "Continuar",
+          cancelButtonText: "Volver"
+        });
+        mfaSelection = selectionResult.value;
+        if (!mfaSelection) return;
+      }
+
       let res = await fetch(`${BACKEND_URL}/api/deliveries/${id}/status`, {
         method: "PATCH",
         headers,
         credentials: "include",
-        body: JSON.stringify({ status, deliveryCode })
+        body: JSON.stringify({ status, deliveryCode, method: status === "cancelled" ? mfaSelection : undefined })
       });
       let data = await readJsonResponse(res);
 
@@ -127,7 +158,7 @@ export default function Deliveries() {
           method: "PATCH",
           headers,
           credentials: "include",
-          body: JSON.stringify({ status, deliveryCode, mfaCode: value, tempToken: data.tempToken })
+          body: JSON.stringify({ status, deliveryCode, mfaCode: value, tempToken: data.tempToken, method: mfaSelection })
         });
         data = await readJsonResponse(res);
       }
@@ -153,13 +184,54 @@ export default function Deliveries() {
       const token = localStorage.getItem("token");
       const headers = { "Content-Type": "application/json" };
       if (token) headers.Authorization = `Bearer ${token}`;
-      const res = await fetch(`${BACKEND_URL}/api/claims/${selectedClaim._id}/resolve`, {
+      let mfaSelection;
+      if (claimAction.newDeliveryStatus === "cancelled") {
+        const selectionResult = await Swal.fire({
+          title: "Verificación MFA",
+          text: "Elige cómo recibir el código de confirmación para cancelar el pedido desde el reclamo.",
+          input: "select",
+          inputOptions: {
+            email: "Correo electrónico",
+            console: "Consola"
+          },
+          inputValue: "email",
+          showCancelButton: true,
+          confirmButtonText: "Continuar",
+          cancelButtonText: "Volver"
+        });
+        mfaSelection = selectionResult.value;
+        if (!mfaSelection) return;
+      }
+
+      let res = await fetch(`${BACKEND_URL}/api/claims/${selectedClaim._id}/resolve`, {
         method: "PATCH",
         headers,
         credentials: "include",
-        body: JSON.stringify(claimAction)
+        body: JSON.stringify({ ...claimAction, method: claimAction.newDeliveryStatus === "cancelled" ? mfaSelection : undefined })
       });
-      const data = await readJsonResponse(res);
+      let data = await readJsonResponse(res);
+
+      if (res.status === 202 && data?.twoFactorRequired) {
+        const { value } = await Swal.fire({
+          title: "Confirmar cancelación desde reclamo",
+          input: "text",
+          inputLabel: "Código MFA",
+          inputPlaceholder: "Ingresa el código recibido",
+          showCancelButton: true,
+          confirmButtonText: "Confirmar",
+          cancelButtonText: "Cancelar"
+        });
+        if (!value) return;
+
+        res = await fetch(`${BACKEND_URL}/api/claims/${selectedClaim._id}/resolve`, {
+          method: "PATCH",
+          headers,
+          credentials: "include",
+          body: JSON.stringify({ ...claimAction, mfaCode: value, tempToken: data.tempToken, method: mfaSelection })
+        });
+        data = await readJsonResponse(res);
+      }
+
       if (!res.ok) throw new Error(data?.message || "No se pudo resolver el reclamo.");
       Swal.fire("Éxito", "Reclamo actualizado correctamente.", "success");
       setSelectedClaim(null);
@@ -341,6 +413,13 @@ export default function Deliveries() {
                   }
 
                   const currentDraftStatus = statusDrafts[delivery._id] || delivery.status;
+                  const allowedNextStatuses = getNextStatuses(delivery.status);
+                  const statusOptions = [
+                    <option key="current" value={delivery.status} disabled>{delivery.status === "pending" ? "Pendiente (actual)" : delivery.status === "ready_for_pickup" ? "Listo para recojo (actual)" : delivery.status === "shipped" ? "Enviado (actual)" : delivery.status === "delivered" ? "Entregado (actual)" : delivery.status === "cancelled" ? "Cancelado (actual)" : delivery.status === "returned" ? "Devuelto (actual)" : delivery.status}</option>,
+                    ...allowedNextStatuses.map((nextStatus) => (
+                      <option key={nextStatus} value={nextStatus}>{nextStatus === "ready_for_pickup" ? "Listo para recojo" : nextStatus === "shipped" ? "Enviado" : nextStatus === "delivered" ? "Entregado" : nextStatus === "cancelled" ? "Cancelado" : nextStatus === "returned" ? "Devuelto" : nextStatus}</option>
+                    ))
+                  ];
 
                   return (
                     <tr key={delivery._id} className={`${rowBg} transition-colors`}>
@@ -393,12 +472,7 @@ export default function Deliveries() {
                             onChange={(e) => setStatusDrafts((prev) => ({ ...prev, [delivery._id]: e.target.value }))}
                             className="rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-xs font-semibold text-gray-700 outline-none"
                           >
-                            <option value="pending">Pendiente</option>
-                            <option value="ready_for_pickup">Listo para recojo</option>
-                            <option value="shipped">Enviado</option>
-                            <option value="delivered">Entregado</option>
-                            <option value="cancelled">Cancelado</option>
-                            <option value="returned">Devuelto</option>
+                            {statusOptions}
                           </select>
                           <button
                             onClick={() => {

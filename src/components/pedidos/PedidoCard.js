@@ -64,10 +64,26 @@ export default function PedidoCard({ order, onReturnSuccess }) {
       const headers = { "Content-Type": "application/json" };
       if (token) headers.Authorization = `Bearer ${token}`;
 
+      const { value: mfaSelection } = await Swal.fire({
+        title: "Verificación MFA",
+        text: "Elige cómo recibir el código para confirmar la cancelación.",
+        input: "select",
+        inputOptions: {
+          email: "Correo electrónico",
+          console: "Consola"
+        },
+        inputValue: "email",
+        showCancelButton: true,
+        confirmButtonText: "Continuar",
+        cancelButtonText: "Volver"
+      });
+      if (!mfaSelection) return;
+
       const requestRes = await fetch(`${BACKEND_URL}/api/deliveries/my-orders/${order._id}/cancel/request`, {
         method: "POST",
         headers,
-        credentials: "include"
+        credentials: "include",
+        body: JSON.stringify({ method: mfaSelection })
       });
       const requestData = await readJsonResponse(requestRes);
       if (!requestRes.ok) throw new Error(requestData?.message || "No se pudo iniciar la verificación MFA.");
@@ -89,7 +105,7 @@ export default function PedidoCard({ order, onReturnSuccess }) {
         method: "POST",
         headers,
         credentials: "include",
-        body: JSON.stringify({ tempToken: requestData.tempToken, code: value.code, reason: value.reason })
+        body: JSON.stringify({ tempToken: requestData.tempToken, code: value.code, reason: value.reason, method: mfaSelection })
       });
       const confirmData = await readJsonResponse(confirmRes);
       if (!confirmRes.ok) throw new Error(confirmData?.message || "No se pudo cancelar el pedido.");
@@ -212,18 +228,20 @@ export default function PedidoCard({ order, onReturnSuccess }) {
 
             <div className="mt-5 rounded-2xl border border-blue-100 bg-blue-50 p-4">
               <h4 className="text-sm font-bold text-blue-900">Estados del pedido</h4>
-              <ol className="mt-4 space-y-3">
-                {statusHistory.map((entry, index) => (
-                  <li key={`${entry.status}-${entry.timestamp || index}`} className="flex gap-3">
-                    <span className="mt-1 h-3 w-3 flex-shrink-0 rounded-full bg-blue-600"></span>
-                    <div>
-                      <div>{getStatusBadge(entry.status)}</div>
-                      <p className="mt-1 text-xs text-gray-600">{entry.note || "Estado actualizado"}</p>
-                      <p className="text-xs text-gray-400">{formatDate(entry.timestamp)}</p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
+              <div className="mt-4 max-h-72 overflow-y-auto pr-2">
+                <ol className="space-y-3">
+                  {statusHistory.map((entry, index) => (
+                    <li key={`${entry.status}-${entry.timestamp || index}`} className="flex gap-3">
+                      <span className="mt-1 h-3 w-3 flex-shrink-0 rounded-full bg-blue-600"></span>
+                      <div>
+                        <div>{getStatusBadge(entry.status)}</div>
+                        <p className="mt-1 text-xs text-gray-600">{entry.note || "Estado actualizado"}</p>
+                        <p className="text-xs text-gray-400">{formatDate(entry.timestamp)}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>
             </div>
           </div>
         </div>
