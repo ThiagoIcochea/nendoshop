@@ -180,7 +180,7 @@ export default function ChatInfo({ users, onReportUser }) {
                     targetUsername: selectedUser.username,
                     reason: reportText
                   });
-                  setFeedback(reportText.trim() ? "Reporte enviado. Si el usuario alcanza 10 reportes quedará bloqueado." : "Reporte enviado.");
+                  setFeedback("Reporte enviado. El comportamiento del usuario en el chat será analizado por nuestro sistema inteligente.");
                   setReportText("");
                   setIsReportOpen(false);
                 }}
