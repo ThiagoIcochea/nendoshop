@@ -1,3 +1,5 @@
+import { getPaymentStatusSeries } from "./paymentStatuses";
+
 export const buildSalesMetrics = (payments = []) => {
   const totals = payments.reduce(
     (acc, payment) => {
@@ -8,9 +10,8 @@ export const buildSalesMetrics = (payments = []) => {
     { sales: 0, count: 0 }
   );
 
-  const stateMap = payments.reduce((acc, payment) => {
-    const state = payment.estado || "Sin estado";
-    acc[state] = (acc[state] || 0) + 1;
+  const stateMap = getPaymentStatusSeries(payments).reduce((acc, entry) => {
+    acc[entry.name] = entry.count;
     return acc;
   }, {});
 
@@ -20,7 +21,7 @@ export const buildSalesMetrics = (payments = []) => {
     return acc;
   }, {});
 
-  const topState = Object.entries(stateMap).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
+  const topState = getPaymentStatusSeries(payments)[0]?.name || "N/A";
   const topProduct = Object.entries(productMap).sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
 
   return {

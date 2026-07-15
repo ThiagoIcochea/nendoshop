@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Activity, AlertTriangle, Shield, ScrollText, Sparkles } from "lucide-react";
 import { buildSalesMetrics } from "../../utils/dashboardMetrics";
+import { getPaymentStatusSeries } from "../../utils/paymentStatuses";
 import { BACKEND_URL } from "../../utils/config";
 
 export default function AdminOverview() {
@@ -79,7 +80,7 @@ export default function AdminOverview() {
     };
   }, [clients, logs, metrics.totals.sales, payments.length]);
 
-  const stateSeries = Object.entries(metrics.stateMap).map(([name, count]) => ({ name, count }));
+  const stateSeries = getPaymentStatusSeries(payments);
   const productSeries = Object.entries(metrics.productMap).map(([name, count]) => ({ name, count }));
   const blockedUsers = clients.filter((client) => client.chatBlockedUntil && new Date(client.chatBlockedUntil) > new Date());
 

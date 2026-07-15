@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { jsPDF } from "jspdf";
 import { BACKEND_URL } from "../../utils/config";
+import { getPaymentStatusLabel, getPaymentStatusOptions, getPaymentStatusSeries, normalizePaymentStatus } from "../../utils/paymentStatuses";
 
 export default function Payments() {
 
@@ -70,6 +71,7 @@ export default function Payments() {
     (acc, pago) => acc + (pago.total || 0),
     0
   );
+  const paymentStateSeries = getPaymentStatusSeries(pagos);
 
   const exportToPdf = () => {
     const doc = new jsPDF({ unit: "pt", format: "a4" });
@@ -80,7 +82,6 @@ export default function Payments() {
 
     const formatCurrency = (value) => `S/ ${Number(value || 0).toFixed(2)}`;
     const splitText = (text, maxWidth) => doc.splitTextToSize(text || "", maxWidth);
-
     doc.setFillColor(109, 40, 217);
     doc.rect(0, 0, pageWidth, 90, "F");
     doc.setTextColor(255, 255, 255);
@@ -102,7 +103,7 @@ export default function Payments() {
     doc.setFontSize(10);
     doc.text(`Ventas totales: ${formatCurrency(totalVentas)}`, margin + 16, 148);
     doc.text(`Pagos registrados: ${pagos.length}`, margin + 16, 162);
-    doc.text(`Estado principal: ${pagos[0]?.estado || "Sin pagos"}`, pageWidth / 2 + 8, 148);
+    doc.text(`Estado principal: ${paymentStateSeries[0]?.name || "Sin pagos"}`, pageWidth / 2 + 8, 148);
 
     let y = 210;
     doc.setFont("helvetica", "bold");
@@ -140,7 +141,7 @@ export default function Payments() {
       doc.text(String(index + 1), margin, y + 14);
       doc.text(splitText(pago.cliente || "Cliente", 90)[0] || "Cliente", margin + 28, y + 14);
       doc.text(lines[0] || "", margin + 140, y + 14);
-      doc.text(pago.estado || "Sin estado", margin + 300, y + 14);
+      doc.text(getPaymentStatusLabel(pago.estado || "Sin estado"), margin + 300, y + 14);
       doc.text(formatCurrency(pago.total || 0), pageWidth - 90, y + 14);
       doc.line(margin, y + 20 + rowHeight - 8, pageWidth - margin, y + 20 + rowHeight - 8);
       y += rowHeight;
@@ -161,7 +162,7 @@ export default function Payments() {
       )
       : pago.producto?.toLowerCase().includes(producto.toLowerCase());
 
-    const matchEstado = estado ? pago.estado === estado : true;
+    const matchEstado = estado ? normalizePaymentStatus(pago.estado) === estado : true;
 
     return matchCliente && matchProducto && matchEstado;
   });
@@ -257,9 +258,9 @@ export default function Payments() {
             className="w-full px-4 py-2 border rounded-lg"
           >
             <option value="">Todos los estados</option>
-            <option value="Pagado">Pagado</option>
-            <option value="Pendiente">Pendiente</option>
-            <option value="Cancelado">Cancelado</option>
+            {getPaymentStatusOptions(pagos).map((item) => (
+              <option key={item.value} value={item.value}>{item.label}</option>
+            ))}
           </select>
 
         </div>
@@ -325,7 +326,7 @@ export default function Payments() {
 
                   <td className="py-4">
                     <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
-                      {pago.estado}
+                      {getPaymentStatusLabel(pago.estado)}
                     </span>
                   </td>
 
@@ -345,7 +346,7 @@ export default function Payments() {
               <div className="flex justify-between items-center mb-2">
                 <span className="font-bold text-gray-800">{pago.cliente}</span>
                 <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-semibold">
-                  {pago.estado}
+                  {getPaymentStatusLabel(pago.estado)}
                 </span>
               </div>
               <div className="text-sm text-gray-600 mb-2">

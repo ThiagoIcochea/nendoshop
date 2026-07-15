@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Filter, Search, ShieldAlert, Unlock, Download } from "lucide-react";
+import { Filter, Lock, Search, ShieldAlert, Unlock, Download } from "lucide-react";
 import Swal from "sweetalert2";
 import { BACKEND_URL } from "../../utils/config";
 
@@ -10,6 +10,9 @@ export default function SecurityLogs() {
   const [ipBlocks, setIpBlocks] = useState([]);
   const [search, setSearch] = useState("");
   const [type, setType] = useState("all");
+  const [ipToBlock, setIpToBlock] = useState("");
+  const [ipBlockReason, setIpBlockReason] = useState("");
+  const [ipBlockDuration, setIpBlockDuration] = useState(30);
 
   const loadData = async () => {
     const authData = JSON.parse(localStorage.getItem("auth"));
@@ -108,6 +111,44 @@ export default function SecurityLogs() {
     }
   };
 
+  const blockIp = async () => {
+    if (!ipToBlock.trim()) {
+      Swal.fire("Atención", "Ingresa una IP válida", "warning");
+      return;
+    }
+
+    const authData = JSON.parse(localStorage.getItem("auth"));
+    const token = authData?.token || localStorage.getItem("token");
+    const headers = {
+      "Content-Type": "application/json"
+    };
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${BACKEND_URL}/api/admin/clients/security/ip-blocks/block`, {
+      method: "POST",
+      headers,
+      credentials: "include",
+      body: JSON.stringify({
+        ip: ipToBlock.trim(),
+        reason: ipBlockReason.trim(),
+        durationMinutes: Number(ipBlockDuration) || 30
+      })
+    });
+
+    if (res.ok) {
+      setIpToBlock("");
+      setIpBlockReason("");
+      setIpBlockDuration(30);
+      await loadData();
+      Swal.fire("Listo", "IP bloqueada", "success");
+    } else {
+      Swal.fire("Error", "No se pudo bloquear la IP", "error");
+    }
+  };
+
   const exportLogs = () => {
     const content = filteredLogs.map((log) => {
       const ip = log.ip || log.ipAddress || "unknown";
@@ -172,22 +213,53 @@ export default function SecurityLogs() {
           </button>
         </div>
 
+        <div className="mb-5 grid gap-3 rounded-2xl border border-gray-100 bg-gray-50 p-4 lg:grid-cols-[1.3fr_1.3fr_0.7fr_auto]">
+          <input
+            type="text"
+            value={ipToBlock}
+            onChange={(e) => setIpToBlock(e.target.value)}
+            placeholder="IP a bloquear"
+            className="rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none"
+          />
+          <input
+            type="text"
+            value={ipBlockReason}
+            onChange={(e) => setIpBlockReason(e.target.value)}
+            placeholder="Motivo del bloqueo"
+            className="rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none"
+          />
+          <input
+            type="number"
+            min="5"
+            value={ipBlockDuration}
+            onChange={(e) => setIpBlockDuration(e.target.value)}
+            placeholder="Minutos"
+            className="rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none"
+          />
+          <button onClick={blockIp} className="flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white">
+            <Lock className="h-4 w-4" />
+            Bloquear IP
+          </button>
+        </div>
+
         <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
           <div className="overflow-hidden rounded-2xl border border-gray-100">
-            <div className="bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-700">Usuarios bloqueados</div>
+            <div className="bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-700">Cuentas</div>
             <div className="divide-y divide-gray-100">
-              {blockedUsers.length === 0 ? (
-                <div className="p-4 text-sm text-gray-500">No hay usuarios bloqueados.</div>
-              ) : blockedUsers.map((user) => (
+              {users.length === 0 ? (
+                <div className="p-4 text-sm text-gray-500">No hay usuarios registrados.</div>
+              ) : users.map((user) => (
                 <div key={user._id} className="flex flex-col gap-2 p-4 md:flex-row md:items-center md:justify-between">
                   <div>
                     <p className="font-medium text-gray-800">{user.name || user.email}</p>
                     <p className="text-sm text-gray-500">{user.email}</p>
-                    <p className="text-sm text-red-500">Motivo: {user.chatBlockReason || "Sin motivo"}</p>
+                    <p className={`text-sm ${user.chatBlockedUntil && new Date(user.chatBlockedUntil) > new Date() ? "text-red-500" : "text-emerald-600"}`}>
+                      Estado: {user.chatBlockedUntil && new Date(user.chatBlockedUntil) > new Date() ? `Bloqueado - ${user.chatBlockReason || "Sin motivo"}` : "Activo"}
+                    </p>
                   </div>
                   <button onClick={() => toggleBlock(user)} className="flex items-center gap-2 rounded-lg border border-green-200 px-3 py-2 text-sm text-green-600">
                     <Unlock className="h-4 w-4" />
-                    Desbloquear
+                    {user.chatBlockedUntil && new Date(user.chatBlockedUntil) > new Date() ? "Desbloquear" : "Bloquear"}
                   </button>
                 </div>
               ))}
