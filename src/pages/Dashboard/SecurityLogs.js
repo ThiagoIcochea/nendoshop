@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Filter, Lock, Search, ShieldAlert, Unlock, Download } from "lucide-react";
+import { Download, Filter, Lock, Search, ShieldAlert, Unlock } from "lucide-react";
 import Swal from "sweetalert2";
 import { BACKEND_URL } from "../../utils/config";
-
 
 export default function SecurityLogs() {
   const [users, setUsers] = useState([]);
@@ -29,7 +28,12 @@ export default function SecurityLogs() {
       fetch(`${BACKEND_URL}/api/admin/clients/security/ip-blocks`, { headers, credentials: "include" })
     ]);
 
-    const [usersData, logsData, ipBlocksData] = await Promise.all([usersRes.json(), logsRes.json(), ipBlocksRes.json()]);
+    const [usersData, logsData, ipBlocksData] = await Promise.all([
+      usersRes.json(),
+      logsRes.json(),
+      ipBlocksRes.json()
+    ]);
+
     setUsers(Array.isArray(usersData) ? usersData.filter((user) => user.role !== "admin") : []);
     setLogs(Array.isArray(logsData) ? logsData : []);
     setIpBlocks(Array.isArray(ipBlocksData) ? ipBlocksData : []);
@@ -47,10 +51,21 @@ export default function SecurityLogs() {
     });
   }, [logs, search, type]);
 
+  const blockedUsers = users.filter((user) => user.chatBlockedUntil && new Date(user.chatBlockedUntil) > new Date());
+  const blockedIps = ipBlocks.filter((item) => item.blockedUntil && new Date(item.blockedUntil) > new Date());
+
+  const authHeaders = () => {
+    const authData = JSON.parse(localStorage.getItem("auth"));
+    const token = authData?.token || localStorage.getItem("token");
+    const headers = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    return headers;
+  };
+
   const toggleBlock = async (user) => {
     const blocked = !user.chatBlockedUntil || new Date(user.chatBlockedUntil) <= new Date();
     const result = await Swal.fire({
-      title: blocked ? "Bloquear usuario" : "Desbloquear usuario",
+      title: blocked ? "Bloquear cuenta" : "Desbloquear cuenta",
       input: "text",
       inputLabel: "Motivo",
       inputValue: user.chatBlockReason || "",
@@ -60,46 +75,28 @@ export default function SecurityLogs() {
 
     if (result.isDismissed || result.isDenied) return;
 
-    const reason = result.value ?? "Sin motivo";
-
-    const authData = JSON.parse(localStorage.getItem("auth"));
-    const token = authData?.token || localStorage.getItem("token");
-
-    const headers = {
-      "Content-Type": "application/json"
-    };
-
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
-
     const res = await fetch(`${BACKEND_URL}/api/admin/clients/${user._id}/block`, {
       method: "PATCH",
-      headers,
+      headers: {
+        "Content-Type": "application/json",
+        ...authHeaders()
+      },
       credentials: "include",
-      body: JSON.stringify({ blocked, reason })
+      body: JSON.stringify({ blocked, reason: result.value || "Sin motivo" })
     });
 
     if (res.ok) {
       await loadData();
-      Swal.fire("Listo", blocked ? "Usuario bloqueado" : "Usuario desbloqueado", "success");
+      Swal.fire("Listo", blocked ? "Cuenta bloqueada" : "Cuenta desbloqueada", "success");
     } else {
       Swal.fire("Error", "No se pudo actualizar el estado", "error");
     }
   };
 
-  const blockedUsers = users.filter((user) => user.chatBlockedUntil && new Date(user.chatBlockedUntil) > new Date());
-  const blockedIps = ipBlocks.filter((item) => item.blockedUntil && new Date(item.blockedUntil) > new Date());
-
   const unblockIp = async (block) => {
-    const authData = JSON.parse(localStorage.getItem("auth"));
-    const token = authData?.token || localStorage.getItem("token");
-    const headers = {};
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-
     const res = await fetch(`${BACKEND_URL}/api/admin/clients/security/ip-blocks/${block._id}/unblock`, {
       method: "PATCH",
-      headers,
+      headers: authHeaders(),
       credentials: "include"
     });
 
@@ -117,19 +114,12 @@ export default function SecurityLogs() {
       return;
     }
 
-    const authData = JSON.parse(localStorage.getItem("auth"));
-    const token = authData?.token || localStorage.getItem("token");
-    const headers = {
-      "Content-Type": "application/json"
-    };
-
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
-
     const res = await fetch(`${BACKEND_URL}/api/admin/clients/security/ip-blocks/block`, {
       method: "POST",
-      headers,
+      headers: {
+        "Content-Type": "application/json",
+        ...authHeaders()
+      },
       credentials: "include",
       body: JSON.stringify({
         ip: ipToBlock.trim(),
@@ -150,11 +140,14 @@ export default function SecurityLogs() {
   };
 
   const exportLogs = () => {
-    const content = filteredLogs.map((log) => {
-      const ip = log.ip || log.ipAddress || "unknown";
-      const ua = log.userAgent || log.user_agent || "unknown";
-      return `[${new Date(log.createdAt).toLocaleString("es-ES")}] ${log.tipo} | ${log.usuario} | ${log.descripcion} | ${log.metodo} ${log.ruta} | IP: ${ip} | User-Agent: ${ua}`;
-    }).join("\n");
+    const content = filteredLogs
+      .map((log) => {
+        const ip = log.ip || log.ipAddress || "unknown";
+        const ua = log.userAgent || log.user_agent || "unknown";
+        return `[${new Date(log.createdAt).toLocaleString("es-PE")}] ${log.tipo} | ${log.usuario} | ${log.descripcion} | ${log.metodo} ${log.ruta} | IP: ${ip} | User-Agent: ${ua}`;
+      })
+      .join("\n");
+
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -164,20 +157,26 @@ export default function SecurityLogs() {
     URL.revokeObjectURL(url);
   };
 
+  const websocketLogs = logs.filter((log) => log.tipo === "WEBSOCKET");
+
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <div className="rounded-2xl bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">Usuarios bloqueados</p>
+          <p className="text-sm text-gray-500">Cuentas bloqueadas</p>
           <p className="mt-2 text-3xl font-semibold text-amber-600">{blockedUsers.length}</p>
+        </div>
+        <div className="rounded-2xl bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-500">IPs bloqueadas</p>
+          <p className="mt-2 text-3xl font-semibold text-red-600">{blockedIps.length}</p>
         </div>
         <div className="rounded-2xl bg-white p-5 shadow-sm">
           <p className="text-sm text-gray-500">Total de registros</p>
           <p className="mt-2 text-3xl font-semibold text-purple-600">{logs.length}</p>
         </div>
         <div className="rounded-2xl bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">IPs bloqueadas</p>
-          <p className="mt-2 text-3xl font-semibold text-red-600">{blockedIps.length}</p>
+          <p className="text-sm text-gray-500">WebSockets</p>
+          <p className="mt-2 text-3xl font-semibold text-blue-600">{websocketLogs.length}</p>
         </div>
       </div>
 
@@ -185,14 +184,20 @@ export default function SecurityLogs() {
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="text-xl font-semibold text-gray-800">Lista negra y logs</h2>
-            <p className="text-sm text-gray-500">Gestiona bloqueos y revisa registros del sistema.</p>
+            <p className="text-sm text-gray-500">Gestiona bloqueos y revisa registros del sistema, incluidos WebSockets.</p>
           </div>
         </div>
 
         <div className="mb-4 grid gap-3 md:grid-cols-2">
           <label className="flex items-center gap-2 rounded-xl border border-gray-200 px-3 py-2">
             <Search className="h-4 w-4 text-gray-400" />
-            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar usuario o acción" className="w-full bg-transparent outline-none" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar usuario o acción"
+              className="w-full bg-transparent outline-none"
+            />
           </label>
           <label className="flex items-center gap-2 rounded-xl border border-gray-200 px-3 py-2">
             <Filter className="h-4 w-4 text-gray-400" />
@@ -202,6 +207,7 @@ export default function SecurityLogs() {
               <option value="SISTEMA">Sistema</option>
               <option value="TRANSACCION">Transacción</option>
               <option value="ERROR">Errores</option>
+              <option value="WEBSOCKET">WebSocket</option>
             </select>
           </label>
         </div>
@@ -248,21 +254,23 @@ export default function SecurityLogs() {
             <div className="divide-y divide-gray-100">
               {users.length === 0 ? (
                 <div className="p-4 text-sm text-gray-500">No hay usuarios registrados.</div>
-              ) : users.map((user) => (
-                <div key={user._id} className="flex flex-col gap-2 p-4 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <p className="font-medium text-gray-800">{user.name || user.email}</p>
-                    <p className="text-sm text-gray-500">{user.email}</p>
-                    <p className={`text-sm ${user.chatBlockedUntil && new Date(user.chatBlockedUntil) > new Date() ? "text-red-500" : "text-emerald-600"}`}>
-                      Estado: {user.chatBlockedUntil && new Date(user.chatBlockedUntil) > new Date() ? `Bloqueado - ${user.chatBlockReason || "Sin motivo"}` : "Activo"}
-                    </p>
+              ) : (
+                users.map((user) => (
+                  <div key={user._id} className="flex flex-col gap-2 p-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <p className="font-medium text-gray-800">{user.name || user.email}</p>
+                      <p className="text-sm text-gray-500">{user.email}</p>
+                      <p className={`text-sm ${user.chatBlockedUntil && new Date(user.chatBlockedUntil) > new Date() ? "text-red-500" : "text-emerald-600"}`}>
+                        Estado: {user.chatBlockedUntil && new Date(user.chatBlockedUntil) > new Date() ? `Bloqueado - ${user.chatBlockReason || "Sin motivo"}` : "Activo"}
+                      </p>
+                    </div>
+                    <button onClick={() => toggleBlock(user)} className="flex items-center gap-2 rounded-lg border border-green-200 px-3 py-2 text-sm text-green-600">
+                      <Unlock className="h-4 w-4" />
+                      {user.chatBlockedUntil && new Date(user.chatBlockedUntil) > new Date() ? "Desbloquear" : "Bloquear"}
+                    </button>
                   </div>
-                  <button onClick={() => toggleBlock(user)} className="flex items-center gap-2 rounded-lg border border-green-200 px-3 py-2 text-sm text-green-600">
-                    <Unlock className="h-4 w-4" />
-                    {user.chatBlockedUntil && new Date(user.chatBlockedUntil) > new Date() ? "Desbloquear" : "Bloquear"}
-                  </button>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
@@ -271,26 +279,28 @@ export default function SecurityLogs() {
             <div className="divide-y divide-gray-100">
               {blockedIps.length === 0 ? (
                 <div className="p-4 text-sm text-gray-500">No hay IPs bloqueadas.</div>
-              ) : blockedIps.map((block) => (
-                <div key={block._id} className="flex flex-col gap-2 p-4 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <p className="font-medium text-gray-800">{block.ip}</p>
-                    <p className="text-sm text-gray-500">Intentos: {block.failedAttempts || 0}</p>
-                    <p className="text-sm text-red-500">Motivo: {block.reason || "Intentos sospechosos"}</p>
-                    <p className="text-xs text-gray-400 break-all">Correos: {(block.emails || []).join(", ") || "Sin datos"}</p>
+              ) : (
+                blockedIps.map((block) => (
+                  <div key={block._id} className="flex flex-col gap-2 p-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <p className="font-medium text-gray-800">{block.ip}</p>
+                      <p className="text-sm text-gray-500">Intentos: {block.failedAttempts || 0}</p>
+                      <p className="text-sm text-red-500">Motivo: {block.reason || "Intentos sospechosos"}</p>
+                      <p className="break-all text-xs text-gray-400">Correos: {(block.emails || []).join(", ") || "Sin datos"}</p>
+                    </div>
+                    <button onClick={() => unblockIp(block)} className="flex items-center gap-2 rounded-lg border border-green-200 px-3 py-2 text-sm text-green-600">
+                      <Unlock className="h-4 w-4" />
+                      Desbloquear IP
+                    </button>
                   </div>
-                  <button onClick={() => unblockIp(block)} className="flex items-center gap-2 rounded-lg border border-green-200 px-3 py-2 text-sm text-green-600">
-                    <Unlock className="h-4 w-4" />
-                    Desbloquear IP
-                  </button>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-gray-100">
             <div className="bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-700">Registros recientes</div>
-            <div className="max-h-[420px] overflow-auto divide-y divide-gray-100">
+            <div className="max-h-[420px] divide-y divide-gray-100 overflow-auto">
               {filteredLogs.map((log) => (
                 <div key={log._id} className="p-4">
                   <div className="flex items-center gap-2 text-sm text-gray-700">
@@ -299,9 +309,11 @@ export default function SecurityLogs() {
                     <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] uppercase text-gray-500">{log.tipo}</span>
                   </div>
                   <p className="mt-2 text-sm text-gray-600">{log.descripcion}</p>
-                  <p className="mt-1 text-xs text-gray-400">{log.metodo} {log.ruta} · {new Date(log.createdAt).toLocaleString("es-ES")}</p>
-                  <p className="mt-1 text-xs text-gray-400 break-all">IP: {log.ip || log.ipAddress || "unknown"}</p>
-                  <p className="mt-1 text-xs text-gray-400 break-all">User-Agent: {log.userAgent || log.user_agent || "unknown"}</p>
+                  <p className="mt-1 text-xs text-gray-400">
+                    {log.metodo} {log.ruta} · {new Date(log.createdAt).toLocaleString("es-PE")}
+                  </p>
+                  <p className="mt-1 break-all text-xs text-gray-400">IP: {log.ip || log.ipAddress || "unknown"}</p>
+                  <p className="mt-1 break-all text-xs text-gray-400">User-Agent: {log.userAgent || log.user_agent || "unknown"}</p>
                 </div>
               ))}
             </div>

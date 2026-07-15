@@ -1,39 +1,30 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
+  LogOut,
+  Menu,
+  Mic,
   Search,
   ShoppingCart,
   User,
-  LogOut,
-  Settings,
-  Menu,
-  X,
-  Mic
+  X
 } from "lucide-react";
-
-import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import logo from "./Assets/logo.png";
 import { BACKEND_URL } from "../utils/config";
 import { ROUTES } from "../utils/secureRoutes";
 
 export default function Navbar() {
-
   const navigate = useNavigate();
   const { auth, setAuth } = useContext(AuthContext);
-
   const [cartCount, setCartCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [voiceError, setVoiceError] = useState("");
+  const [search, setSearch] = useState(localStorage.getItem("productSearch") || "");
 
-  const isAdmin = Boolean(
-    auth?.role === "admin" || auth?.isAdmin || auth?.user?.role === "admin"
-  );
-
-  const [search, setSearch] = useState(
-    localStorage.getItem("productSearch") || ""
-  );
+  const isAdmin = Boolean(auth?.role === "admin" || auth?.isAdmin || auth?.user?.role === "admin");
 
   const updateCartCount = () => {
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -78,6 +69,7 @@ export default function Navbar() {
   const handleLogout = () => {
     setAuth(null);
     localStorage.removeItem("auth");
+    localStorage.removeItem("token");
     navigate(ROUTES.login);
   };
 
@@ -89,13 +81,17 @@ export default function Navbar() {
     localStorage.removeItem("productSearchResults");
 
     try {
-      const res = await fetch(`${BACKEND_URL}/api/products/search?query=${encodeURIComponent(term)}`, {
-        credentials: "include"
-      });
+      const res = await fetch(
+        `${BACKEND_URL}/api/products/search?query=${encodeURIComponent(term)}`,
+        { credentials: "include" }
+      );
       const data = await res.json();
       const products = Array.isArray(data?.products) ? data.products : [];
       localStorage.setItem("productSearchResults", JSON.stringify(products));
-      localStorage.setItem("productSearchMeta", JSON.stringify({ query: data?.query || term, appliedBy: data?.appliedBy || "local" }));
+      localStorage.setItem(
+        "productSearchMeta",
+        JSON.stringify({ query: data?.query || term, appliedBy: data?.appliedBy || "local" })
+      );
     } catch (error) {
       localStorage.setItem("productSearchResults", JSON.stringify([]));
     }
@@ -105,8 +101,8 @@ export default function Navbar() {
     setMenuOpen(false);
   };
 
-  const handleSearch = (e) => {
-    if (e.key === "Enter") {
+  const handleSearch = (event) => {
+    if (event.key === "Enter") {
       submitSearch(search);
     }
   };
@@ -156,10 +152,7 @@ export default function Navbar() {
   const mobileMenu = menuOpen && typeof document !== "undefined"
     ? createPortal(
         <div className="fixed inset-0 z-[100] md:hidden">
-          <div
-            className="absolute inset-0 bg-black/45"
-            onClick={() => setMenuOpen(false)}
-          />
+          <div className="absolute inset-0 bg-black/45" onClick={() => setMenuOpen(false)} />
 
           <div className="absolute inset-y-0 left-0 z-[101] flex w-80 max-w-[85vw] flex-col overflow-hidden border-r border-gray-200 bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
@@ -192,7 +185,7 @@ export default function Navbar() {
                     Chat
                   </Link>
                   <Link to="/pedidos" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
-                    Mis Pedidos
+                    Mis pedidos
                   </Link>
                 </>
               )}
@@ -243,176 +236,150 @@ export default function Navbar() {
 
   return (
     <>
-    <header className="sticky top-0 z-40 overflow-x-hidden border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
+      {mobileMenu}
+      <header className="sticky top-0 z-40 overflow-x-hidden border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
+        <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+          <div className="flex min-h-[56px] items-center justify-between gap-2 py-2 sm:h-20 sm:min-h-0 sm:py-0">
+            <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+              <button
+                onClick={() => setMenuOpen((value) => !value)}
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-sm md:hidden"
+                aria-label="Abrir menú"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
 
-      <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+              <Link to="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
+                <img
+                  src={logo}
+                  alt="Nendoshop Logo"
+                  className="h-10 w-10 rounded-full border border-gray-100 object-contain shadow-sm sm:h-12 sm:w-12"
+                />
 
-        <div className="flex min-h-[56px] items-center justify-between gap-2 py-2 sm:h-20 sm:min-h-0 sm:py-0">
-
-          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-
-            <button
-              onClick={() => setMenuOpen((value) => !value)}
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-sm md:hidden"
-              aria-label="Abrir menú"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
-
-            <Link to="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
-
-              <img
-                src={logo}
-                alt="Nendoshop Logo"
-                className="h-10 w-10 rounded-full border border-gray-100 object-contain shadow-sm sm:h-12 sm:w-12"
-              />
-
-              <span className="hidden text-lg font-bold tracking-tight text-gray-900 sm:block sm:text-xl">
-                Nendoshop
-              </span>
-
-            </Link>
-
-            <nav className="hidden md:flex items-center gap-6 border-l border-gray-200 pl-6">
-
-              <Link to="/" className="text-gray-600 hover:text-brand font-medium">
-                Inicio
+                <span className="hidden text-lg font-bold tracking-tight text-gray-900 sm:block sm:text-xl">
+                  Nendoshop
+                </span>
               </Link>
 
-              <Link to="/about" className="text-gray-600 hover:text-brand font-medium">
-                Nosotros
-              </Link>
+              <nav className="hidden items-center gap-6 border-l border-gray-200 pl-6 md:flex">
+                <Link to="/" className="font-medium text-gray-600 hover:text-brand">
+                  Inicio
+                </Link>
+                <Link to="/about" className="font-medium text-gray-600 hover:text-brand">
+                  Nosotros
+                </Link>
+                <Link to="/catalog" className="font-medium text-gray-600 hover:text-brand">
+                  Catálogo
+                </Link>
 
-              <Link to="/catalog" className="text-gray-600 hover:text-brand font-medium">
-                Catálogo
-              </Link>
+                {auth && (
+                  <>
+                    <Link to="/chat" className="font-medium text-gray-600 hover:text-brand">
+                      Chat
+                    </Link>
+                    <Link to="/pedidos" className="font-medium text-gray-600 hover:text-brand">
+                      Mis pedidos
+                    </Link>
+                  </>
+                )}
 
-              {auth && (
+                {isAdmin && (
+                  <button onClick={() => navigate("/dashboard")} className="font-medium text-gray-600 hover:text-brand">
+                    Dashboard
+                  </button>
+                )}
+              </nav>
+            </div>
+
+            <div className="flex flex-shrink-0 items-center justify-end gap-2 sm:gap-3">
+              <div className="hidden flex-1 items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-2 shadow-sm md:flex md:max-w-xl">
+                <Search className="h-4 w-4 text-gray-400" />
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  onKeyDown={handleSearch}
+                  placeholder="Buscar figuras, precios o productos"
+                  className="w-full border-0 bg-transparent py-1 text-sm text-gray-700 outline-none placeholder:text-gray-400"
+                />
+                <button
+                  type="button"
+                  onClick={handleVoiceSearch}
+                  className={`rounded-full p-1.5 ${isListening ? "bg-brand text-white" : "text-gray-500 hover:bg-gray-200"}`}
+                  title="Buscar por voz"
+                >
+                  <Mic className="h-4 w-4" />
+                </button>
+              </div>
+
+              {!auth ? (
+                <Link to="/login" className="flex items-center gap-2 text-brand">
+                  <User className="h-5 w-5" />
+                  <span className="hidden lg:inline">Iniciar sesión</span>
+                </Link>
+              ) : (
                 <>
-                  <Link to="/chat" className="text-gray-600 hover:text-brand font-medium">
-                    Chat
+                  <Link to="/profile" className="flex-shrink-0">
+                    <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-brand text-sm font-bold text-white">
+                      {auth.profileImg ? (
+                        <img src={auth.profileImg} alt="Perfil" className="h-full w-full object-cover" />
+                      ) : (
+                        <User className="h-5 w-5 text-white" />
+                      )}
+                    </div>
                   </Link>
-                  <Link to="/pedidos" className="text-gray-600 hover:text-brand font-medium">
-                    Mis Pedidos
-                  </Link>
+
+                  <button
+                    onClick={handleLogout}
+                    className="flex h-10 w-10 items-center justify-center rounded-full text-red-500 hover:bg-red-50"
+                    aria-label="Cerrar sesión"
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </button>
                 </>
               )}
 
-              {isAdmin && (
-                <button
-                  onClick={() => navigate("/dashboard")}
-                  className="text-gray-600 hover:text-brand font-medium"
-                >
-                  Dashboard
-                </button>
-              )}
-
-            </nav>
-
-          </div>
-
-          <div className="flex flex-shrink-0 items-center justify-end gap-2 sm:gap-3">
-
-            <div className="hidden flex-1 items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-2 shadow-sm md:flex md:max-w-xl">
-              <Search className="h-4 w-4 text-gray-400" />
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={handleSearch}
-                placeholder="Buscar figuras, precios o productos"
-                className="w-full border-0 bg-transparent py-1 text-sm text-gray-700 outline-none placeholder:text-gray-400"
-              />
               <button
-                type="button"
-                onClick={handleVoiceSearch}
-                className={`rounded-full p-1.5 ${isListening ? "bg-brand text-white" : "text-gray-500 hover:bg-gray-200"}`}
-                title="Buscar por voz"
+                onClick={() => navigate("/cart")}
+                className="relative flex h-10 w-10 items-center justify-center rounded-full text-brand hover:bg-gray-100"
               >
-                <Mic className="h-4 w-4" />
+                <ShoppingCart className="h-5 w-5" />
+
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-brand text-xs text-white">
+                    {cartCount}
+                  </span>
+                )}
               </button>
-            </div>
 
-            {!auth ? (
-              <Link to="/login" className="flex items-center gap-2 text-brand">
-                <User className="h-5 w-5" />
-                <span className="hidden lg:inline">Login</span>
-              </Link>
-            ) : (
-              <>
-                <Link to="/profile" className="flex-shrink-0">
-                  <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-brand text-sm font-bold text-white">
-                    {auth.profileImg ? (
-                      <img src={auth.profileImg} alt="Perfil" className="h-full w-full object-cover" />
-                    ) : (
-                      (auth.name?.[0] || "") + (auth.lastname?.[0] || "")
-                    )}
-                  </div>
-                </Link>
-
-                <button
-                  onClick={handleLogout}
-                  className="flex h-10 w-10 items-center justify-center rounded-full text-red-500 hover:bg-red-50"
-                  aria-label="Cerrar sesión"
+              {isAdmin && (
+                <Link
+                  to="/api-comentarios"
+                  className="flex items-center gap-2 rounded-full p-2 text-gray-600 hover:bg-gray-100"
+                  title="Configuraciones"
+                  aria-label="Ir a configuraciones"
                 >
-                  <LogOut className="h-5 w-5" />
-                </button>
-              </>
-            )}
-
-            <button
-              onClick={() => navigate("/cart")}
-              className="relative flex h-10 w-10 items-center justify-center rounded-full text-brand hover:bg-gray-100"
-            >
-              <ShoppingCart className="h-5 w-5" />
-
-              {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-brand text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                  {cartCount}
-                </span>
+                  <SettingsIcon />
+                </Link>
               )}
-            </button>
-
-            {isAdmin && (
-              <Link
-                to="/api-comentarios"
-                className="flex items-center gap-2 rounded-full p-2 text-gray-600 hover:bg-gray-100"
-                title="Configuraciones"
-                aria-label="Ir a configuraciones"
-              >
-                <Settings className="h-5 w-5" />
-              </Link>
-            )}
-
+            </div>
           </div>
-
         </div>
 
-      </div>
-
-      <div className="px-3 pb-3 md:hidden">
-        <div className="flex min-h-[44px] w-full items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-2 shadow-sm">
-          <Search className="h-4 w-4 text-gray-400" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={handleSearch}
-            placeholder="Buscar figuras, precios o productos"
-            className="w-full border-0 bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-400"
-          />
-          <button
-            type="button"
-            onClick={handleVoiceSearch}
-            className={`rounded-full p-1.5 ${isListening ? "bg-brand text-white" : "text-gray-500 hover:bg-gray-200"}`}
-            title="Buscar por voz"
-          >
-            <Mic className="h-4 w-4" />
-          </button>
-        </div>
-        {voiceError && <p className="mt-2 text-xs text-red-500">{voiceError}</p>}
-      </div>
-
-    </header>
-    {mobileMenu}
+        {voiceError ? (
+          <div className="border-t border-red-100 bg-red-50 px-4 py-2 text-center text-sm text-red-600">
+            {voiceError}
+          </div>
+        ) : null}
+      </header>
     </>
+  );
+}
+
+function SettingsIcon() {
+  return (
+    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7z" />
+      <path d="M19.4 15a7.9 7.9 0 0 0 .1-1 7.9 7.9 0 0 0-.1-1l2-1.5-2-3.5-2.4.8a8 8 0 0 0-1.7-1l-.4-2.5h-4l-.4 2.5a8 8 0 0 0-1.7 1l-2.4-.8-2 3.5 2 1.5a7.9 7.9 0 0 0-.1 1 7.9 7.9 0 0 0 .1 1l-2 1.5 2 3.5 2.4-.8a8 8 0 0 0 1.7 1l.4 2.5h4l.4-2.5a8 8 0 0 0 1.7-1l2.4.8 2-3.5-2-1.5z" />
+    </svg>
   );
 }

@@ -1,52 +1,33 @@
 import { useState } from "react";
+import { AlertTriangle, FileText, Users, User } from "lucide-react";
 import OnlineUsers from "../OnlineUsers";
 
-const getUserInitials = (username = "") => {
-  const parts = String(username).trim().split(/\s+/).filter(Boolean);
-  if (!parts.length) return "U";
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-};
-
 export default function ChatInfo({ users, onReportUser }) {
-
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [reportText, setReportText] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
-  const [brokenImages, setBrokenImages] = useState({});
   const [feedback, setFeedback] = useState("");
+  const [brokenImages, setBrokenImages] = useState({});
 
   return (
-    <aside className="w-full h-full bg-white flex flex-col overflow-y-auto md:w-80">
-
-      <div className="p-5 border-b border-purple-100 bg-gradient-to-b from-purple-50 to-white">
-
-        <h3 className="text-sm font-semibold text-purple-700">
-          Información del chat
-        </h3>
-
-        <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+    <aside className="flex h-full w-full flex-col overflow-y-auto bg-white md:w-80">
+      <div className="border-b border-purple-100 bg-gradient-to-b from-purple-50 to-white p-5">
+        <h3 className="text-sm font-semibold text-purple-700">Información del chat</h3>
+        <p className="mt-1 text-xs leading-relaxed text-gray-500">
           Espacio para comunidad, soporte y conversaciones en tiempo real.
         </p>
-
       </div>
 
-      <div className="p-5 border-b border-purple-100">
-
-        <div className="flex items-center justify-between mb-4">
-
+      <div className="border-b border-purple-100 p-5">
+        <div className="mb-4 flex items-center justify-between">
           <div>
             <h4 className="text-sm font-semibold text-gray-800">
-              👥 Usuarios activos
+              <Users className="inline h-4 w-4" /> Usuarios activos
             </h4>
-
-            <p className="text-xs text-gray-400">
-              {users.length} conectados
-            </p>
+            <p className="text-xs text-gray-400">{users.length} conectados</p>
           </div>
 
-          <div className="flex -space-x-3">
-
+          <div className="-space-x-3 flex">
             {users.slice(0, 4).map((u, i) => {
               const username = u?.username || u?.name || "Usuario";
               const avatarSrc = u?.profileImg || u?.avatar || "";
@@ -55,64 +36,56 @@ export default function ChatInfo({ users, onReportUser }) {
               return (
                 <div
                   key={i}
-                  className="w-9 h-9 rounded-full border-2 border-white shadow-sm overflow-hidden bg-gradient-to-br from-purple-500 to-fuchsia-500 text-white flex items-center justify-center text-[11px] font-semibold"
+                  className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-gradient-to-br from-purple-500 to-fuchsia-500 text-[11px] font-semibold text-white shadow-sm"
                 >
                   {showImage ? (
                     <img
                       src={avatarSrc}
                       alt={username}
                       onError={() => setBrokenImages((prev) => ({ ...prev, [i]: true }))}
-                      className="w-full h-full object-cover"
+                      className="h-full w-full object-cover"
                     />
                   ) : (
-                    getUserInitials(username)
+                    <User className="h-4 w-4 text-white" />
                   )}
                 </div>
               );
             })}
-
           </div>
-
         </div>
 
         <OnlineUsers onlineUsers={users} onSelectUser={setSelectedUser} />
-
       </div>
 
       <div className="flex-1 p-5">
-
-        <h4 className="text-sm font-semibold text-gray-800 mb-4">
-          📜 Reglas del chat
+        <h4 className="mb-4 text-sm font-semibold text-gray-800">
+          <FileText className="inline h-4 w-4" /> Reglas del chat
         </h4>
 
         <div className="space-y-4 text-sm">
-
-          <div className="flex gap-3 text-gray-600 hover:text-purple-700 transition">
+          <div className="flex gap-3 text-gray-600 transition hover:text-purple-700">
             <span>✅</span>
             <span>Sé respetuoso con los demás</span>
           </div>
 
-          <div className="flex gap-3 text-gray-600 hover:text-purple-700 transition">
+          <div className="flex gap-3 text-gray-600 transition hover:text-purple-700">
             <span>🚫</span>
             <span>No spam ni publicidad</span>
           </div>
 
-          <div className="flex gap-3 text-gray-600 hover:text-purple-700 transition">
+          <div className="flex gap-3 text-gray-600 transition hover:text-purple-700">
             <span>🔗</span>
             <span>No enlaces maliciosos</span>
           </div>
 
-          <div className="flex gap-3 text-gray-600 hover:text-purple-700 transition">
+          <div className="flex gap-3 text-gray-600 transition hover:text-purple-700">
             <span>🎉</span>
             <span>Participa y disfruta</span>
           </div>
-
         </div>
-
       </div>
 
-      <div className="p-5 border-t border-purple-100 bg-white">
-
+      <div className="border-t border-purple-100 bg-white p-5">
         <button
           onClick={() => {
             if (!selectedUser) {
@@ -122,52 +95,36 @@ export default function ChatInfo({ users, onReportUser }) {
             setFeedback("");
             setIsReportOpen(true);
           }}
-          className="
-          w-full py-3 rounded-2xl
-          bg-gradient-to-r
-          from-red-500 to-red-400
-          text-white font-medium
-          hover:shadow-lg
-          transition
-          "
+          className="w-full rounded-2xl bg-gradient-to-r from-red-500 to-red-400 py-3 font-medium text-white transition hover:shadow-lg"
         >
-          ⚠ Reportar usuario
+          <AlertTriangle className="mr-2 inline h-4 w-4" /> Reportar usuario
         </button>
 
-        <p className="text-[11px] text-gray-400 text-center mt-2">
+        <p className="mt-2 text-center text-[11px] text-gray-400">
           El equipo revisará tu reporte
         </p>
         {feedback ? (
           <p className="mt-2 text-center text-sm text-red-500">{feedback}</p>
         ) : null}
-
       </div>
 
       {isReportOpen && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-
-          <div className="bg-white w-[min(92vw,24rem)] rounded-2xl p-5 shadow-xl">
-
-            <h2 className="text-lg font-semibold text-gray-900">
-              Reportar usuario
-            </h2>
-
-            <p className="text-xs text-gray-500 mt-1">
-              Describe el problema del usuario
-            </p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-[min(92vw,24rem)] rounded-2xl bg-white p-5 shadow-xl">
+            <h2 className="text-lg font-semibold text-gray-900">Reportar usuario</h2>
+            <p className="mt-1 text-xs text-gray-500">Describe el problema del usuario</p>
 
             <textarea
               value={reportText}
               onChange={(e) => setReportText(e.target.value)}
               placeholder="Ej: spam, insultos, comportamiento inapropiado..."
-              className="w-full mt-3 p-3 border rounded-xl text-sm focus:ring-2 focus:ring-red-300 outline-none"
+              className="mt-3 w-full rounded-xl border p-3 text-sm outline-none focus:ring-2 focus:ring-red-300"
             />
 
-            <div className="flex justify-end gap-2 mt-4">
-
+            <div className="mt-4 flex justify-end gap-2">
               <button
                 onClick={() => setIsReportOpen(false)}
-                className="px-3 py-2 text-sm rounded-lg bg-gray-100 hover:bg-gray-200"
+                className="rounded-lg bg-gray-100 px-3 py-2 text-sm hover:bg-gray-200"
               >
                 Cancelar
               </button>
@@ -184,18 +141,14 @@ export default function ChatInfo({ users, onReportUser }) {
                   setReportText("");
                   setIsReportOpen(false);
                 }}
-                className="px-3 py-2 text-sm rounded-lg bg-red-500 text-white hover:bg-red-600"
+                className="rounded-lg bg-red-500 px-3 py-2 text-sm text-white hover:bg-red-600"
               >
                 Enviar
               </button>
-
             </div>
-
           </div>
-
         </div>
       )}
-
     </aside>
   );
 }

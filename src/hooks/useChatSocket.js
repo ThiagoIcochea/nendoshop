@@ -1,21 +1,39 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BACKEND_URL } from "../utils/config";
 import { ROUTES } from "../utils/secureRoutes";
+
 const getWebSocketUrl = () => {
   if (!BACKEND_URL) return null;
   if (BACKEND_URL.startsWith("https://")) return BACKEND_URL.replace("https://", "wss://");
   if (BACKEND_URL.startsWith("http://")) return BACKEND_URL.replace("http://", "ws://");
   return BACKEND_URL;
 };
+
 const WS_URL = getWebSocketUrl();
 
+const getAuthToken = () => {
+  try {
+    const authData = JSON.parse(localStorage.getItem("auth"));
+    return authData?.token || localStorage.getItem("token") || "";
+  } catch (error) {
+    return localStorage.getItem("token") || "";
+  }
+};
+
 const fetchRoomMessages = async (roomKey) => {
+  const headers = {};
+  const token = getAuthToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+
   const response = await fetch(`${BACKEND_URL}/api/chat/rooms/${roomKey}/messages?limit=200`, {
-    credentials: "include"
+    credentials: "include",
+    headers
   });
+
   if (!response.ok) {
     throw new Error("No se pudieron cargar los mensajes");
   }
+
   return response.json();
 };
 
@@ -29,6 +47,26 @@ const readLocalCart = () => {
   }
 };
 
+const getCacheKey = (roomKey) => `chat_messages_${roomKey}`;
+
+const readCachedMessages = (roomKey) => {
+  try {
+    const cached = localStorage.getItem(getCacheKey(roomKey));
+    const data = cached ? JSON.parse(cached) : [];
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    return [];
+  }
+};
+
+const saveCachedMessages = (roomKey, messages) => {
+  try {
+    localStorage.setItem(getCacheKey(roomKey), JSON.stringify(messages));
+  } catch (error) {
+    // No-op.
+  }
+};
+
 export default function useChatSocket(roomKey, username, userId, profileImg = "") {
   const [messages, setMessages] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -38,6 +76,9 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
   const typingTimeoutRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
   const isMountedRef = useRef(true);
+
+  const finalRoomKey = roomKey === "support" ? (userId ? `support_${userId}` : roomKey) : roomKey;
+  const authToken = getAuthToken();
 
   const syncBotCartAction = useCallback((message) => {
     const action = message?.meta?.action;
@@ -89,13 +130,11 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
     }
   }, []);
 
-  const finalRoomKey = roomKey === "support" ? (userId ? `support_${userId}` : roomKey) : roomKey;
-
-
   const connectWebSocket = useCallback(() => {
-    if (socketRef.current) return;
+    if (!WS_URL || !authToken || socketRef.current) return;
 
-    const socket = new WebSocket(`${WS_URL}`);
+    const separator = WS_URL.includes("?") ? "&" : "?";
+    const socket = new WebSocket(`${WS_URL}${separator}token=${encodeURIComponent(authToken)}`);
     socketRef.current = socket;
 
     socket.addEventListener("open", () => {
@@ -121,7 +160,11 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
               syncBotCartAction(payload.message);
               handleBotAction(payload.message);
             }
-            setMessages((prev) => [...prev, payload.message]);
+            setMessages((prev) => {
+              const next = [...prev, payload.message];
+              saveCachedMessages(finalRoomKey, next);
+              return next;
+            });
             break;
           case "typing":
             if (payload.username !== username) {
@@ -160,12 +203,17 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
       }
     });
 
-    socket.addEventListener("close", () => {
+    socket.addEventListener("close", (event) => {
       if (!isMountedRef.current) return;
       setConnected(false);
       if (socketRef.current === socket) {
         socketRef.current = null;
       }
+
+      if (event.code === 1008 || event.code === 4001) {
+        return;
+      }
+
       if (!reconnectTimeoutRef.current) {
         reconnectTimeoutRef.current = setTimeout(() => {
           reconnectTimeoutRef.current = null;
@@ -177,23 +225,32 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
     socket.addEventListener("error", () => {
       setConnected(false);
     });
-  }, [roomKey, username, userId, finalRoomKey, syncBotCartAction, handleBotAction]);
+  }, [authToken, finalRoomKey, handleBotAction, profileImg, syncBotCartAction, userId, username]);
 
   useEffect(() => {
     isMountedRef.current = true;
-    if (!roomKey || !username) return;
+    if (!roomKey || !username) return undefined;
 
     let active = true;
+    const cachedMessages = readCachedMessages(finalRoomKey);
+    if (cachedMessages.length) {
+      setMessages(cachedMessages);
+    } else {
+      setMessages([]);
+    }
 
-    setMessages([]);
-    fetchRoomMessages(finalRoomKey)
-      .then((data) => {
-        if (!active) return;
-        setMessages(data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    if (authToken) {
+      fetchRoomMessages(finalRoomKey)
+        .then((data) => {
+          if (!active) return;
+          const nextMessages = Array.isArray(data) ? data : [];
+          setMessages(nextMessages);
+          saveCachedMessages(finalRoomKey, nextMessages);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
 
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
       connectWebSocket();
@@ -215,26 +272,27 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
       setTypingUser("");
       setOnlineUsers([]);
     };
-  }, [roomKey, username, userId, profileImg, connectWebSocket, finalRoomKey]);
+  }, [authToken, connectWebSocket, finalRoomKey, profileImg, roomKey, userId, username]);
 
   const sendMessage = useCallback((text) => {
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
       console.warn("Socket no conectado");
       return;
     }
+
     const cartItems = finalRoomKey?.startsWith("support") ? readLocalCart() : [];
     socketRef.current.send(JSON.stringify({ type: "message", roomKey: finalRoomKey, text, username, userId, profileImg, cartItems }));
-  }, [roomKey, username, userId, profileImg, finalRoomKey]);
+  }, [finalRoomKey, profileImg, userId, username]);
 
   const sendTyping = useCallback(() => {
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
     socketRef.current.send(JSON.stringify({ type: "typing", roomKey: finalRoomKey }));
-  }, [roomKey, finalRoomKey]);
+  }, [finalRoomKey]);
 
   const reportUser = useCallback((payload) => {
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
     socketRef.current.send(JSON.stringify({ type: "report-user", roomKey: finalRoomKey, ...payload }));
-  }, [roomKey, finalRoomKey]);
+  }, [finalRoomKey]);
 
   return {
     messages,

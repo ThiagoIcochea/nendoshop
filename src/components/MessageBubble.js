@@ -1,5 +1,4 @@
 import { User } from "lucide-react";
-import { useState } from "react";
 
 const getAvatarSrc = (profileImg) => {
   if (!profileImg) return null;
@@ -21,26 +20,24 @@ const renderTextWithLinks = (text) => {
           href={part}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-purple-600 underline break-all"
+          className="break-all text-purple-600 underline"
         >
           {part}
         </a>
       );
     }
 
-    return <span key={`${part}-${index}`} className="whitespace-pre-wrap">{part}</span>;
+    return (
+      <span key={`${part}-${index}`} className="whitespace-pre-wrap">
+        {part}
+      </span>
+    );
   });
 };
 
 export default function MessageBubble({ user, text, time, isOwn, profileImg, displayName }) {
-  const initials = (displayName || user || "U")
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
-  const avatarSrc = getAvatarSrc(profileImg, displayName || user || "Usuario");
+  const avatarSrc = getAvatarSrc(profileImg);
+  const nameLabel = displayName || user || "Usuario";
 
   return (
     <div
@@ -48,20 +45,18 @@ export default function MessageBubble({ user, text, time, isOwn, profileImg, dis
         isOwn ? "justify-end" : "justify-start"
       }`}
     >
-      <div className={`flex gap-3 max-w-[75%] items-end`}>
-
-        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-500 via-fuchsia-500 to-indigo-500 text-white flex items-center justify-center text-xs font-bold shadow-md shrink-0 overflow-hidden">
+      <div className="flex max-w-[75%] items-end gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-purple-500 via-fuchsia-500 to-indigo-500 text-white shadow-md">
           {avatarSrc ? (
-            <img src={avatarSrc} alt={displayName || user} className="w-full h-full object-cover" />
+            <img src={avatarSrc} alt={nameLabel} className="h-full w-full object-cover" />
           ) : (
-            initials
+            <User className="h-5 w-5 text-white" />
           )}
         </div>
 
         <div className="flex flex-col">
-
           <div
-            className={`flex items-center gap-2 mb-1 ${
+            className={`mb-1 flex items-center gap-2 ${
               isOwn ? "justify-end" : "justify-start"
             }`}
           >
@@ -70,47 +65,46 @@ export default function MessageBubble({ user, text, time, isOwn, profileImg, dis
                 isOwn ? "text-purple-300" : "text-purple-700"
               }`}
             >
-              {displayName || (isOwn ? "Tú" : user)}
+              {nameLabel}
             </span>
 
-            <span className="text-[11px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <span className="text-[11px] text-gray-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
               {time}
             </span>
           </div>
 
           <div
             className={`
-              relative px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words
+              relative break-words rounded-2xl px-4 py-2.5 text-sm leading-relaxed
               shadow-sm transition-all duration-200 transform
               group-hover:scale-[1.02] group-hover:shadow-lg
-
-              ${isOwn
-                ? `
-                  bg-gradient-to-br from-purple-600 via-purple-500 to-fuchsia-500
-                  text-white rounded-br-md
-                `
-                : `
-                  bg-white text-gray-800 border border-purple-100
-                  rounded-bl-md
-                `
+              ${
+                isOwn
+                  ? `
+                    rounded-br-md bg-gradient-to-br from-purple-600 via-purple-500 to-fuchsia-500
+                    text-white
+                  `
+                  : `
+                    rounded-bl-md border border-purple-100 bg-white text-gray-800
+                  `
               }
             `}
           >
-            <div className="whitespace-pre-wrap break-words">
+            <div className="break-words whitespace-pre-wrap">
               {renderTextWithLinks(text)}
             </div>
 
             <div
               className={`
-                absolute bottom-0 w-3 h-3 rotate-45
-                ${isOwn
-                  ? "right-[-6px] bg-purple-500"
-                  : "left-[-6px] bg-white border-l border-b border-purple-100"
+                absolute bottom-0 h-3 w-3 rotate-45
+                ${
+                  isOwn
+                    ? "right-[-6px] bg-purple-500"
+                    : "left-[-6px] border-l border-b border-purple-100 bg-white"
                 }
               `}
             />
           </div>
-
         </div>
       </div>
     </div>
