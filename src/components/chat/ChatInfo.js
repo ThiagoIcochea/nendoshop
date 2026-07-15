@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { AlertTriangle, FileText, Users, User } from "lucide-react";
+import { AlertTriangle, FileText, Users } from "lucide-react";
 import OnlineUsers from "../OnlineUsers";
+import AvatarWithFallback from "./AvatarWithFallback";
 
 export default function ChatInfo({ users, onReportUser }) {
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [reportText, setReportText] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [feedback, setFeedback] = useState("");
-  const [brokenImages, setBrokenImages] = useState({});
 
   return (
     <aside className="flex h-full w-full flex-col overflow-y-auto bg-white md:w-80">
@@ -31,23 +31,10 @@ export default function ChatInfo({ users, onReportUser }) {
             {users.slice(0, 4).map((u, i) => {
               const username = u?.username || u?.name || "Usuario";
               const avatarSrc = u?.profileImg || u?.avatar || "";
-              const showImage = Boolean(avatarSrc) && !brokenImages[i];
 
               return (
-                <div
-                  key={i}
-                  className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-gradient-to-br from-purple-500 to-fuchsia-500 text-[11px] font-semibold text-white shadow-sm"
-                >
-                  {showImage ? (
-                    <img
-                      src={avatarSrc}
-                      alt={username}
-                      onError={() => setBrokenImages((prev) => ({ ...prev, [i]: true }))}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <User className="h-4 w-4 text-white" />
-                  )}
+                <div key={i} className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-white shadow-sm">
+                  <AvatarWithFallback src={avatarSrc} alt={username} className="h-9 w-9" fallbackClassName="text-[11px] font-semibold" />
                 </div>
               );
             })}

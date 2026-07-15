@@ -13,11 +13,17 @@ const WS_URL = getWebSocketUrl();
 
 const getAuthToken = () => {
   try {
-    const authData = JSON.parse(localStorage.getItem("auth"));
-    return authData?.token || localStorage.getItem("token") || "";
+    const savedAuth = localStorage.getItem("auth");
+    if (savedAuth) {
+      const authData = JSON.parse(savedAuth);
+      if (authData?.token) return authData.token;
+      if (authData?.user?.token) return authData.user.token;
+    }
   } catch (error) {
-    return localStorage.getItem("token") || "";
+    // Ignore malformed auth payloads and fall back to the plain token entry.
   }
+
+  return localStorage.getItem("token") || "";
 };
 
 const fetchRoomMessages = async (roomKey) => {
@@ -131,7 +137,15 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
   }, []);
 
   const connectWebSocket = useCallback(() => {
-    if (!WS_URL || !authToken || socketRef.current) return;
+    if (!WS_URL || !authToken) return;
+
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      return;
+    }
+
+    if (socketRef.current && [WebSocket.CONNECTING, WebSocket.OPEN].includes(socketRef.current.readyState)) {
+      return;
+    }
 
     const separator = WS_URL.includes("?") ? "&" : "?";
     const socket = new WebSocket(`${WS_URL}${separator}token=${encodeURIComponent(authToken)}`);
@@ -266,7 +280,11 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
         reconnectTimeoutRef.current = null;
       }
       if (socketRef.current) {
-        socketRef.current.close();
+        try {
+          socketRef.current.close();
+        } catch (error) {
+          // Ignore close errors during unmount.
+        }
         socketRef.current = null;
       }
       setTypingUser("");

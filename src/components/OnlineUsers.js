@@ -1,9 +1,9 @@
-import { Search, User } from "lucide-react";
+import { Search } from "lucide-react";
 import { useState } from "react";
+import AvatarWithFallback from "./chat/AvatarWithFallback";
 
 export default function OnlineUsers({ onlineUsers = [], onSelectUser }) {
   const [searchUser, setSearchUser] = useState("");
-  const [imageErrors, setImageErrors] = useState({});
 
   const filteredUsers = (onlineUsers || []).filter((user) => {
     const username = String(user?.username || user?.name || "").toLowerCase();
@@ -41,7 +41,6 @@ export default function OnlineUsers({ onlineUsers = [], onSelectUser }) {
           filteredUsers.map((user, index) => {
             const username = user?.username || user?.name || "Usuario";
             const avatarSrc = user?.profileImg || user?.avatar || "";
-            const imageFailed = Boolean(imageErrors[index]);
 
             return (
               <div
@@ -58,18 +57,11 @@ export default function OnlineUsers({ onlineUsers = [], onSelectUser }) {
               >
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-purple-100 bg-gradient-to-br from-purple-500 to-fuchsia-500 text-white shadow-sm transition group-hover:scale-105">
-                      {avatarSrc && !imageFailed ? (
-                        <img
-                          src={avatarSrc}
-                          alt={username}
-                          onError={() => setImageErrors((prev) => ({ ...prev, [index]: true }))}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <User className="h-5 w-5 text-white" />
-                      )}
-                    </div>
+                    <AvatarWithFallback
+                      src={avatarSrc}
+                      alt={username}
+                      className="h-10 w-10 border border-purple-100 transition group-hover:scale-105"
+                    />
 
                     <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-green-400">
                       <span className="absolute inset-0 animate-ping rounded-full bg-green-400 opacity-50" />
