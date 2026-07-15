@@ -1,4 +1,4 @@
-import { Bell, MoreVertical, Paperclip, Globe2, Mic } from "lucide-react";
+import { Bell, MoreVertical, Paperclip } from "lucide-react";
 import MessageBubble from "../MessageBubble";
 import MessageInput from "../MessageInput";
 import TypingIndicator from "../TypingIndicator";
@@ -26,7 +26,7 @@ export default function ChatWindow({
       title: "Soporte",
       subtitle: "Atención y ayuda para NendoShop",
       emptyTitle: "No hay consultas todavía",
-      emptySubtitle: "¿Necesitas ayuda? Escríbenos 💜"
+      emptySubtitle: "¿Necesitas ayuda? Escríbenos 💬"
     }
   };
 
