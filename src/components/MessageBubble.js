@@ -1,9 +1,12 @@
-const getAvatarSrc = (profileImg, fallbackName) => {
+import { User } from "lucide-react";
+import { useState } from "react";
+
+const getAvatarSrc = (profileImg) => {
   if (!profileImg) return null;
   if (typeof profileImg === "string" && profileImg.trim()) {
     return profileImg;
   }
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName || "Usuario")}&background=7c3aed&color=ffffff`;
+  return null;
 };
 
 const renderTextWithLinks = (text) => {
