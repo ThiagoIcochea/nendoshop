@@ -8,7 +8,7 @@ export default function Pagos() {
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
   const [paymentStatus, setPaymentStatus] = useState("inactivo");
-  const [paso, setPaso] = useState(1); 
+  const [paso, setPaso] = useState(1);
   const [saveCard, setSaveCard] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("card"); // 'card' o 'paypal'
 
@@ -121,10 +121,10 @@ export default function Pagos() {
   };
 
   const [envioDatos, setEnvioDatos] = useState({
-    tipoComprobante: "boleta", 
-    documento: "",             
+    tipoComprobante: "boleta",
+    documento: "",
     razonSocial: "",
-    metodoEnvio: "delivery",   
+    metodoEnvio: "delivery",
     direccionEntrega: {
       calle: "",
       distrito: ""
@@ -133,11 +133,11 @@ export default function Pagos() {
   });
 
   const [card, setCard] = useState({
-  cardName: "",
-  cardNumber: "",
-  cardCVV: "",
-  cardType: "visa"
-});
+    cardName: "",
+    cardNumber: "",
+    cardCVV: "",
+    cardType: "visa"
+  });
 
   useEffect(() => {
     const data = JSON.parse(localStorage.getItem("cart")) || [];
@@ -176,18 +176,18 @@ export default function Pagos() {
 
   useEffect(() => {
 
-  if (user?.paymentmethod) {
+    if (user?.paymentmethod) {
 
-    setCard({
-      cardName: user.paymentmethod.nombretarjeta || "",
-      cardNumber: user.paymentmethod.numerotarjeta || "",
-      cardCVV: user.paymentmethod.cvv || "",
-      cardType: user.paymentmethod.tipo || "visa"
-    });
+      setCard({
+        cardName: user.paymentmethod.nombretarjeta || "",
+        cardNumber: user.paymentmethod.numerotarjeta || "",
+        cardCVV: user.paymentmethod.cvv || "",
+        cardType: user.paymentmethod.tipo || "visa"
+      });
 
-  }
+    }
 
-}, [user]);
+  }, [user]);
 
   const total = cart.reduce((acc, p) => {
     const price = p.discount > 0 ? p.price * (1 - p.discount) : p.price;
@@ -206,26 +206,26 @@ export default function Pagos() {
 
   const avanzarPaso = (e) => {
     e.preventDefault();
-    
+
     if (envioDatos.tipoComprobante === "boleta" && envioDatos.documento.length !== 8) {
-      Swal.fire("Error 630","⚠️ Error de Validación: El DNI debe tener exactamente 8 dígitos.","error");
-      return; 
+      Swal.fire("Error 630", "⚠️ Error de Validación: El DNI debe tener exactamente 8 dígitos.", "error");
+      return;
     }
 
     if (envioDatos.tipoComprobante === "factura") {
       if (envioDatos.documento.length !== 11) {
-       Swal.fire("Error 630","⚠️ Error de Validación: El RUC debe tener exactamente 11 dígitos.","error");
+        Swal.fire("Error 630", "⚠️ Error de Validación: El RUC debe tener exactamente 11 dígitos.", "error");
         return;
       }
       if (!envioDatos.razonSocial.trim()) {
-        Swal.fire("Error 630","⚠️ Error de Validación: La Razón Social es obligatoria para Facturas.","error");
+        Swal.fire("Error 630", "⚠️ Error de Validación: La Razón Social es obligatoria para Facturas.", "error");
         return;
       }
     }
 
     if (envioDatos.metodoEnvio === "delivery") {
       if (!envioDatos.direccionEntrega.calle.trim() || !envioDatos.direccionEntrega.distrito.trim()) {
-        Swal.fire("Error 630","⚠️ Error de Validación: Por favor, completa la calle y el distrito para el envío.","error");
+        Swal.fire("Error 630", "⚠️ Error de Validación: Por favor, completa la calle y el distrito para el envío.", "error");
         return;
       }
     }
@@ -236,55 +236,66 @@ export default function Pagos() {
     e.preventDefault();
 
     if (card.cardNumber.length < 16) {
-      return Swal.fire("Error 630","Por favor, completa los 16 dígitos de la tarjeta.","error");
+      return Swal.fire("Error 630", "Por favor, completa los 16 dígitos de la tarjeta.", "error");
     }
 
     if (card.cardCVV.length < 3) {
-      Swal.fire("Error 630","⚠️ Error de Facturación: El código CVV es inválido.","error");
+      Swal.fire("Error 630", "⚠️ Error de Facturación: El código CVV es inválido.", "error");
       return;
     }
 
     setPaymentStatus("procesando");
 
     try {
+      // REVERT: eliminar las líneas de authData/token/cardHeaders y reemplazar headers por { "Content-Type": "application/json" }
       const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
+
+      // Fix Bug 3: extraer el token y adjuntarlo como Bearer igual que los handlers de PayPal.
+      // En desarrollo (HTTP) las cookies SameSite:"none" no viajan; el header es el fallback necesario.
+      const authData = JSON.parse(localStorage.getItem("auth"));
+      const token = authData?.token || localStorage.getItem("token");
+      const cardHeaders = { "Content-Type": "application/json" };
+      if (token) {
+        cardHeaders["Authorization"] = `Bearer ${token}`;
+      }
+
       const paymentData = {
-  cliente: user ? `${user.name} ${user.lastname}` : "Cliente Anónimo",
+        cliente: user ? `${user.name} ${user.lastname}` : "Cliente Anónimo",
 
-  saveCard,
+        saveCard,
 
-  paymentmethod: saveCard ? {
-    nombretarjeta: card.cardName,
-    numerotarjeta: card.cardNumber,
-    cvv: card.cardCVV,
-    tipo: card.cardType
-  } : undefined,
+        paymentmethod: saveCard ? {
+          nombretarjeta: card.cardName,
+          numerotarjeta: card.cardNumber,
+          cvv: card.cardCVV,
+          tipo: card.cardType
+        } : undefined,
 
-  tipo_comprobante: envioDatos.tipoComprobante,
-  documento: envioDatos.documento,
-  razon_social: envioDatos.tipoComprobante === "factura" ? envioDatos.razonSocial : undefined,
-  metodo_envio: envioDatos.metodoEnvio === "presencial" ? "recojo" : envioDatos.metodoEnvio,
-  direccion_entrega: envioDatos.metodoEnvio === "delivery"
-    ? `${envioDatos.direccionEntrega.calle}, ${envioDatos.direccionEntrega.distrito}`
-    : "Recojo en Tienda: Av. Arequipa 265, Lima - Perú",
-  referencia: envioDatos.metodoEnvio === "delivery" ? envioDatos.referencia : undefined,
-  envio: envioDatos.metodoEnvio === "delivery" ? 15.00 : 0,
-  productos: cart.map((p) => ({
-    name: p.name,
-    quantity: p.quantity,
-    price: p.price
-  })),
-  total: envioDatos.metodoEnvio === "delivery" ? total + 15 : total,
-  deliveryType: envioDatos.metodoEnvio === "delivery" ? "shipping" : "pickup",
-  estado: "Pagado"
-};
+        tipo_comprobante: envioDatos.tipoComprobante,
+        documento: envioDatos.documento,
+        razon_social: envioDatos.tipoComprobante === "factura" ? envioDatos.razonSocial : undefined,
+        metodo_envio: envioDatos.metodoEnvio === "presencial" ? "recojo" : envioDatos.metodoEnvio,
+        direccion_entrega: envioDatos.metodoEnvio === "delivery"
+          ? `${envioDatos.direccionEntrega.calle}, ${envioDatos.direccionEntrega.distrito}`
+          : "Recojo en Tienda: Av. Arequipa 265, Lima - Perú",
+        referencia: envioDatos.metodoEnvio === "delivery" ? envioDatos.referencia : undefined,
+        envio: envioDatos.metodoEnvio === "delivery" ? 15.00 : 0,
+        productos: cart.map((p) => ({
+          name: p.name,
+          quantity: p.quantity,
+          price: p.price
+        })),
+        total: envioDatos.metodoEnvio === "delivery" ? total + 15 : total,
+        deliveryType: envioDatos.metodoEnvio === "delivery" ? "shipping" : "pickup",
+        estado: "Pagado"
+      };
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 18000);
 
       const res = await fetch(`${BACKEND_URL}/api/payments`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: cardHeaders,
         credentials: "include",
         body: JSON.stringify(paymentData),
         signal: controller.signal
@@ -339,7 +350,7 @@ export default function Pagos() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 items-start">
 
           <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-            
+
             {paso === 1 && (
               <form onSubmit={avanzarPaso} className="animate__animated animate__fadeIn space-y-8">
                 <div className="flex items-center gap-3 border-b pb-2">
@@ -363,7 +374,7 @@ export default function Pagos() {
                   {envioDatos.tipoComprobante === "boleta" ? (
                     <div>
                       <div className="flex justify-between items-end mb-1">
-                        <label className="block text-sm font-medium text-gray-700">DNI</label> 
+                        <label className="block text-sm font-medium text-gray-700">DNI</label>
                         <span className={`text-xs ${envioDatos.documento.length === 8 ? 'text-green-600 font-bold' : 'text-red-400'}`}>
                           {envioDatos.documento.length}/8
                         </span>
@@ -391,9 +402,9 @@ export default function Pagos() {
 
                 <div className="pt-4 border-t">
                   <h3 className="text-md font-semibold text-gray-700 mb-3">Método de Entrega</h3>
-                  <select 
-                    value={envioDatos.metodoEnvio} 
-                    onChange={(e) => setEnvioDatos({ ...envioDatos, metodoEnvio: e.target.value, direccionEntrega: { calle: "", distrito: "" }, referencia: "" })} 
+                  <select
+                    value={envioDatos.metodoEnvio}
+                    onChange={(e) => setEnvioDatos({ ...envioDatos, metodoEnvio: e.target.value, direccionEntrega: { calle: "", distrito: "" }, referencia: "" })}
                     className="w-full mb-5 border-gray-300 rounded-lg p-3 border outline-none focus:ring-brand bg-white"
                   >
                     <option value="delivery">Envío a Domicilio</option>
@@ -426,7 +437,7 @@ export default function Pagos() {
                       </div>
                       <p className="text-gray-600 mb-4 ml-9">Av. Arequipa 265, Lima - Perú</p>
                       <div className="rounded-lg overflow-hidden border border-gray-300">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3901.7828004149955!2d-77.03816652414346!3d-12.058455842245238!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c8c6db20b335%3A0xcab528f44d5cf301!2sAv.%20Arequipa%20265%2C%20Lima%2015046!5e0!3m2!1ses-419!2spe!4v1715480000000!5m2!1ses-419!2spe" width="100%" height="200" style={{border:0}} allowFullScreen="" loading="lazy" referrerPolicy="no-referrer-when-downgrade" title="Mapa de la Tienda"></iframe>
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3901.7828004149955!2d-77.03816652414346!3d-12.058455842245238!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c8c6db20b335%3A0xcab528f44d5cf301!2sAv.%20Arequipa%20265%2C%20Lima%2015046!5e0!3m2!1ses-419!2spe!4v1715480000000!5m2!1ses-419!2spe" width="100%" height="200" style={{ border: 0 }} allowFullScreen="" loading="lazy" referrerPolicy="no-referrer-when-downgrade" title="Mapa de la Tienda"></iframe>
                       </div>
                     </div>
                   )}
@@ -452,22 +463,20 @@ export default function Pagos() {
                   <button
                     type="button"
                     onClick={() => setPaymentMethod("card")}
-                    className={`flex-1 py-3 px-4 rounded-xl border-2 font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-                      paymentMethod === "card"
-                        ? "border-purple-600 bg-purple-50 text-purple-700 shadow-sm"
-                        : "border-gray-200 hover:border-purple-200 text-gray-600 hover:bg-gray-50"
-                    }`}
+                    className={`flex-1 py-3 px-4 rounded-xl border-2 font-bold text-sm transition-all flex items-center justify-center gap-2 ${paymentMethod === "card"
+                      ? "border-purple-600 bg-purple-50 text-purple-700 shadow-sm"
+                      : "border-gray-200 hover:border-purple-200 text-gray-600 hover:bg-gray-50"
+                      }`}
                   >
                     💳 Tarjeta de Crédito/Débito
                   </button>
                   <button
                     type="button"
                     onClick={() => setPaymentMethod("paypal")}
-                    className={`flex-1 py-3 px-4 rounded-xl border-2 font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-                      paymentMethod === "paypal"
-                        ? "border-purple-600 bg-purple-50 text-purple-700 shadow-sm"
-                        : "border-gray-200 hover:border-purple-200 text-gray-600 hover:bg-gray-50"
-                    }`}
+                    className={`flex-1 py-3 px-4 rounded-xl border-2 font-bold text-sm transition-all flex items-center justify-center gap-2 ${paymentMethod === "paypal"
+                      ? "border-purple-600 bg-purple-50 text-purple-700 shadow-sm"
+                      : "border-gray-200 hover:border-purple-200 text-gray-600 hover:bg-gray-50"
+                      }`}
                   >
                     🟡 PayPal
                   </button>
