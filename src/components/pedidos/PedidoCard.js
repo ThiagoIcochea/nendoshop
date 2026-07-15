@@ -10,17 +10,18 @@ const isBusinessDay = (date) => {
   return day !== 0 && day !== 6;
 };
 
-const addBusinessHours = (startDate, hours) => {
+const addBusinessDays = (startDate, days) => {
   const start = new Date(startDate);
   if (Number.isNaN(start.getTime())) return null;
 
   const result = new Date(start);
-  let remainingHours = Math.ceil(Number(hours) || 0);
+  result.setHours(0, 0, 0, 0);
+  let remainingDays = Math.ceil(Number(days) || 0);
 
-  while (remainingHours > 0) {
-    result.setHours(result.getHours() + 1);
+  while (remainingDays > 0) {
+    result.setDate(result.getDate() + 1);
     if (isBusinessDay(result)) {
-      remainingHours -= 1;
+      remainingDays -= 1;
     }
   }
 
@@ -67,14 +68,14 @@ export default function PedidoCard({ order, onReturnSuccess }) {
   const claimEligibility = useMemo(() => {
     const status = String(order.status || "").toLowerCase();
     const hasDeadline = Boolean(order.estimatedDate);
-    const claimDeadline = hasDeadline ? addBusinessHours(order.estimatedDate, 48) : null;
+    const claimDeadline = hasDeadline ? addBusinessDays(order.estimatedDate, 2) : null;
     const deadlinePassed = Boolean(claimDeadline) && claimDeadline.getTime() <= Date.now();
     const canClaim = ["delivered", "returned"].includes(status) || status === "cancelled" || (["pending", "ready_for_pickup", "shipped"].includes(status) && deadlinePassed);
     return {
       canClaim,
       message: canClaim
         ? "Puedes generar un reclamo para este pedido."
-        : "Los reclamos estarán disponibles cuando el pedido haya sido entregado, devuelto o cancelado, o cuando pasen 48 horas hábiles desde la fecha estimada de entrega."
+        : "Los reclamos estarán disponibles cuando el pedido haya sido entregado, devuelto o cancelado, o cuando pasen 2 días hábiles desde la fecha estimada de entrega."
     };
   }, [order.estimatedDate, order.status]);
 

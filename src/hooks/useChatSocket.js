@@ -26,6 +26,23 @@ const getAuthToken = () => {
   return localStorage.getItem("token") || "";
 };
 
+const decodeTokenPayload = (token) => {
+  try {
+    const payload = String(token || "").split(".")[1];
+    if (!payload) return null;
+    const normalizedPayload = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const paddedPayload = normalizedPayload.padEnd(normalizedPayload.length + ((4 - (normalizedPayload.length % 4)) % 4), "=");
+    return JSON.parse(window.atob(paddedPayload));
+  } catch (error) {
+    return null;
+  }
+};
+
+const getUserIdFromToken = (token) => {
+  const payload = decodeTokenPayload(token);
+  return payload?.id || payload?._id || payload?.userId || payload?.sub || null;
+};
+
 const fetchRoomMessages = async (roomKey) => {
   const headers = {};
   const token = getAuthToken();
@@ -84,8 +101,9 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
   const reconnectDelayRef = useRef(500);
   const isMountedRef = useRef(true);
 
-  const finalRoomKey = roomKey === "support" ? (userId ? `support_${userId}` : roomKey) : roomKey;
   const authToken = getAuthToken();
+  const resolvedUserId = userId || getUserIdFromToken(authToken);
+  const finalRoomKey = roomKey === "support" ? (resolvedUserId ? `support_${resolvedUserId}` : roomKey) : roomKey;
 
   const syncBotCartAction = useCallback((message) => {
     const action = message?.meta?.action;
@@ -162,7 +180,7 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
         reconnectTimeoutRef.current = null;
       }
       if (finalRoomKey && username) {
-        socket.send(JSON.stringify({ type: "join", roomKey: finalRoomKey, username, userId, profileImg }));
+        socket.send(JSON.stringify({ type: "join", roomKey: finalRoomKey, username, userId: resolvedUserId, profileImg }));
       }
     });
 
@@ -244,7 +262,7 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
     socket.addEventListener("error", () => {
       setConnected(false);
     });
-  }, [authToken, finalRoomKey, handleBotAction, profileImg, syncBotCartAction, userId, username]);
+  }, [authToken, finalRoomKey, handleBotAction, profileImg, resolvedUserId, syncBotCartAction, username]);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -272,7 +290,7 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
       connectWebSocket();
     } else if (finalRoomKey) {
-      socketRef.current.send(JSON.stringify({ type: "join", roomKey: finalRoomKey, username, userId, profileImg }));
+      socketRef.current.send(JSON.stringify({ type: "join", roomKey: finalRoomKey, username, userId: resolvedUserId, profileImg }));
     }
 
     return () => {
@@ -293,7 +311,7 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
       setTypingUser("");
       setOnlineUsers([]);
     };
-  }, [authToken, connectWebSocket, finalRoomKey, profileImg, roomKey, userId, username]);
+  }, [authToken, connectWebSocket, finalRoomKey, profileImg, resolvedUserId, roomKey, username]);
 
   const sendMessage = useCallback((text) => {
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
@@ -302,8 +320,8 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
     }
 
     const cartItems = finalRoomKey?.startsWith("support") ? readLocalCart() : [];
-    socketRef.current.send(JSON.stringify({ type: "message", roomKey: finalRoomKey, text, username, userId, profileImg, cartItems }));
-  }, [finalRoomKey, profileImg, userId, username]);
+    socketRef.current.send(JSON.stringify({ type: "message", roomKey: finalRoomKey, text, username, userId: resolvedUserId, profileImg, cartItems }));
+  }, [finalRoomKey, profileImg, resolvedUserId, username]);
 
   const sendTyping = useCallback(() => {
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
