@@ -475,7 +475,7 @@ export default function Deliveries() {
                               const nextStatus = currentDraftStatus;
                               if (nextStatus === "delivered") {
                                 const codeResult = await promptDeliveryCode();
-                                const code = codeResult?.value;
+                                const code = typeof codeResult?.value === "string" ? codeResult.value : codeResult?.value?.code || "";
                                 if (code) handleUpdateStatus(delivery._id, nextStatus, code);
                                 return;
                               }
@@ -590,7 +590,7 @@ export default function Deliveries() {
                         const nextStatus = currentDraftStatus;
                         if (nextStatus === "delivered") {
                           const codeResult = await promptDeliveryCode();
-                          const code = codeResult?.value;
+                          const code = typeof codeResult?.value === "string" ? codeResult.value : codeResult?.value?.code || "";
                           if (code) handleUpdateStatus(delivery._id, nextStatus, code);
                           return;
                         }
@@ -732,10 +732,11 @@ export default function Deliveries() {
                                   <option value="cancelled">Cancelado</option>
                                   <option value="returned">Devuelto</option>
                                 </select>
-                                <button onClick={() => {
+                                <button onClick={async () => {
                                   const nextStatus = currentDraftStatus;
                                   if (nextStatus === "delivered") {
-                                    const code = window.prompt("Ingresa el código de validación de entrega:");
+                                    const codeResult = await promptDeliveryCode();
+                                    const code = typeof codeResult?.value === "string" ? codeResult.value : codeResult?.value?.code || "";
                                     if (code) handleUpdateStatus(delivery._id, nextStatus, code);
                                     return;
                                   }

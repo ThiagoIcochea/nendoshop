@@ -83,7 +83,9 @@ export const promptVerificationCode = async ({
   description = "Ingresa el código recibido.",
   placeholder = "Código de verificación",
   confirmButtonText = "Confirmar",
-  cancelButtonText = "Cancelar"
+  cancelButtonText = "Cancelar",
+  length = 6,
+  inputMode = "text"
 } = {}) => {
   const result = await Swal.fire({
     title,
@@ -113,17 +115,28 @@ export const promptVerificationCode = async ({
         if (hidden) hidden.value = inputs.map((input) => input.value).join("");
       };
 
-      for (let index = 0; index < 6; index += 1) {
+      const codeLength = Number(length) || 6;
+      for (let index = 0; index < codeLength; index += 1) {
         const input = document.createElement("input");
         input.type = "text";
-        input.inputMode = "numeric";
+        input.inputMode = inputMode;
         input.maxLength = 1;
-        input.placeholder = index === 0 ? "0" : "";
-        input.className = "h-12 w-10 rounded-xl border border-gray-300 text-center text-lg font-semibold outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200";
+        input.autocomplete = "one-time-code";
+        input.placeholder = index === 0 ? (placeholder?.charAt(0) || "0") : "";
+        input.className = "h-12 w-10 rounded-xl border border-gray-300 text-center text-lg font-semibold uppercase outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200";
         input.addEventListener("input", (event) => {
-          const value = event.target.value.replace(/\D/g, "");
+          const value = event.target.value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
           event.target.value = value;
-          if (value && index < 5) inputs[index + 1]?.focus();
+          if (value && index < codeLength - 1) inputs[index + 1]?.focus();
+          updateHidden();
+        });
+        input.addEventListener("paste", (event) => {
+          event.preventDefault();
+          const pasted = event.clipboardData.getData("text").replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, codeLength);
+          pasted.split("").forEach((char, pasteIndex) => {
+            if (inputs[pasteIndex]) inputs[pasteIndex].value = char;
+          });
+          inputs[Math.max(0, Math.min(pasted.length, codeLength) - 1)]?.focus();
           updateHidden();
         });
         input.addEventListener("keydown", (event) => {
@@ -153,11 +166,11 @@ export const promptMfaCode = async ({
   description = "Ingresa el código que recibiste.",
   confirmButtonText = "Confirmar",
   cancelButtonText = "Cancelar"
-} = {}) => promptVerificationCode({ title, description, confirmButtonText, cancelButtonText });
+} = {}) => promptVerificationCode({ title, description, placeholder: "ABC123", confirmButtonText, cancelButtonText, inputMode: "text" });
 
 export const promptDeliveryCode = async ({
   title = "Confirmar entrega",
   description = "Ingresa el código de validación para marcar esta entrega como completada.",
   confirmButtonText = "Confirmar entrega",
   cancelButtonText = "Cancelar"
-} = {}) => promptVerificationCode({ title, description, confirmButtonText, cancelButtonText });
+} = {}) => promptVerificationCode({ title, description, placeholder: "ABC123", confirmButtonText, cancelButtonText, inputMode: "text" });

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Download, Filter, Lock, Search, ShieldAlert, Unlock } from "lucide-react";
 import Swal from "sweetalert2";
 import { BACKEND_URL } from "../../utils/config";
+import { promptMfaCode, promptMfaMethodSelection } from "../../utils/mfaFlow";
 
 export default function SecurityLogs() {
   const [users, setUsers] = useState([]);
@@ -70,26 +71,67 @@ export default function SecurityLogs() {
       inputLabel: "Motivo",
       inputValue: user.chatBlockReason || "",
       showCancelButton: true,
-      confirmButtonText: blocked ? "Bloquear" : "Desbloquear"
+      confirmButtonText: blocked ? "Bloquear" : "Desbloquear",
+      cancelButtonText: "Cancelar",
+      buttonsStyling: false,
+      customClass: {
+        popup: "rounded-3xl border border-purple-100 shadow-2xl",
+        input: "rounded-xl border border-gray-300 px-3 py-2 text-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-200",
+        confirmButton: "rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-500 px-4 py-2 text-white border-0 shadow-md",
+        cancelButton: "rounded-xl border border-gray-300 bg-white px-4 py-2 text-gray-700"
+      }
     });
 
     if (result.isDismissed || result.isDenied) return;
+    const reason = result.value || "Sin motivo";
 
-    const res = await fetch(`${BACKEND_URL}/api/admin/clients/${user._id}/block`, {
+    const selectionResult = await promptMfaMethodSelection({
+      title: blocked ? "Confirmar bloqueo" : "Confirmar desbloqueo",
+      description: "Elige cómo recibir el código MFA para confirmar esta acción.",
+      confirmButtonText: "Continuar",
+      cancelButtonText: "Volver"
+    });
+    const mfaSelection = selectionResult.value;
+    if (!mfaSelection) return;
+
+    let res = await fetch(`${BACKEND_URL}/api/admin/clients/${user._id}/block`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
         ...authHeaders()
       },
       credentials: "include",
-      body: JSON.stringify({ blocked, reason: result.value || "Sin motivo" })
+      body: JSON.stringify({ blocked, reason, method: mfaSelection })
     });
+    let data = await res.json().catch(() => ({}));
+
+    if (res.status === 202 && data?.twoFactorRequired) {
+      const codeResult = await promptMfaCode({
+        title: blocked ? "Confirmar bloqueo" : "Confirmar desbloqueo",
+        description: "Ingresa el código que recibiste para autorizar esta acción.",
+        confirmButtonText: "Confirmar",
+        cancelButtonText: "Cancelar"
+      });
+      const mfaCode = typeof codeResult?.value === "string" ? codeResult.value : codeResult?.value?.code || "";
+      if (!mfaCode) return;
+
+      res = await fetch(`${BACKEND_URL}/api/admin/clients/${user._id}/block`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeaders()
+        },
+        credentials: "include",
+        body: JSON.stringify({ blocked, reason, mfaCode, tempToken: data.tempToken, method: mfaSelection })
+      });
+      data = await res.json().catch(() => ({}));
+    }
 
     if (res.ok) {
       await loadData();
       Swal.fire("Listo", blocked ? "Cuenta bloqueada" : "Cuenta desbloqueada", "success");
     } else {
-      Swal.fire("Error", "No se pudo actualizar el estado", "error");
+      Swal.fire("Error", data?.message || "No se pudo actualizar el estado", "error");
     }
   };
 
