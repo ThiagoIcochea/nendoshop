@@ -81,6 +81,7 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
   const socketRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
+  const reconnectDelayRef = useRef(500);
   const isMountedRef = useRef(true);
 
   const finalRoomKey = roomKey === "support" ? (userId ? `support_${userId}` : roomKey) : roomKey;
@@ -137,7 +138,7 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
   }, []);
 
   const connectWebSocket = useCallback(() => {
-    if (!WS_URL || !authToken) return;
+    if (!WS_URL) return;
 
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
       return;
@@ -148,12 +149,14 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
     }
 
     const separator = WS_URL.includes("?") ? "&" : "?";
-    const socket = new WebSocket(`${WS_URL}${separator}token=${encodeURIComponent(authToken)}`);
+    const socketUrl = authToken ? `${WS_URL}${separator}token=${encodeURIComponent(authToken)}` : WS_URL;
+    const socket = new WebSocket(socketUrl);
     socketRef.current = socket;
 
     socket.addEventListener("open", () => {
       if (!isMountedRef.current) return;
       setConnected(true);
+      reconnectDelayRef.current = 500;
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = null;
@@ -229,10 +232,12 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
       }
 
       if (!reconnectTimeoutRef.current) {
+        const delay = reconnectDelayRef.current;
+        reconnectDelayRef.current = Math.min(delay * 2, 5000);
         reconnectTimeoutRef.current = setTimeout(() => {
           reconnectTimeoutRef.current = null;
           connectWebSocket();
-        }, 2500);
+        }, delay);
       }
     });
 
@@ -253,18 +258,16 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
       setMessages([]);
     }
 
-    if (authToken) {
-      fetchRoomMessages(finalRoomKey)
-        .then((data) => {
-          if (!active) return;
-          const nextMessages = Array.isArray(data) ? data : [];
-          setMessages(nextMessages);
-          saveCachedMessages(finalRoomKey, nextMessages);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
+    fetchRoomMessages(finalRoomKey)
+      .then((data) => {
+        if (!active) return;
+        const nextMessages = Array.isArray(data) ? data : [];
+        setMessages(nextMessages);
+        saveCachedMessages(finalRoomKey, nextMessages);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
     if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
       connectWebSocket();

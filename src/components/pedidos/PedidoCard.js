@@ -5,6 +5,28 @@ import { BACKEND_URL } from "../../utils/config";
 import { readJsonResponse } from "../../utils/api";
 import { promptMfaCode, promptMfaMethodSelection } from "../../utils/mfaFlow";
 
+const isBusinessDay = (date) => {
+  const day = date.getDay();
+  return day !== 0 && day !== 6;
+};
+
+const addBusinessHours = (startDate, hours) => {
+  const start = new Date(startDate);
+  if (Number.isNaN(start.getTime())) return null;
+
+  const result = new Date(start);
+  let remainingHours = Math.ceil(Number(hours) || 0);
+
+  while (remainingHours > 0) {
+    result.setHours(result.getHours() + 1);
+    if (isBusinessDay(result)) {
+      remainingHours -= 1;
+    }
+  }
+
+  return result;
+};
+
 export default function PedidoCard({ order, onReturnSuccess }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showClaim, setShowClaim] = useState(false);
@@ -45,13 +67,14 @@ export default function PedidoCard({ order, onReturnSuccess }) {
   const claimEligibility = useMemo(() => {
     const status = String(order.status || "").toLowerCase();
     const hasDeadline = Boolean(order.estimatedDate);
-    const deadlinePassed = hasDeadline && new Date(order.estimatedDate).getTime() < Date.now();
+    const claimDeadline = hasDeadline ? addBusinessHours(order.estimatedDate, 48) : null;
+    const deadlinePassed = Boolean(claimDeadline) && claimDeadline.getTime() <= Date.now();
     const canClaim = ["delivered", "returned"].includes(status) || status === "cancelled" || (["pending", "ready_for_pickup", "shipped"].includes(status) && deadlinePassed);
     return {
       canClaim,
       message: canClaim
         ? "Puedes generar un reclamo para este pedido."
-        : "Los reclamos estarán disponibles cuando el pedido haya sido entregado, devuelto o cancelado, o cuando haya pasado la fecha estimada de entrega."
+        : "Los reclamos estarán disponibles cuando el pedido haya sido entregado, devuelto o cancelado, o cuando pasen 48 horas hábiles desde la fecha estimada de entrega."
     };
   }, [order.estimatedDate, order.status]);
 
