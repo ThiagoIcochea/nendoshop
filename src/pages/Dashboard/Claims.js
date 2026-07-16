@@ -133,8 +133,8 @@ export default function Claims() {
 
       {selectedClaim && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-gray-800">Resolver reclamo</h3>
+          <div className="w-full max-w-xl rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-2xl text-gray-800 dark:text-gray-200">
+            <h3 className="text-lg font-bold">Resolver reclamo</h3>
             <p className="mt-1 text-sm text-gray-500">Categoría: {CLAIM_LABELS[selectedClaim.category] || selectedClaim.category}</p>
             <form onSubmit={handleResolveClaim} className="mt-4 space-y-4">
               <select value={claimAction.status} onChange={(e) => setClaimAction({ ...claimAction, status: e.target.value })} className="w-full rounded-xl border border-gray-300 px-3 py-2">

@@ -150,7 +150,7 @@ export default function Clients() {
   const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-6 animate__animated animate__fadeIn">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 p-4 md:p-6 animate__animated animate__fadeIn transition-colors">
 
       <div className="mb-8 animate__animated animate__fadeInDown">
         <h1 className="text-3xl md:text-4xl font-bold text-purple-600">Clientes</h1>
@@ -353,7 +353,7 @@ export default function Clients() {
 
         <button
           onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
-          className="px-4 py-2 bg-gray-200 rounded"
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded disabled:opacity-50 transition-colors"
         >
           Anterior
         </button>
@@ -362,7 +362,7 @@ export default function Clients() {
           <button
             key={i}
             onClick={() => setCurrentPage(i + 1)}
-            className={`px-4 py-2 rounded ${currentPage === i + 1 ? "bg-purple-600 text-white" : "bg-gray-200"}`}
+            className={`px-4 py-2 rounded transition-colors ${currentPage === i + 1 ? "bg-purple-600 text-white" : "bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200"}`}
           >
             {i + 1}
           </button>
@@ -370,7 +370,7 @@ export default function Clients() {
 
         <button
           onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
-          className="px-4 py-2 bg-gray-200 rounded"
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded disabled:opacity-50 transition-colors"
         >
           Siguiente
         </button>

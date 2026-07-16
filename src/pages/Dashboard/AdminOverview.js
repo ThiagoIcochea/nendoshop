@@ -168,8 +168,8 @@ export default function AdminOverview() {
                 return (
                   <g key={entry.name}>
                     <rect x={x} y={y} width="36" height={height} rx="6" fill={index % 2 === 0 ? "#8b5cf6" : "#4f46e5"} />
-                    <text x={x + 18} y="155" textAnchor="middle" fontSize="10" fill="#6b7280">{entry.name}</text>
-                    <text x={x + 18} y={y - 6} textAnchor="middle" fontSize="10" fill="#111827">{entry.count}</text>
+                    <text x={x + 18} y="155" textAnchor="middle" fontSize="10" fill="currentColor" className="text-gray-500 dark:text-gray-400">{entry.name}</text>
+                    <text x={x + 18} y={y - 6} textAnchor="middle" fontSize="10" fill="currentColor" className="text-gray-900 dark:text-gray-100">{entry.count}</text>
                   </g>
                 );
               })}
@@ -188,8 +188,8 @@ export default function AdminOverview() {
                 return (
                   <g key={entry.name}>
                     <rect x={x} y={y} width="36" height={height} rx="6" fill={index % 2 === 0 ? "#06b6d4" : "#0f766e"} />
-                    <text x={x + 18} y="155" textAnchor="middle" fontSize="10" fill="#6b7280">{entry.name.slice(0, 7)}</text>
-                    <text x={x + 18} y={y - 6} textAnchor="middle" fontSize="10" fill="#111827">{entry.count}</text>
+                    <text x={x + 18} y="155" textAnchor="middle" fontSize="10" fill="currentColor" className="text-gray-500 dark:text-gray-400">{entry.name.slice(0, 7)}</text>
+                    <text x={x + 18} y={y - 6} textAnchor="middle" fontSize="10" fill="currentColor" className="text-gray-900 dark:text-gray-100">{entry.count}</text>
                   </g>
                 );
               })}

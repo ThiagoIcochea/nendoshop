@@ -781,9 +781,9 @@ export default function Deliveries() {
 
       {selectedClaim && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-gray-800">Resolver reclamo</h3>
-            <p className="mt-1 text-sm text-gray-500">Categoría: {selectedClaim.category}</p>
+          <div className="w-full max-w-xl rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-2xl text-gray-800 dark:text-gray-200">
+            <h3 className="text-lg font-bold">Resolver reclamo</h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Categoría: {selectedClaim.category}</p>
             <form onSubmit={handleResolveClaim} className="mt-4 space-y-4">
               <div>
                 <label className="mb-1 block text-sm font-semibold text-gray-700">Resolución</label>
@@ -830,36 +830,36 @@ export default function Deliveries() {
 
       {selectedDelivery && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl">
+          <div className="w-full max-w-2xl rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-2xl text-gray-800 dark:text-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-bold text-gray-800">Detalle del pedido</h3>
-                <p className="text-sm text-gray-500">Pedido: {selectedDelivery._id}</p>
+                <h3 className="text-lg font-bold">Detalle del pedido</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Pedido: {selectedDelivery._id}</p>
               </div>
-              <button onClick={() => setSelectedDelivery(null)} className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-600">Cerrar</button>
+              <button onClick={() => setSelectedDelivery(null)} className="rounded-lg border border-gray-300 dark:border-gray-700 px-3 py-2 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-850">Cerrar</button>
             </div>
-            <div className="mt-4 grid gap-3 text-sm text-gray-700 md:grid-cols-2">
-              <div><span className="font-semibold">Cliente:</span> {selectedDelivery.paymentId?.cliente || 'Cliente anónimo'}</div>
-              <div><span className="font-semibold">Pago:</span> {selectedDelivery.paymentId?._id || selectedDelivery.paymentId || '—'}</div>
-              <div><span className="font-semibold">Tipo:</span> {selectedDelivery.deliveryType === 'pickup' ? 'Recojo' : 'Envío'}</div>
-              <div><span className="font-semibold">Estado:</span> {selectedDelivery.status}</div>
-              <div><span className="font-semibold">Dirección:</span> {selectedDelivery.destinationAddress || '—'}</div>
-              <div><span className="font-semibold">Referencia:</span> {selectedDelivery.reference || '—'}</div>
-              <div><span className="font-semibold">Agencia:</span> {selectedDelivery.agency || '—'}</div>
-              <div><span className="font-semibold">Código de confirmación:</span> {selectedDelivery.deliveryCode ? 'Privado y visible solo al confirmar la entrega' : '—'}</div>
-              <div><span className="font-semibold">Código de seguimiento:</span> {selectedDelivery.trackingCode || '—'}</div>
-              <div><span className="font-semibold">Fecha estimada:</span> {selectedDelivery.estimatedDate ? new Date(selectedDelivery.estimatedDate).toLocaleDateString('es-PE') : '—'}</div>
+            <div className="mt-4 grid gap-3 text-sm md:grid-cols-2">
+              <div><span className="font-semibold text-gray-500 dark:text-gray-400">Cliente:</span> {selectedDelivery.paymentId?.cliente || 'Cliente anónimo'}</div>
+              <div><span className="font-semibold text-gray-500 dark:text-gray-400">Pago:</span> {selectedDelivery.paymentId?._id || selectedDelivery.paymentId || '—'}</div>
+              <div><span className="font-semibold text-gray-500 dark:text-gray-400">Tipo:</span> {selectedDelivery.deliveryType === 'pickup' ? 'Recojo' : 'Envío'}</div>
+              <div><span className="font-semibold text-gray-500 dark:text-gray-400">Estado:</span> {selectedDelivery.status}</div>
+              <div><span className="font-semibold text-gray-500 dark:text-gray-400">Dirección:</span> {selectedDelivery.destinationAddress || '—'}</div>
+              <div><span className="font-semibold text-gray-500 dark:text-gray-400">Referencia:</span> {selectedDelivery.reference || '—'}</div>
+              <div><span className="font-semibold text-gray-500 dark:text-gray-400">Agencia:</span> {selectedDelivery.agency || '—'}</div>
+              <div><span className="font-semibold text-gray-500 dark:text-gray-400">Código de confirmación:</span> {selectedDelivery.deliveryCode ? 'Privado y visible solo al confirmar la entrega' : '—'}</div>
+              <div><span className="font-semibold text-gray-500 dark:text-gray-400">Código de seguimiento:</span> {selectedDelivery.trackingCode || '—'}</div>
+              <div><span className="font-semibold text-gray-500 dark:text-gray-400">Fecha estimada:</span> {selectedDelivery.estimatedDate ? new Date(selectedDelivery.estimatedDate).toLocaleDateString('es-PE') : '—'}</div>
             </div>
 
-            <div className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-4">
-              <h4 className="text-sm font-semibold text-gray-800">Productos del pedido</h4>
+            <div className="mt-6 rounded-2xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 p-4">
+              <h4 className="text-sm font-semibold">Productos del pedido</h4>
               <ul className="mt-3 space-y-2">
                 {(selectedDelivery.paymentId?.productos || []).length === 0 ? (
-                  <li className="text-sm text-gray-500">No hay productos registrados para este pedido.</li>
+                  <li className="text-sm text-gray-500 dark:text-gray-400">No hay productos registrados para este pedido.</li>
                 ) : (selectedDelivery.paymentId?.productos || []).map((product, index) => (
-                  <li key={`${product?.name || 'producto'}-${index}`} className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700">
+                  <li key={`${product?.name || 'producto'}-${index}`} className="flex items-center justify-between rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-700 dark:text-gray-200">
                     <span>{product?.name || 'Producto sin nombre'}</span>
-                    <span className="font-semibold text-gray-500">x{product?.quantity || 0}</span>
+                    <span className="font-semibold text-gray-500 dark:text-gray-400">x{product?.quantity || 0}</span>
                   </li>
                 ))}
               </ul>
@@ -870,7 +870,7 @@ export default function Deliveries() {
 
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate__animated animate__fadeIn">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-100">
+          <div className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-100">
             <div className="bg-purple-600 px-6 py-4 flex justify-between items-center text-white">
               <h3 className="font-bold text-lg">Registrar Envío a Domicilio</h3>
               <button

@@ -175,7 +175,7 @@ export default function Payments() {
 
   return (
 
-    <div className="min-h-screen bg-gray-100 p-4 md:p-6">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 p-4 md:p-6 transition-colors">
 
       <div className="flex flex-col md:flex-row justify-between gap-4 md:items-center mb-8">
 
@@ -368,7 +368,7 @@ export default function Payments() {
           <button
             onClick={() => setCurrentPage(currentPage - 1)}
             disabled={currentPage === 1}
-            className="px-4 py-2 bg-gray-200 rounded"
+            className="px-4 py-2 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded disabled:opacity-50 transition-colors"
           >
             Anterior
           </button>
@@ -377,7 +377,7 @@ export default function Payments() {
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`px-4 py-2 rounded ${currentPage === i + 1 ? "bg-purple-600 text-white" : "bg-gray-200"}`}
+              className={`px-4 py-2 rounded transition-colors ${currentPage === i + 1 ? "bg-purple-600 text-white" : "bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200"}`}
             >
               {i + 1}
             </button>
@@ -386,7 +386,7 @@ export default function Payments() {
           <button
             onClick={() => setCurrentPage(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-gray-200 rounded"
+            className="px-4 py-2 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded disabled:opacity-50 transition-colors"
           >
             Siguiente
           </button>
