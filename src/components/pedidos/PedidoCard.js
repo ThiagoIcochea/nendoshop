@@ -193,7 +193,7 @@ export default function PedidoCard({ order, onReturnSuccess }) {
           <div className="mb-3 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-blue-800">
             <div className="font-semibold">Tracking actual</div>
             <div className="mt-1">{statusHistory[statusHistory.length - 1]?.note || "Estado actualizado"}</div>
-            {order.status === "ready_for_pickup" && order.deliveryCode && (
+            {["ready_for_pickup", "shipped"].includes(String(order.status || "").toLowerCase()) && order.deliveryCode && (
               <div className="mt-2 rounded-lg border border-green-200 bg-green-50 px-2 py-2 font-semibold text-green-700">
                 Código de confirmación: {order.deliveryCode}
               </div>

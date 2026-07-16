@@ -3,11 +3,18 @@ import { AlertTriangle, FileText, Users } from "lucide-react";
 import OnlineUsers from "../OnlineUsers";
 import AvatarWithFallback from "./AvatarWithFallback";
 
-export default function ChatInfo({ users, onReportUser }) {
+export default function ChatInfo({ users, currentUser, onReportUser }) {
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [reportText, setReportText] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [feedback, setFeedback] = useState("");
+  const currentUserId = currentUser?._id || currentUser?.id || currentUser?.userId || null;
+  const currentUserRole = currentUser?.role || currentUser?.user?.role || "user";
+  const selectedUserId = selectedUser?.id || selectedUser?.userId || null;
+  const selectedUserRole = selectedUser?.role || "user";
+  const cannotReportSelected =
+    Boolean(selectedUserId && currentUserId && String(selectedUserId) === String(currentUserId)) ||
+    (selectedUserRole === "admin" && currentUserRole !== "admin");
 
   return (
     <aside className="flex h-full w-full flex-col overflow-y-auto bg-white md:w-80">
@@ -79,6 +86,14 @@ export default function ChatInfo({ users, onReportUser }) {
               alert("Selecciona un usuario de la lista primero");
               return;
             }
+            if (cannotReportSelected) {
+              setFeedback(
+                selectedUserId && currentUserId && String(selectedUserId) === String(currentUserId)
+                  ? "No puedes reportarte a ti mismo."
+                  : "Solo un administrador puede reportar a otro administrador."
+              );
+              return;
+            }
             setFeedback("");
             setIsReportOpen(true);
           }}
@@ -119,6 +134,15 @@ export default function ChatInfo({ users, onReportUser }) {
               <button
                 onClick={() => {
                   if (!selectedUser) return;
+                  if (cannotReportSelected) {
+                    setFeedback(
+                      selectedUserId && currentUserId && String(selectedUserId) === String(currentUserId)
+                        ? "No puedes reportarte a ti mismo."
+                        : "Solo un administrador puede reportar a otro administrador."
+                    );
+                    setIsReportOpen(false);
+                    return;
+                  }
                   onReportUser?.({
                     targetUserId: selectedUser.id,
                     targetUsername: selectedUser.username,

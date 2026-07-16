@@ -156,19 +156,54 @@ export default function SecurityLogs() {
       return;
     }
 
-    const res = await fetch(`${BACKEND_URL}/api/admin/clients/security/ip-blocks/block`, {
+    const selectionResult = await promptMfaMethodSelection({
+      title: "Confirmar bloqueo de IP",
+      description: "Elige como recibir el codigo MFA para bloquear esta IP.",
+      confirmButtonText: "Continuar",
+      cancelButtonText: "Volver"
+    });
+    const mfaSelection = selectionResult.value;
+    if (!mfaSelection) return;
+
+    const payload = {
+      ip: ipToBlock.trim(),
+      reason: ipBlockReason.trim(),
+      durationMinutes: Number(ipBlockDuration) || 30,
+      method: mfaSelection
+    };
+
+    let res = await fetch(`${BACKEND_URL}/api/admin/clients/security/ip-blocks/block`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         ...authHeaders()
       },
       credentials: "include",
-      body: JSON.stringify({
-        ip: ipToBlock.trim(),
-        reason: ipBlockReason.trim(),
-        durationMinutes: Number(ipBlockDuration) || 30
-      })
+      body: JSON.stringify(payload)
     });
+    let data = await res.json().catch(() => ({}));
+
+    if (res.status === 202 && data?.twoFactorRequired) {
+      const codeResult = await promptMfaCode({
+        title: "Confirmar bloqueo de IP",
+        description: "Ingresa el codigo que recibiste para autorizar el bloqueo.",
+        confirmButtonText: "Bloquear IP",
+        cancelButtonText: "Cancelar"
+      });
+      const mfaCode = typeof codeResult?.value === "string" ? codeResult.value : codeResult?.value?.code || "";
+      if (!mfaCode) return;
+
+      res = await fetch(`${BACKEND_URL}/api/admin/clients/security/ip-blocks/block`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeaders()
+        },
+        credentials: "include",
+        body: JSON.stringify({ ...payload, mfaCode, tempToken: data.tempToken })
+      });
+      data = await res.json().catch(() => ({}));
+    }
 
     if (res.ok) {
       setIpToBlock("");
@@ -177,7 +212,7 @@ export default function SecurityLogs() {
       await loadData();
       Swal.fire("Listo", "IP bloqueada", "success");
     } else {
-      Swal.fire("Error", "No se pudo bloquear la IP", "error");
+      Swal.fire("Error", data?.message || "No se pudo bloquear la IP", "error");
     }
   };
 

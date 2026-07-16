@@ -379,7 +379,7 @@ export default function Deliveries() {
                   const payment = delivery.paymentId;
                   const clientName = payment?.cliente || "Cliente Anónimo";
                   const paymentId = payment?._id || delivery.paymentId || "—";
-                  const deliveryType = payment?.deliveryType || "shipping";
+                  const deliveryType = delivery.deliveryType || payment?.deliveryType || "shipping";
                   
                   const isShippingInfoFilled = Boolean(
                     delivery.destinationAddress &&
@@ -515,7 +515,7 @@ export default function Deliveries() {
               const payment = delivery.paymentId;
               const clientName = payment?.cliente || "Cliente Anónimo";
               const paymentId = payment?._id || delivery.paymentId || "—";
-              const deliveryType = payment?.deliveryType || "shipping";
+              const deliveryType = delivery.deliveryType || payment?.deliveryType || "shipping";
 
               let statusBadgeClass = "bg-gray-100 text-gray-800";
               let statusText = "Pendiente";
@@ -670,7 +670,7 @@ export default function Deliveries() {
                         const payment = delivery.paymentId;
                         const clientName = payment?.cliente || "Cliente Anónimo";
                         const paymentId = payment?._id || delivery.paymentId || "—";
-                        const deliveryType = payment?.deliveryType || "shipping";
+                        const deliveryType = delivery.deliveryType || payment?.deliveryType || "shipping";
                         const isShippingInfoFilled = Boolean(
                           delivery.destinationAddress &&
                           delivery.destinationAddress !== "Pendiente de registro" &&

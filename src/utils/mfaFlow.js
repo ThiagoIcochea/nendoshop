@@ -53,7 +53,7 @@ export const promptMfaMethodSelection = async ({
     cancelButtonText,
     buttonsStyling: false,
     customClass: {
-      popup: "rounded-3xl border border-purple-100 shadow-2xl",
+      popup: "w-[calc(100vw-2rem)] max-w-md rounded-3xl border border-purple-100 shadow-2xl",
       confirmButton: "rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-500 px-4 py-2 text-white border-0 shadow-md",
       cancelButton: "rounded-xl border border-gray-300 bg-white px-4 py-2 text-gray-700"
     },
@@ -87,14 +87,15 @@ export const promptVerificationCode = async ({
   length = 6,
   inputMode = "text",
   allowedPattern = /[^a-zA-Z0-9]/g,
-  cellClassName = "h-12 w-10"
+  cellClassName = "h-12 w-10",
+  gridClassName = "flex flex-wrap justify-center gap-2"
 } = {}) => {
   const result = await Swal.fire({
     title,
     html: `
       <div class="text-left">
         <p class="mb-3 text-sm text-gray-600">${description}</p>
-        <div id="verification-code-grid" class="flex justify-center gap-2"></div>
+        <div id="verification-code-grid" class="${gridClassName}"></div>
         <input id="verification-code-hidden" type="hidden" />
       </div>
     `,
@@ -103,7 +104,7 @@ export const promptVerificationCode = async ({
     cancelButtonText,
     buttonsStyling: false,
     customClass: {
-      popup: "rounded-3xl border border-purple-100 shadow-2xl",
+      popup: "w-[calc(100vw-2rem)] max-w-md rounded-3xl border border-purple-100 shadow-2xl",
       confirmButton: "rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-500 px-4 py-2 text-white border-0 shadow-md",
       cancelButton: "rounded-xl border border-gray-300 bg-white px-4 py-2 text-gray-700"
     },
@@ -191,5 +192,6 @@ export const promptDeliveryCode = async ({
   length: 11,
   inputMode: "text",
   allowedPattern: /[^a-zA-Z0-9-]/g,
-  cellClassName: "h-12 w-8 sm:w-10"
+  cellClassName: "h-10 w-6 text-sm sm:h-12 sm:w-8 sm:text-base",
+  gridClassName: "flex flex-wrap justify-center gap-1.5 sm:gap-2"
 });

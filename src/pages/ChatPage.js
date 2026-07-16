@@ -71,7 +71,7 @@ export default function ChatPage() {
         </main>
 
         <aside className={`${infoOpen ? "absolute inset-y-0 right-0 w-full z-20 block" : "hidden"} border-l border-purple-100 bg-white shadow-sm md:relative md:block md:w-[340px] md:shrink-0 md:border-l xl:block md:max-h-full`}>
-          <ChatInfo users={onlineUsers} onReportUser={reportUser} />
+          <ChatInfo users={onlineUsers} currentUser={auth} onReportUser={reportUser} />
         </aside>
 
       </div>
