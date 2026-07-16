@@ -149,10 +149,9 @@ export default function AdminAccess() {
       Swal.fire("Error", "No se pudo completar la recuperacion", "error");
     }
   };
-
   return (
 
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-100">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-gray-950 transition-colors">
 
       <ParticlesBackground />
 
@@ -229,26 +228,26 @@ export default function AdminAccess() {
 
         </form>
 
-        {showResetModal && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4">
-            <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-              <h3 className="text-lg font-semibold text-gray-900">Recuperar acceso admin</h3>
-              <p className="mt-2 text-sm text-gray-500">Este flujo solo acepta cuentas administrador y envia verificacion en dos pasos.</p>
-              <form onSubmit={handleForgotPassword} className="mt-4 space-y-3">
-                <input className="w-full rounded-xl border border-gray-300 p-3" placeholder="Correo administrador" value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} />
-                <input type="password" className="w-full rounded-xl border border-gray-300 p-3" placeholder="Nueva contrasena" value={resetPassword} onChange={(e) => setResetPassword(e.target.value)} />
-                <div className="flex justify-end gap-2 pt-2">
-                  <button type="button" onClick={() => setShowResetModal(false)} className="rounded-lg border px-3 py-2 text-sm">Cancelar</button>
-                  <button type="submit" className="rounded-lg bg-brand px-3 py-2 text-sm text-white" disabled={resetLoading}>
-                    {resetLoading ? "Enviando..." : "Recuperar acceso"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
       </div>
+
+      {showResetModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-2xl border border-gray-200 dark:border-gray-800 text-gray-800 dark:text-gray-200 transition-colors">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recuperar acceso admin</h3>
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Este flujo solo acepta cuentas administrador y envia verificacion en dos pasos.</p>
+            <form onSubmit={handleForgotPassword} className="mt-4 space-y-3">
+              <input className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 text-gray-850 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand" placeholder="Correo administrador" value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} />
+              <input type="password" className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 text-gray-850 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand" placeholder="Nueva contrasena" value={resetPassword} onChange={(e) => setResetPassword(e.target.value)} />
+              <div className="flex justify-end gap-2 pt-2">
+                <button type="button" onClick={() => setShowResetModal(false)} className="rounded-lg border border-gray-300 dark:border-gray-700 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Cancelar</button>
+                <button type="submit" className="rounded-lg bg-brand hover:bg-brand-dark px-3 py-2 text-sm text-white font-semibold transition-colors" disabled={resetLoading}>
+                  {resetLoading ? "Enviando..." : "Recuperar acceso"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
 
