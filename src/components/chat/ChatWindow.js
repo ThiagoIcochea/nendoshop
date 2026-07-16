@@ -122,7 +122,7 @@ export default function ChatWindow({
         </div>
       </div>
 
-      <div className="sticky bottom-0 z-20 border-t border-purple-100 bg-gradient-to-t from-white via-white to-purple-50/40 px-1 py-2 shadow-[0_-10px_30px_rgba(88,28,135,0.06)] backdrop-blur-xl sm:px-2 sm:py-3">
+      <div className="sticky bottom-0 z-20 w-full">
         <div className="mx-auto max-w-4xl">
           <MessageInput sendMessage={sendMessage} sendTyping={sendTyping} disabled={!connected} />
         </div>

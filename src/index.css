@@ -9,3 +9,9 @@
     @apply bg-background text-gray-800 font-sans antialiased;
   }
 }
+
+/* Global mobile overflow prevention */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}

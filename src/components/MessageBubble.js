@@ -45,7 +45,7 @@ export default function MessageBubble({ user, text, time, isOwn, profileImg, dis
         isOwn ? "justify-end" : "justify-start"
       }`}
     >
-      <div className="flex max-w-[75%] items-end gap-3">
+      <div className={`flex max-w-[85%] items-end gap-3 ${isOwn ? "flex-row-reverse" : ""}`}>
         <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-purple-500 via-fuchsia-500 to-indigo-500 text-white shadow-md">
           {avatarSrc ? (
             <img src={avatarSrc} alt={nameLabel} className="h-full w-full object-cover" />

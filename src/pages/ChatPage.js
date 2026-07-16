@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import SidebarChats from "../components/chat/SidebarChats";
 import ChatWindow from "../components/chat/ChatWindow";
@@ -13,10 +13,7 @@ export default function ChatPage() {
   const { auth } = useContext(AuthContext);
 
   const username = auth?.name || auth?.email || "Invitado";
-
   const userId = auth?._id || auth?.id || auth?.userId || null;
-
-  
 
   const {
     messages,
@@ -27,6 +24,17 @@ export default function ChatPage() {
     reportUser,
     connected
   } = useChatSocket(currentChat, username, userId, auth?.profileImg || "");
+
+  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1024);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const showLeftSidebar = windowWidth >= 768 || menuOpen;
+  const showRightSidebar = windowWidth >= 1280 || infoOpen;
 
   return (
     <div className="h-[calc(100dvh-64px)] md:h-[calc(100vh-64px)] bg-gradient-to-br from-white via-purple-50/30 to-white overflow-hidden flex flex-col">
@@ -41,20 +49,20 @@ export default function ChatPage() {
       </div>
 
       <div className="flex-grow flex h-full min-h-0 flex-col md:flex-row relative">
-        <aside className={`${menuOpen ? "absolute inset-y-0 left-0 w-full z-20 block" : "hidden"} border-r border-purple-100 bg-white shadow-sm md:relative md:block md:w-[300px] md:shrink-0 md:border-r md:max-h-full`}>
-          <SidebarChats
-            currentChat={currentChat}
-            setCurrentChat={(chat) => {
-              setCurrentChat(chat);
-              setMenuOpen(false);
-            }}
-          />
-        </aside>
+        {showLeftSidebar && (
+          <aside className={`${windowWidth < 768 ? "absolute inset-y-0 left-0 w-full z-20" : "relative w-[300px] shrink-0"} border-r border-purple-100 bg-white shadow-sm h-full`}>
+            <SidebarChats
+              currentChat={currentChat}
+              setCurrentChat={(chat) => {
+                setCurrentChat(chat);
+                setMenuOpen(false);
+              }}
+            />
+          </aside>
+        )}
 
-        <main className="flex-1 min-h-0 min-w-0 flex justify-center overflow-hidden">
-
+        <main className="flex-grow flex-1 min-h-0 min-w-0 flex justify-center overflow-hidden">
           <div className="w-full max-w-5xl flex flex-col bg-white/40 backdrop-blur-sm min-h-0">
-
             <ChatWindow
               currentChat={currentChat}
               messages={messages}
@@ -65,15 +73,14 @@ export default function ChatPage() {
               currentUser={auth}
               currentUserName={username}
             />
-
           </div>
-
         </main>
 
-        <aside className={`${infoOpen ? "absolute inset-y-0 right-0 w-full z-20 block" : "hidden"} border-l border-purple-100 bg-white shadow-sm md:relative md:block md:w-[340px] md:shrink-0 md:border-l xl:block md:max-h-full`}>
-          <ChatInfo users={onlineUsers} currentUser={auth} onReportUser={reportUser} />
-        </aside>
-
+        {showRightSidebar && (
+          <aside className={`${windowWidth < 1280 ? "absolute inset-y-0 right-0 w-full md:w-[340px] z-20" : "relative w-[340px] shrink-0"} border-l border-purple-100 bg-white shadow-sm h-full`}>
+            <ChatInfo users={onlineUsers} currentUser={auth} onReportUser={reportUser} />
+          </aside>
+        )}
       </div>
     </div>
   );
