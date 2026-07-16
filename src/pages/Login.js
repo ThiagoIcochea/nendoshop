@@ -57,6 +57,10 @@ export default function Login() {
       return Swal.fire("Error","No se recibió información de usuario","error");
     }
 
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+    }
+
     if (data.user.role === "user") {
       setAuth(data.user);
       navigate("/");

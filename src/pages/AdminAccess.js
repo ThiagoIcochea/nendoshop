@@ -78,6 +78,10 @@ export default function AdminAccess() {
         return Swal.fire("Permisos Insuficientes","Acceso denegado","error");
       }
 
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+
       setAuth(data.user);
       navigate(ROUTES.dashboard);
 

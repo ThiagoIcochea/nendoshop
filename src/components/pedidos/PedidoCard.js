@@ -70,12 +70,26 @@ export default function PedidoCard({ order, onReturnSuccess }) {
     const hasDeadline = Boolean(order.estimatedDate);
     const claimDeadline = hasDeadline ? addBusinessDays(order.estimatedDate, 2) : null;
     const deadlinePassed = Boolean(claimDeadline) && claimDeadline.getTime() <= Date.now();
-    const canClaim = ["delivered", "returned"].includes(status) || status === "cancelled" || (["pending", "ready_for_pickup", "shipped"].includes(status) && deadlinePassed);
+    const allowedCategories = [];
+    if (["pending", "ready_for_pickup", "shipped"].includes(status) && deadlinePassed) {
+      allowedCategories.push("delay");
+    }
+    if (["delivered", "returned"].includes(status)) {
+      allowedCategories.push("incomplete", "damaged");
+    }
+    if (status === "delivered") {
+      allowedCategories.push("return");
+    }
+    if (status === "cancelled") {
+      allowedCategories.push("cancellation");
+    }
+    const canClaim = allowedCategories.length > 0;
     return {
       canClaim,
+      allowedCategories,
       message: canClaim
         ? "Puedes generar un reclamo para este pedido."
-        : "Los reclamos estarán disponibles cuando el pedido haya sido entregado, devuelto o cancelado, o cuando pasen 2 días hábiles desde la fecha estimada de entrega."
+        : "Los reclamos se habilitan según el motivo: demora tras 2 días hábiles de la fecha máxima, pedido incompleto o dañado al entregarse, devolución con pedido entregado, o cancelación con pedido cancelado."
     };
   }, [order.estimatedDate, order.status]);
 
@@ -196,20 +210,18 @@ export default function PedidoCard({ order, onReturnSuccess }) {
             </button>
           )}
 
-          {order.status !== "returned" && (
+          {claimEligibility.canClaim ? (
             <>
-              {claimEligibility.canClaim ? (
-                <button onClick={() => setShowClaim((prev) => !prev)} className="mt-3 w-full rounded-xl border border-brand/20 bg-white px-4 py-2 text-sm font-semibold text-brand transition hover:bg-brand hover:text-white">
-                  {showClaim ? "Ocultar reclamo" : "Generar reclamo"}
-                </button>
-              ) : (
-                <p className="mt-3 text-center text-xs text-gray-500">{claimEligibility.message}</p>
-              )}
-              {showClaim && <ClaimModal order={order} onSubmitted={() => setShowClaim(false)} />}
+              <button onClick={() => setShowClaim((prev) => !prev)} className="mt-3 w-full rounded-xl border border-brand/20 bg-white px-4 py-2 text-sm font-semibold text-brand transition hover:bg-brand hover:text-white">
+                {showClaim ? "Ocultar reclamo" : "Generar reclamo"}
+              </button>
+              {showClaim && <ClaimModal order={order} allowedCategories={claimEligibility.allowedCategories} onSubmitted={() => setShowClaim(false)} />}
             </>
+          ) : (
+            <p className="mt-3 text-center text-xs text-gray-500">{claimEligibility.message}</p>
           )}
 
-          {order.status === "returned" && (
+          {order.status === "returned" && !claimEligibility.canClaim && (
             <p className="rounded-xl border border-dashed border-gray-200 bg-gray-50/50 py-2.5 text-center text-sm font-bold italic text-gray-400">
               Devolución Procesada
             </p>

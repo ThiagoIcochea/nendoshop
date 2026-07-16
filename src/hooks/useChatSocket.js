@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BACKEND_URL } from "../utils/config";
 import { ROUTES } from "../utils/secureRoutes";
 
@@ -90,6 +90,13 @@ const saveCachedMessages = (roomKey, messages) => {
   }
 };
 
+const buildOnlineUser = (id, name, profileImg = "") => ({
+  id: id || name || "current-user",
+  username: name || "Usuario",
+  profileImg: profileImg || "",
+  online: true
+});
+
 export default function useChatSocket(roomKey, username, userId, profileImg = "") {
   const [messages, setMessages] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -104,6 +111,10 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
   const authToken = getAuthToken();
   const resolvedUserId = userId || getUserIdFromToken(authToken);
   const finalRoomKey = roomKey === "support" ? (resolvedUserId ? `support_${resolvedUserId}` : roomKey) : roomKey;
+  const currentOnlineUser = useMemo(
+    () => buildOnlineUser(resolvedUserId, username, profileImg),
+    [profileImg, resolvedUserId, username]
+  );
 
   const syncBotCartAction = useCallback((message) => {
     const action = message?.meta?.action;
@@ -181,6 +192,7 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
       }
       if (finalRoomKey && username) {
         socket.send(JSON.stringify({ type: "join", roomKey: finalRoomKey, username, userId: resolvedUserId, profileImg }));
+        setOnlineUsers((prev) => (prev.some((user) => String(user.id) === String(currentOnlineUser.id)) ? prev : [currentOnlineUser, ...prev]));
       }
     });
 
@@ -189,6 +201,7 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
         const payload = JSON.parse(event.data);
         switch (payload.type) {
           case "joined":
+            setOnlineUsers((prev) => (prev.some((user) => String(user.id) === String(currentOnlineUser.id)) ? prev : [currentOnlineUser, ...prev]));
             break;
           case "room-message":
             if (payload.message?.role === "assistant") {
@@ -240,10 +253,9 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
 
     socket.addEventListener("close", (event) => {
       if (!isMountedRef.current) return;
+      if (socketRef.current !== socket) return;
       setConnected(false);
-      if (socketRef.current === socket) {
-        socketRef.current = null;
-      }
+      socketRef.current = null;
 
       if (event.code === 1008 || event.code === 4001) {
         return;
@@ -260,9 +272,10 @@ export default function useChatSocket(roomKey, username, userId, profileImg = ""
     });
 
     socket.addEventListener("error", () => {
+      if (socketRef.current !== socket) return;
       setConnected(false);
     });
-  }, [authToken, finalRoomKey, handleBotAction, profileImg, resolvedUserId, syncBotCartAction, username]);
+  }, [authToken, currentOnlineUser, finalRoomKey, handleBotAction, profileImg, resolvedUserId, syncBotCartAction, username]);
 
   useEffect(() => {
     isMountedRef.current = true;
