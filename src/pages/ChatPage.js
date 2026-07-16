@@ -37,20 +37,20 @@ export default function ChatPage() {
   const showRightSidebar = windowWidth >= 1280 || infoOpen;
 
   return (
-    <div className="h-[calc(100dvh-64px)] md:h-[calc(100vh-64px)] bg-gradient-to-br from-white via-purple-50/30 to-white overflow-hidden flex flex-col">
-      <div className="flex items-center justify-between border-b border-purple-100 bg-white/90 px-4 py-3 md:hidden flex-shrink-0">
-        <button onClick={() => { setMenuOpen((v) => !v); setInfoOpen(false); }} className="rounded-xl border border-purple-200 p-2 text-purple-700">
+    <div className="h-[calc(100dvh-64px)] md:h-[calc(100vh-64px)] bg-gradient-to-br from-white via-purple-50/30 to-white dark:from-gray-950 dark:via-gray-900/30 dark:to-gray-950 overflow-hidden flex flex-col">
+      <div className="flex items-center justify-between border-b border-purple-100 dark:border-gray-800 bg-white/90 dark:bg-gray-900/90 px-4 py-3 md:hidden flex-shrink-0">
+        <button onClick={() => { setMenuOpen((v) => !v); setInfoOpen(false); }} className="rounded-xl border border-purple-200 dark:border-gray-700 p-2 text-purple-700 dark:text-purple-300">
           {menuOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
-        <span className="text-sm font-semibold text-gray-700">Chat</span>
-        <button onClick={() => { setInfoOpen((v) => !v); setMenuOpen(false); }} className="rounded-xl border border-purple-200 px-3 py-2 text-sm text-purple-700">
+        <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">Chat</span>
+        <button onClick={() => { setInfoOpen((v) => !v); setMenuOpen(false); }} className="rounded-xl border border-purple-200 dark:border-gray-700 px-3 py-2 text-sm text-purple-700 dark:text-purple-300">
           {infoOpen ? "Cerrar Info" : "Info"}
         </button>
       </div>
 
       <div className="flex-grow flex h-full min-h-0 flex-col md:flex-row relative">
         {showLeftSidebar && (
-          <aside className={`${windowWidth < 768 ? "absolute inset-y-0 left-0 w-full z-20" : "relative w-[300px] shrink-0"} border-r border-purple-100 bg-white shadow-sm h-full`}>
+          <aside className={`${windowWidth < 768 ? "absolute inset-y-0 left-0 w-full z-20" : "relative w-[300px] shrink-0"} border-r border-purple-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm h-full`}>
             <SidebarChats
               currentChat={currentChat}
               setCurrentChat={(chat) => {
@@ -62,7 +62,7 @@ export default function ChatPage() {
         )}
 
         <main className="flex-grow flex-1 min-h-0 min-w-0 flex justify-center overflow-hidden">
-          <div className="w-full max-w-5xl flex flex-col bg-white/40 backdrop-blur-sm min-h-0">
+          <div className="w-full max-w-5xl flex flex-col bg-white/40 dark:bg-gray-900/40 backdrop-blur-sm min-h-0">
             <ChatWindow
               currentChat={currentChat}
               messages={messages}
@@ -77,7 +77,7 @@ export default function ChatPage() {
         </main>
 
         {showRightSidebar && (
-          <aside className={`${windowWidth < 1280 ? "absolute inset-y-0 right-0 w-full md:w-[340px] z-20" : "relative w-[340px] shrink-0"} border-l border-purple-100 bg-white shadow-sm h-full`}>
+          <aside className={`${windowWidth < 1280 ? "absolute inset-y-0 right-0 w-full md:w-[340px] z-20" : "relative w-[340px] shrink-0"} border-l border-purple-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm h-full`}>
             <ChatInfo users={onlineUsers} currentUser={auth} onReportUser={reportUser} />
           </aside>
         )}

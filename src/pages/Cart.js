@@ -172,18 +172,18 @@ export default function Cart() {
 
                         <button
                           onClick={() => decrease(product.id)}
-                          className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"
+                          className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition font-bold"
                         >
                           -
                         </button>
 
-                        <span>
+                        <span className="px-2 font-semibold text-gray-850 dark:text-gray-200">
                           {product.quantity}
                         </span>
 
                         <button
                           onClick={() => increase(product.id)}
-                          className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition"
+                          className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition font-bold"
                         >
                           +
                         </button>

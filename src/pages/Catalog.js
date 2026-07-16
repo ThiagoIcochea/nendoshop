@@ -178,12 +178,12 @@ useEffect(() => {
 
       <div className="relative z-10">
 
-        <h1 className="text-3xl font-bold mb-6 text-gray-900">
+        <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
           Catálogo de Nendoroids
         </h1>
 
         {search.trim() && (
-          <div className="mb-4 rounded-lg border border-brand/20 bg-brand/10 px-4 py-3 text-sm text-brand">
+          <div className="mb-4 rounded-lg border border-brand/20 dark:border-purple-500/20 bg-brand/10 dark:bg-purple-950/20 px-4 py-3 text-sm text-brand dark:text-purple-300">
             Mostrando resultados para: <span className="font-semibold">{search}</span>
           </div>
         )}
@@ -194,7 +194,7 @@ useEffect(() => {
             name="category"
             value={filters.category}
             onChange={handleFilterChange}
-            className="border p-3 rounded-lg"
+            className="border border-gray-200 dark:border-gray-700 p-3 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-colors"
           >
             <option value="">Todas las categorías</option>
             <option value="Nendoroid">Nendoroid</option>
@@ -204,7 +204,7 @@ useEffect(() => {
             name="brand"
             value={filters.brand}
             onChange={handleFilterChange}
-            className="border p-3 rounded-lg"
+            className="border border-gray-200 dark:border-gray-700 p-3 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-colors"
           >
             <option value="">Todas las marcas</option>
             <option value="Good Smile Company">
@@ -216,7 +216,7 @@ useEffect(() => {
             name="stock"
             value={filters.stock}
             onChange={handleFilterChange}
-            className="border p-3 rounded-lg"
+            className="border border-gray-200 dark:border-gray-700 p-3 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-colors"
           >
             <option value="">Stock</option>
             <option value="available">Disponible</option>
@@ -226,7 +226,7 @@ useEffect(() => {
             name="discount"
             value={filters.discount}
             onChange={handleFilterChange}
-            className="border p-3 rounded-lg"
+            className="border border-gray-200 dark:border-gray-700 p-3 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-colors"
           >
             <option value="">Descuento</option>
             <option value="discount">Con descuento</option>
@@ -236,7 +236,7 @@ useEffect(() => {
             name="recommended"
             value={filters.recommended}
             onChange={handleFilterChange}
-            className="border p-3 rounded-lg"
+            className="border border-gray-200 dark:border-gray-700 p-3 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-colors"
           >
             <option value="">Relevancia</option>
             <option value="recommended">Recomendados</option>
@@ -246,7 +246,7 @@ useEffect(() => {
             name="sort"
             value={filters.sort}
             onChange={handleFilterChange}
-            className="border p-3 rounded-lg lg:col-span-5"
+            className="border border-gray-200 dark:border-gray-700 p-3 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 outline-none focus:border-brand focus:ring-1 focus:ring-brand transition-colors lg:col-span-5"
           >
             <option value="">Ordenar</option>
             <option value="price-asc">
@@ -301,7 +301,7 @@ useEffect(() => {
           <button
             onClick={() => setCurrentPage(currentPage - 1)}
             disabled={currentPage === 1}
-            className="px-3 sm:px-4 py-2 text-sm sm:text-base bg-gray-200 rounded disabled:opacity-50"
+            className="px-3 sm:px-4 py-2 text-sm sm:text-base bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 disabled:hover:bg-gray-200 dark:disabled:hover:bg-gray-800 rounded disabled:opacity-50 transition-colors"
           >
             Anterior
           </button>
@@ -310,9 +310,9 @@ useEffect(() => {
             <button
               key={i}
               onClick={() => setCurrentPage(i + 1)}
-              className={`px-4 py-2 rounded ${currentPage === i + 1
+              className={`px-4 py-2 rounded transition-colors ${currentPage === i + 1
                 ? "bg-brand text-white"
-                : "bg-gray-200"
+                : "bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700"
                 }`}
             >
               {i + 1}
@@ -322,7 +322,7 @@ useEffect(() => {
           <button
             onClick={() => setCurrentPage(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+            className="px-4 py-2 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 disabled:hover:bg-gray-200 dark:disabled:hover:bg-gray-800 rounded disabled:opacity-50 transition-colors"
           >
             Siguiente
           </button>

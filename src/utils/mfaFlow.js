@@ -54,8 +54,8 @@ export const promptMfaMethodSelection = async ({
     buttonsStyling: false,
     customClass: {
       popup: "w-[calc(100vw-2rem)] max-w-md rounded-3xl border border-purple-100 shadow-2xl",
-      confirmButton: "rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-500 px-4 py-2 text-white border-0 shadow-md",
-      cancelButton: "rounded-xl border border-gray-300 bg-white px-4 py-2 text-gray-700"
+      confirmButton: "rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-500 px-5 py-2.5 text-white border-0 shadow-md mx-2 sm:mx-3",
+      cancelButton: "rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-gray-700 mx-2 sm:mx-3"
     },
     preConfirm: () => document.getElementById("mfa-method-picker")?.value || "email",
     didOpen: () => {
@@ -65,8 +65,12 @@ export const promptMfaMethodSelection = async ({
         button.addEventListener("click", () => {
           const selected = button.getAttribute("data-method");
           if (hidden) hidden.value = selected;
-          buttons.forEach((item) => item.classList.remove("border-purple-500", "bg-purple-50", "ring-2", "ring-purple-500"));
-          button.classList.add("border-purple-500", "bg-purple-50", "ring-2", "ring-purple-500");
+          buttons.forEach((item) => {
+            item.classList.remove("border-purple-500", "bg-purple-50", "dark:bg-purple-950/40", "ring-2", "ring-purple-500", "text-purple-700", "dark:text-purple-300");
+            item.classList.add("text-gray-700");
+          });
+          button.classList.remove("text-gray-700");
+          button.classList.add("border-purple-500", "bg-purple-50", "dark:bg-purple-950/40", "ring-2", "ring-purple-500", "text-purple-700", "dark:text-purple-300");
         });
       });
     }
@@ -105,19 +109,19 @@ export const promptVerificationCode = async ({
     buttonsStyling: false,
     customClass: {
       popup: "w-[calc(100vw-2rem)] max-w-md rounded-3xl border border-purple-100 shadow-2xl",
-      confirmButton: "rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-500 px-4 py-2 text-white border-0 shadow-md",
-      cancelButton: "rounded-xl border border-gray-300 bg-white px-4 py-2 text-gray-700"
+      confirmButton: "rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-500 px-5 py-2.5 text-white border-0 shadow-md mx-2 sm:mx-3",
+      cancelButton: "rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-gray-700 mx-2 sm:mx-3"
     },
     preConfirm: () => document.getElementById("verification-code-hidden")?.value || "",
     didOpen: () => {
       const container = document.getElementById("verification-code-grid");
       const hidden = document.getElementById("verification-code-hidden");
       const inputs = [];
-
+ 
       const updateHidden = () => {
         if (hidden) hidden.value = inputs.map((input) => input.value).join("");
       };
-
+ 
       const codeLength = Number(length) || 6;
       for (let index = 0; index < codeLength; index += 1) {
         const input = document.createElement("input");
@@ -126,7 +130,7 @@ export const promptVerificationCode = async ({
         input.maxLength = 1;
         input.autocomplete = "one-time-code";
         input.placeholder = index === 0 ? (placeholder?.charAt(0) || "0") : "";
-        input.className = `${cellClassName} rounded-xl border border-gray-300 text-center text-lg font-semibold uppercase outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200`;
+        input.className = `${cellClassName} rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-center text-lg font-semibold uppercase outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-900`;
         input.addEventListener("input", (event) => {
           const value = event.target.value.replace(allowedPattern, "").toUpperCase();
           event.target.value = value;

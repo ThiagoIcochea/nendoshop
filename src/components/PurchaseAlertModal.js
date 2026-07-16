@@ -82,18 +82,18 @@ export default function PurchaseAlertModal() {
 
   return createPortal(
     <div className="fixed bottom-4 right-4 z-[1200] pointer-events-none" role="status" aria-live="polite">
-      <div className="w-[320px] max-w-[calc(100vw-2rem)] rounded-2xl border border-amber-200 bg-white/95 shadow-2xl backdrop-blur-md p-3 animate-[fadeIn_0.25s_ease-out]">
-        <div className="flex items-center gap-2 text-amber-600 font-semibold text-xs uppercase tracking-wide">
+      <div className="w-[320px] max-w-[calc(100vw-2rem)] rounded-2xl border border-amber-200 dark:border-amber-800/80 bg-white/95 dark:bg-gray-900/95 shadow-2xl backdrop-blur-md p-3 animate-[fadeIn_0.25s_ease-out]">
+        <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-semibold text-xs uppercase tracking-wide">
           <span>🔥</span>
           <span>Oferta en tiempo real</span>
         </div>
-        <h3 className="mt-2 text-sm font-bold text-gray-900 leading-snug">
+        <h3 className="mt-2 text-sm font-bold text-gray-900 dark:text-gray-100 leading-snug">
           {alert.customer} acaba de comprar {alert.product}
         </h3>
-        <p className="mt-1 text-sm text-gray-600">
+        <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
           Aprovecha ahora por solo {alert.priceLabel || `S/. ${alert.price}`}
         </p>
-        <p className="mt-2 text-xs text-purple-700 font-medium">
+        <p className="mt-2 text-xs text-purple-700 dark:text-purple-300 font-medium">
           {alert.message}
         </p>
         {alert.productId ? (

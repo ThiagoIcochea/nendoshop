@@ -1,22 +1,26 @@
-export default function ParticlesBackground() {
+import React, { useMemo } from "react";
 
-  const particles = Array.from({ length: 55 }).map((_, i) => ({
-    id: i,
-    size: Math.random() * 5 + 4,
-    top: Math.random() * 100,
-    left: Math.random() * 100,
-    delay: Math.random() * 2,
-    color: [
-      "#8b5cf6",
-      "#22d3ee",
-      "#84cc16",
-      "#a855f7",
-      "#06b6d4"
-    ][Math.floor(Math.random() * 5)]
-  }));
+function ParticlesBackground() {
+
+  const particles = useMemo(() => {
+    return Array.from({ length: 55 }).map((_, i) => ({
+      id: i,
+      size: Math.random() * 5 + 4,
+      top: Math.random() * 100,
+      left: Math.random() * 100,
+      delay: Math.random() * 2,
+      color: [
+        "#8b5cf6",
+        "#22d3ee",
+        "#84cc16",
+        "#a855f7",
+        "#06b6d4"
+      ][Math.floor(Math.random() * 5)]
+    }));
+  }, []);
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden bg-white">
+    <div className="pointer-events-none absolute inset-0 overflow-hidden bg-transparent">
 
       <style>
         {`
@@ -65,3 +69,5 @@ export default function ParticlesBackground() {
     </div>
   );
 }
+
+export default React.memo(ParticlesBackground);

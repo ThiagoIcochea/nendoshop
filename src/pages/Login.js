@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import ParticlesBackground from "../components/ParticlesBackground";
 import { useContext } from "react";
@@ -194,7 +195,7 @@ export default function Login() {
           </div>
         </form>
 
-        {showResetModal && (
+        {showResetModal && createPortal(
           <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4">
             <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
               <h3 className="text-lg font-semibold text-gray-900">Recuperar contraseña</h3>
@@ -221,7 +222,8 @@ export default function Login() {
                 </div>
               </form>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
       </div>

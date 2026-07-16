@@ -311,14 +311,15 @@ export default function ProductDetail() {
                   src={img}
                   alt=""
                   onClick={() => setSelectedImage(img)}
-                  className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded cursor-pointer border hover:border-brand"
+                  className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded cursor-pointer border hover:border-brand bg-white"
+                  style={{ backgroundColor: "#ffffff" }}
                 />
 
               ))}
 
             </div>
 
-            <div className="flex-1 overflow-hidden rounded-lg animate__animated animate__fadeIn">
+            <div className="flex-1 overflow-hidden rounded-lg animate__animated animate__fadeIn bg-white" style={{ backgroundColor: "#ffffff" }}>
 
               <img
                 src={selectedImage || product?.image}
@@ -377,10 +378,10 @@ export default function ProductDetail() {
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
 
-              <div className="flex border rounded overflow-hidden">
+              <div className="flex border border-gray-200 dark:border-gray-700 rounded overflow-hidden w-full sm:w-32 justify-between items-center bg-white dark:bg-gray-800 transition-colors">
 
                 <button
-                  className="px-4 py-2"
+                  className="w-1/3 py-2 text-center text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-bold"
                   onClick={() =>
                     setQuantity(
                       Math.max(1, quantity - 1)
@@ -390,12 +391,12 @@ export default function ProductDetail() {
                   -
                 </button>
 
-                <span className="px-4 flex items-center">
+                <span className="w-1/3 text-center font-semibold text-gray-800 dark:text-gray-200">
                   {quantity}
                 </span>
 
                 <button
-                  className="px-4 py-2"
+                  className="w-1/3 py-2 text-center text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-bold"
                   onClick={() =>
                     setQuantity(
                       Math.min(
@@ -533,8 +534,8 @@ export default function ProductDetail() {
                           key={star}
                           onClick={() => setRating(star)}
                           className={`cursor-pointer text-xl ${star <= rating
-                              ? "text-yellow-400 scale-110"
-                              : "text-gray-300"
+                            ? "text-yellow-400 scale-110"
+                            : "text-gray-300"
                             }`}
                         >
                           ★

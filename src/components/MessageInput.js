@@ -87,9 +87,9 @@ export default function MessageInput({ sendMessage, sendTyping, disabled }) {
   };
 
   return (
-    <div className="mb-2 w-full border-t border-purple-100 bg-gradient-to-t from-white via-white to-purple-50/30 px-3 py-3 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(88,28,135,0.06)] backdrop-blur-xl sm:mb-3 sm:px-4 sm:py-4">
+    <div className="mb-2 w-full border-t border-purple-100 dark:border-gray-800 bg-gradient-to-t from-white via-white to-purple-50/30 dark:from-gray-950 dark:via-gray-950 dark:to-gray-900/30 px-3 py-3 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(88,28,135,0.06)] backdrop-blur-xl sm:mb-3 sm:px-4 sm:py-4">
 
-      <div className="mx-auto flex max-w-3xl flex-col gap-2 rounded-[22px] border border-purple-200/80 bg-white/95 px-2.5 py-2 shadow-sm transition focus-within:ring-2 focus-within:ring-purple-200 sm:flex-row sm:items-center sm:px-3 sm:py-2.5">
+      <div className="mx-auto flex max-w-3xl flex-col gap-2 rounded-[22px] border border-purple-200/80 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 px-2.5 py-2 shadow-sm transition focus-within:ring-2 focus-within:ring-purple-200 sm:flex-row sm:items-center sm:px-3 sm:py-2.5">
 
         <input
           type="text"
@@ -100,7 +100,7 @@ export default function MessageInput({ sendMessage, sendTyping, disabled }) {
           }}
           onKeyDown={handleKeyDown}
           placeholder="Escribe un mensaje..."
-          className="flex-1 min-w-0 bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none"
+          className="flex-1 min-w-0 bg-transparent text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 outline-none"
         />
 
         <div className="flex items-center gap-2 sm:gap-2">
@@ -111,7 +111,7 @@ export default function MessageInput({ sendMessage, sendTyping, disabled }) {
             className={`flex h-11 w-11 items-center justify-center rounded-xl border transition ${
               isListening
                 ? "border-purple-500 bg-purple-600 text-white shadow-sm"
-                : "border-purple-200 bg-white text-purple-600 hover:bg-purple-100"
+                : "border-purple-200 dark:border-gray-800 bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-gray-700"
             }`}
           >
             <Mic className="h-4 w-4" />
@@ -125,7 +125,7 @@ export default function MessageInput({ sendMessage, sendTyping, disabled }) {
               ${
                 canSend && !disabled
                   ? "bg-gradient-to-r from-purple-600 to-purple-500 text-white shadow-md hover:shadow-lg hover:shadow-purple-200"
-                  : "cursor-not-allowed bg-purple-100 text-purple-300"
+                  : "cursor-not-allowed bg-purple-100 dark:bg-gray-800 text-purple-300 dark:text-gray-600"
               }
             `}
           >
@@ -139,11 +139,11 @@ export default function MessageInput({ sendMessage, sendTyping, disabled }) {
  
       <div className="mt-2 flex flex-col gap-1 px-1 text-[11px] sm:flex-row sm:items-center sm:justify-between">
 
-        <span className="text-gray-400">
+        <span className="text-gray-400 dark:text-gray-500">
           {voiceError || "Presiona Enter para enviar · Usa el micrófono para dictar"}
         </span>
 
-        <span className={`font-medium ${disabled ? "text-red-400" : "text-purple-400"}`}>
+        <span className={`font-medium ${disabled ? "text-red-400" : "text-purple-400 dark:text-purple-300"}`}>
           {disabled ? "Conexión desconectada" : "Comunidad activa 💬"}
         </span>
 

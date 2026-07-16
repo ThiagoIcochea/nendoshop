@@ -231,29 +231,32 @@ export default function TwoFactorAuth() {
   }, [code]);
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-gray-50 overflow-hidden">
+    <div className="relative min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 overflow-hidden transition-colors duration-300">
       <ParticlesBackground density={30} speed={0.3} />
 
       <div className="relative z-10 w-full max-w-md px-4">
-        <div className="bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl border p-8">
+        <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-2xl rounded-2xl border border-purple-100 dark:border-gray-800 p-5 sm:p-8 text-gray-800 dark:text-gray-100 transition-colors duration-300">
 
-          <button onClick={() => navigate(ROUTES.login)} className="flex items-center text-sm mb-6">
+          <button
+            onClick={() => navigate(ROUTES.login)}
+            className="flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-brand dark:hover:text-purple-400 transition-colors mb-6"
+          >
             <ArrowLeft size={16} /> Volver
           </button>
 
           <div className="text-center mb-6">
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-2xl bg-brand text-white mb-4">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-2xl bg-brand text-white mb-4 shadow-md shadow-purple-200 dark:shadow-none">
               <ShieldAlert size={30} />
             </div>
 
-            <h2 className="text-2xl font-bold">Verificación de 2 Factores</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Verificación de 2 Factores</h2>
 
             {forceEmailOnly ? (
-              <div className="mt-4 rounded-xl border border-purple-200 bg-purple-50 p-3 text-sm text-purple-700">
+              <div className="mt-4 rounded-xl border border-purple-200 dark:border-purple-900/40 bg-purple-50 dark:bg-purple-950/20 p-3 text-sm text-purple-700 dark:text-purple-300">
                 <div className="flex items-center gap-2 font-medium">
                   <Mail size={16} /> Verificación por correo
                 </div>
-                <p className="mt-1 text-xs text-purple-600">Este paso del registro solo admite el envío del código por correo electrónico.</p>
+                <p className="mt-1 text-xs text-purple-600 dark:text-purple-400">Este paso del registro solo admite el envío del código por correo electrónico.</p>
               </div>
             ) : (
               <div className="mt-4 grid grid-cols-2 gap-3">
@@ -262,8 +265,8 @@ export default function TwoFactorAuth() {
                   onClick={() => setVerificationMethod("email")}
                   className={`p-2 border rounded-xl flex items-center gap-2 transition-all ${
                     verificationMethod === "email"
-                      ? "border-brand bg-purple-50 text-brand font-semibold shadow-sm"
-                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                      ? "border-brand bg-purple-50 dark:bg-purple-950/40 text-brand dark:text-purple-300 font-semibold shadow-sm"
+                      : "border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
                 >
                   <Mail size={16} /> Correo
@@ -273,8 +276,8 @@ export default function TwoFactorAuth() {
                   onClick={() => setVerificationMethod("sms")}
                   className={`p-2 border rounded-xl flex items-center gap-2 transition-all ${
                     verificationMethod === "sms"
-                      ? "border-brand bg-purple-50 text-brand font-semibold shadow-sm"
-                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                      ? "border-brand bg-purple-50 dark:bg-purple-950/40 text-brand dark:text-purple-300 font-semibold shadow-sm"
+                      : "border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
                 >
                   <Smartphone size={16} /> SMS
@@ -284,8 +287,8 @@ export default function TwoFactorAuth() {
                   onClick={() => setVerificationMethod("call")}
                   className={`p-2 border rounded-xl flex items-center gap-2 transition-all ${
                     verificationMethod === "call"
-                      ? "border-brand bg-purple-50 text-brand font-semibold shadow-sm"
-                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                      ? "border-brand bg-purple-50 dark:bg-purple-950/40 text-brand dark:text-purple-300 font-semibold shadow-sm"
+                      : "border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
                 >
                   <Phone size={16} /> Llamada
@@ -295,8 +298,8 @@ export default function TwoFactorAuth() {
                   onClick={() => setVerificationMethod("whatsapp")}
                   className={`p-2 border rounded-xl flex items-center gap-2 transition-all ${
                     verificationMethod === "whatsapp"
-                      ? "border-brand bg-purple-50 text-brand font-semibold shadow-sm"
-                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                      ? "border-brand bg-purple-50 dark:bg-purple-950/40 text-brand dark:text-purple-300 font-semibold shadow-sm"
+                      : "border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
                   }`}
                 >
                   <MessageCircle size={16} /> WhatsApp
@@ -304,32 +307,45 @@ export default function TwoFactorAuth() {
               </div>
             )}
 
-            <p className="text-sm mt-3 text-gray-600">
-              Código enviado por {verificationMethod}
+            <p className="text-sm mt-3 text-gray-500 dark:text-gray-400">
+              Código enviado por <span className="font-semibold text-brand dark:text-purple-400">{verificationMethod}</span>
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex justify-between gap-2">
+            <div className="flex justify-between gap-1.5 sm:gap-2">
               {code.map((v, i) => (
-                <input key={i} ref={(el) => (inputRefs.current[i] = el)} maxLength={1} value={v}
+                <input
+                  key={i}
+                  ref={(el) => (inputRefs.current[i] = el)}
+                  maxLength={1}
+                  value={v}
                   onChange={(e) => handleChange(i, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(i, e)}
-                  className="w-12 h-14 text-center border rounded-xl" />
+                  className="w-full max-w-[3rem] h-12 sm:h-14 text-center border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-all"
+                />
               ))}
             </div>
 
-            <button type="submit" className="w-full bg-brand text-white p-3 rounded-xl">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-brand hover:bg-brand-dark dark:bg-purple-600 dark:hover:bg-purple-700 text-white p-3 rounded-xl font-semibold shadow-md transition-all active:scale-95 disabled:opacity-50"
+            >
               {loading ? "Cargando..." : "Verificar"}
             </button>
 
-            <div className="text-center text-sm">
+            <div className="text-center text-sm text-gray-500 dark:text-gray-400">
               {canResend ? (
-                <button type="button" onClick={handleResend} className="text-brand">
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  className="text-brand dark:text-purple-400 font-semibold hover:underline animate-pulse"
+                >
                   Reenviar código
                 </button>
               ) : (
-                <span>Reenviar en {resendTimer}s</span>
+                <span>Reenviar en <span className="font-semibold text-gray-800 dark:text-gray-200">{resendTimer}s</span></span>
               )}
             </div>
           </form>

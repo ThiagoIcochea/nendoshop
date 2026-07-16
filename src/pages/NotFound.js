@@ -4,10 +4,10 @@ import E404 from "../components/Assets/E404.png";
 export default function NotFound() {
   return (
     <div
-      className="min-h-screen bg-white relative overflow-hidden pt-12 lg:pt-24 bg-puntos bg-puntos-sm animate__animated animate__fadeIn"
+      className="min-h-screen bg-white dark:bg-gray-950 relative overflow-hidden pt-12 lg:pt-24 bg-puntos bg-puntos-sm animate__animated animate__fadeIn transition-colors duration-300"
       style={{
-        backgroundImage: "radial-gradient(#b0b3b8 14%, transparent 18%)",
-        backgroundSize: "10px 10px",
+        backgroundImage: "radial-gradient(circle at center, var(--bg-mask-color) 0%, transparent 70%), radial-gradient(var(--dot-color) 14%, transparent 18%)",
+        backgroundSize: "100% 100%, 10px 10px",
       }}
     >
       <main className="flex-grow relative z-10 flex flex-col lg:flex-row items-center justify-center px-4 gap-8 lg:gap-4">
@@ -42,14 +42,14 @@ export default function NotFound() {
 
             <Link
               to="/catalog"
-              className="inline-block px-8 sm:px-12 py-4 border-2 border-brand text-brand font-bold text-lg rounded-lg hover:bg-brand hover:text-white transition-all duration-300 transform hover:scale-105"
+              className="inline-block px-8 sm:px-12 py-4 border-2 border-brand dark:border-purple-400 text-brand dark:text-purple-300 font-bold text-lg rounded-lg hover:bg-brand dark:hover:bg-purple-600 hover:text-white transition-all duration-300 transform hover:scale-105"
             >
               Volver al Catálogo
             </Link>
 
             <Link
               to="/"
-              className="inline-block px-8 sm:px-12 py-4 text-brand hover:text-brand-dark font-medium transition-colors underline self-center lg:self-auto"
+              className="inline-block px-8 sm:px-12 py-4 text-brand dark:text-purple-400 hover:text-brand-dark dark:hover:text-purple-300 font-medium transition-colors underline self-center lg:self-auto"
             >
               O regresa al inicio
             </Link>

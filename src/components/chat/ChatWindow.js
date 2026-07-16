@@ -33,8 +33,8 @@ export default function ChatWindow({
   const chat = chatData[currentChat];
 
   return (
-    <main className="relative flex h-full min-h-0 flex-col overflow-hidden bg-gradient-to-b from-white via-purple-50/20 to-white">
-      <header className="sticky top-0 z-20 border-b border-purple-100 bg-white/80 backdrop-blur-xl">
+    <main className="relative flex h-full min-h-0 flex-col overflow-hidden bg-gradient-to-b from-white via-purple-50/20 to-white dark:from-gray-950 dark:via-gray-900/20 dark:to-gray-950">
+      <header className="sticky top-0 z-20 border-b border-purple-100 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl">
         <div className="flex h-20 items-center justify-between gap-2 px-3 sm:px-8">
           <div className="flex items-center gap-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-purple-500 text-lg text-white shadow-md sm:h-12 sm:w-12 sm:text-xl">
@@ -43,18 +43,18 @@ export default function ChatWindow({
 
             <div>
               <div className="flex items-center gap-3">
-                <h2 className="text-lg font-bold text-gray-800">{chat.title}</h2>
+                <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">{chat.title}</h2>
 
                 <span
                   className={`rounded-full px-2 py-1 text-xs font-medium ${
-                    connected ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                    connected ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300" : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300"
                   }`}
                 >
                   {connected ? "Conectado" : "Desconectado"}
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 text-xs text-gray-500">
+              <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                 <span className="relative flex h-2.5 w-2.5">
                   <span className="absolute h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
                   <span className="relative h-2.5 w-2.5 rounded-full bg-green-500" />
@@ -66,15 +66,15 @@ export default function ChatWindow({
           </div>
 
           <div className="hidden items-center gap-2 sm:flex">
-            <button className="h-10 w-10 rounded-xl text-gray-500 transition hover:bg-purple-50 hover:text-purple-600">
+            <button className="h-10 w-10 rounded-xl text-gray-500 dark:text-gray-400 transition hover:bg-purple-50 dark:hover:bg-gray-800 hover:text-purple-600 dark:hover:text-purple-400">
               <Bell className="h-5 w-5" />
             </button>
 
-            <button className="h-10 w-10 rounded-xl text-gray-500 transition hover:bg-purple-50 hover:text-purple-600">
+            <button className="h-10 w-10 rounded-xl text-gray-500 dark:text-gray-400 transition hover:bg-purple-50 dark:hover:bg-gray-800 hover:text-purple-600 dark:hover:text-purple-400">
               <Paperclip className="h-5 w-5" />
             </button>
 
-            <button className="h-10 w-10 rounded-xl text-gray-500 transition hover:bg-purple-50 hover:text-purple-600">
+            <button className="h-10 w-10 rounded-xl text-gray-500 dark:text-gray-400 transition hover:bg-purple-50 dark:hover:bg-gray-800 hover:text-purple-600 dark:hover:text-purple-400">
               <MoreVertical className="h-5 w-5" />
             </button>
           </div>
@@ -89,9 +89,9 @@ export default function ChatWindow({
                 {chat.icon}
               </div>
 
-              <h2 className="text-xl font-bold text-gray-700">{chat.emptyTitle}</h2>
+              <h2 className="text-xl font-bold text-gray-700 dark:text-gray-200">{chat.emptyTitle}</h2>
 
-              <p className="mt-2 text-sm text-gray-400">{chat.emptySubtitle}</p>
+              <p className="mt-2 text-sm text-gray-400 dark:text-gray-500">{chat.emptySubtitle}</p>
             </div>
           )}
 

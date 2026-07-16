@@ -17,21 +17,21 @@ export default function ChatInfo({ users, currentUser, onReportUser }) {
     (selectedUserRole === "admin" && currentUserRole !== "admin");
 
   return (
-    <aside className="flex h-full w-full flex-col overflow-y-auto bg-white md:w-80">
-      <div className="border-b border-purple-100 bg-gradient-to-b from-purple-50 to-white p-5">
-        <h3 className="text-sm font-semibold text-purple-700">Información del chat</h3>
-        <p className="mt-1 text-xs leading-relaxed text-gray-500">
+    <aside className="flex h-full w-full flex-col overflow-y-auto bg-white dark:bg-gray-900 md:w-80">
+      <div className="border-b border-purple-100 dark:border-gray-800 bg-gradient-to-b from-purple-50 to-white dark:from-gray-800 dark:to-gray-900 p-5">
+        <h3 className="text-sm font-semibold text-purple-700 dark:text-purple-300">Información del chat</h3>
+        <p className="mt-1 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
           Espacio para comunidad, soporte y conversaciones en tiempo real.
         </p>
       </div>
 
-      <div className="border-b border-purple-100 p-5">
+      <div className="border-b border-purple-100 dark:border-gray-800 p-5">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-semibold text-gray-800">
+            <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
               <Users className="inline h-4 w-4" /> Usuarios activos
             </h4>
-            <p className="text-xs text-gray-400">{users.length} conectados</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">{users.length} conectados</p>
           </div>
 
           <div className="-space-x-3 flex">
@@ -52,34 +52,34 @@ export default function ChatInfo({ users, currentUser, onReportUser }) {
       </div>
 
       <div className="flex-1 p-5">
-        <h4 className="mb-4 text-sm font-semibold text-gray-800">
+        <h4 className="mb-4 text-sm font-semibold text-gray-800 dark:text-gray-200">
           <FileText className="inline h-4 w-4" /> Reglas del chat
         </h4>
 
         <div className="space-y-4 text-sm">
-          <div className="flex gap-3 text-gray-600 transition hover:text-purple-700">
+          <div className="flex gap-3 text-gray-600 dark:text-gray-300 transition hover:text-purple-700 dark:hover:text-purple-300">
             <span>✅</span>
             <span>Sé respetuoso con los demás</span>
           </div>
 
-          <div className="flex gap-3 text-gray-600 transition hover:text-purple-700">
+          <div className="flex gap-3 text-gray-600 dark:text-gray-300 transition hover:text-purple-700 dark:hover:text-purple-300">
             <span>🚫</span>
             <span>No spam ni publicidad</span>
           </div>
 
-          <div className="flex gap-3 text-gray-600 transition hover:text-purple-700">
+          <div className="flex gap-3 text-gray-600 dark:text-gray-300 transition hover:text-purple-700 dark:hover:text-purple-300">
             <span>🔗</span>
             <span>No enlaces maliciosos</span>
           </div>
 
-          <div className="flex gap-3 text-gray-600 transition hover:text-purple-700">
+          <div className="flex gap-3 text-gray-600 dark:text-gray-300 transition hover:text-purple-700 dark:hover:text-purple-300">
             <span>🎉</span>
             <span>Participa y disfruta</span>
           </div>
         </div>
       </div>
 
-      <div className="border-t border-purple-100 bg-white p-5">
+      <div className="border-t border-purple-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
         <button
           onClick={() => {
             if (!selectedUser) {
@@ -102,7 +102,7 @@ export default function ChatInfo({ users, currentUser, onReportUser }) {
           <AlertTriangle className="mr-2 inline h-4 w-4" /> Reportar usuario
         </button>
 
-        <p className="mt-2 text-center text-[11px] text-gray-400">
+        <p className="mt-2 text-center text-[11px] text-gray-400 dark:text-gray-500">
           El equipo revisará tu reporte
         </p>
         {feedback ? (
@@ -112,21 +112,21 @@ export default function ChatInfo({ users, currentUser, onReportUser }) {
 
       {isReportOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-[min(92vw,24rem)] rounded-2xl bg-white p-5 shadow-xl">
-            <h2 className="text-lg font-semibold text-gray-900">Reportar usuario</h2>
-            <p className="mt-1 text-xs text-gray-500">Describe el problema del usuario</p>
+          <div className="w-[min(92vw,24rem)] rounded-2xl bg-white dark:bg-gray-800 p-5 shadow-xl">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Reportar usuario</h2>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Describe el problema del usuario</p>
 
             <textarea
               value={reportText}
               onChange={(e) => setReportText(e.target.value)}
               placeholder="Ej: spam, insultos, comportamiento inapropiado..."
-              className="mt-3 w-full rounded-xl border p-3 text-sm outline-none focus:ring-2 focus:ring-red-300"
+              className="mt-3 w-full rounded-xl border dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 p-3 text-sm outline-none focus:ring-2 focus:ring-red-300"
             />
 
             <div className="mt-4 flex justify-end gap-2">
               <button
                 onClick={() => setIsReportOpen(false)}
-                className="rounded-lg bg-gray-100 px-3 py-2 text-sm hover:bg-gray-200"
+                className="rounded-lg bg-gray-100 dark:bg-gray-700 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600"
               >
                 Cancelar
               </button>

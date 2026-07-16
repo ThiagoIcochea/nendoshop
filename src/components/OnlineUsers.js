@@ -21,8 +21,8 @@ export default function OnlineUsers({ onlineUsers = [], onSelectUser }) {
           className="
             w-full
             rounded-2xl
-            border border-purple-100
-            bg-purple-50
+            border border-purple-100 dark:border-gray-800
+            bg-purple-50 dark:bg-gray-800
             px-4 py-3
             text-sm
             outline-none
@@ -52,7 +52,7 @@ export default function OnlineUsers({ onlineUsers = [], onSelectUser }) {
                   rounded-2xl
                   px-3 py-2.5
                   transition-all
-                  hover:bg-purple-50
+                  hover:bg-purple-50 dark:hover:bg-gray-800/50
                 "
               >
                 <div className="flex items-center gap-3">
@@ -69,10 +69,10 @@ export default function OnlineUsers({ onlineUsers = [], onSelectUser }) {
                   </div>
 
                   <div>
-                    <p className="text-sm font-medium text-gray-700 transition group-hover:text-purple-700">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 transition group-hover:text-purple-700 dark:group-hover:text-purple-300">
                       {username}
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-gray-400 dark:text-gray-500">
                       {user.online === true || user.connected === true || user.status === "connected"
                         ? "Conectado"
                         : "Desconectado"}

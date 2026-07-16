@@ -16,7 +16,7 @@ export default function Card({
 
     <div className="bg-white rounded-xl overflow-hidden border border-brand flex flex-col hover:shadow-lg transition-shadow duration-300 group h-full animate__animated animate__fadeInUp">
 
-      <div className="h-48 sm:h-56 md:h-64 overflow-hidden bg-gray-50 relative p-3 sm:p-4 flex items-center justify-center">
+      <div className="h-48 sm:h-56 md:h-64 overflow-hidden relative p-3 sm:p-4 flex items-center justify-center bg-white" style={{ backgroundColor: "#ffffff" }}>
 
         {loading ? (
           <Skeleton height="100%" width="100%" />

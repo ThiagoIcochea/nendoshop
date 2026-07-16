@@ -50,15 +50,18 @@ export default function Home() {
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
 
-          <section className="mb-12 relative rounded-2xl overflow-hidden border border-brand bg-white shadow-sm">
+          <section className="mb-12 relative rounded-2xl overflow-hidden border border-brand bg-white shadow-sm" style={{ backgroundColor: "#ffffff" }}>
 
-            <div className="animate__animated animate__fadeInLeft absolute inset-0 bg-gradient-to-r from-white/90 via-white/60 to-transparent z-10 flex flex-col justify-center px-6 sm:px-12">
+            <div
+              className="animate__animated animate__fadeInLeft absolute inset-0 bg-gradient-to-r from-white/95 via-white/70 to-transparent z-10 flex flex-col justify-center px-6 sm:px-12"
+              style={{ background: "linear-gradient(to right, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.7) 60%, transparent 100%)" }}
+            >
 
-              <h2 className="text-3xl sm:text-5xl font-black text-gray-900 tracking-tight mb-4">
+              <h2 className="text-3xl sm:text-5xl font-black tracking-tight mb-4" style={{ color: "#111827" }}>
                 Nendoshop
               </h2>
 
-              <p className="text-sm sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-md font-medium">
+              <p className="text-sm sm:text-lg mb-6 sm:mb-8 max-w-md font-medium" style={{ color: "#4b5563" }}>
                 Descubre las mejores figuras coleccionables y Nendoroids con detalles increíbles.
               </p>
 
@@ -73,7 +76,10 @@ export default function Home() {
 
             </div>
 
-            <div className="h-[260px] sm:h-[420px] w-full flex justify-center sm:justify-end bg-gradient-to-r from-gray-50 to-white">
+            <div
+              className="h-[260px] sm:h-[420px] w-full flex justify-center sm:justify-end"
+              style={{ backgroundColor: "#ffffff" }}
+            >
               <img
                 src="template-banner.png"
                 alt="Nendoroid Hero Banner"
@@ -83,7 +89,7 @@ export default function Home() {
 
           </section>
 
-          <section className="flex flex-col sm:flex-row gap-3 sm:gap-0 justify-between items-start sm:items-center mb-6 bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-brand">
+          <section className="flex flex-row justify-between items-center mb-6 bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-brand" style={{ backgroundColor: "#ffffff" }}>
 
             <div className="flex items-center gap-2 cursor-pointer group text-sm sm:text-base">
               <Filter className="h-5 w-5 text-brand group-hover:text-brand-dark transition-colors" />
@@ -98,13 +104,14 @@ export default function Home() {
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
-                className="appearance-none w-full sm:w-auto bg-white border border-brand text-sm sm:text-base text-gray-700 py-2 pl-3 sm:pl-4 pr-8 sm:pr-10 rounded-full focus:outline-none focus:ring-1 focus:ring-brand focus:border-brand font-medium cursor-pointer"
+                className="appearance-none w-full sm:w-auto bg-white border border-brand text-sm sm:text-base py-2 pl-3 sm:pl-4 pr-8 sm:pr-10 rounded-full focus:outline-none focus:ring-1 focus:ring-brand focus:border-brand font-medium cursor-pointer"
+                style={{ backgroundColor: "#ffffff", color: "#374151" }}
               >
-                <option value="best">Mas vendidos</option>
-                <option value="price-asc">Precio: Menor a Mayor</option>
-                <option value="price-desc">Precio: Mayor a Menor</option>
-                <option value="discount">Con descuento</option>
-                <option value="stock">Mayor stock</option>
+                <option value="best" style={{ backgroundColor: "#ffffff", color: "#374151" }}>Mas vendidos</option>
+                <option value="price-asc" style={{ backgroundColor: "#ffffff", color: "#374151" }}>Precio: Menor a Mayor</option>
+                <option value="price-desc" style={{ backgroundColor: "#ffffff", color: "#374151" }}>Precio: Mayor a Menor</option>
+                <option value="discount" style={{ backgroundColor: "#ffffff", color: "#374151" }}>Con descuento</option>
+                <option value="stock" style={{ backgroundColor: "#ffffff", color: "#374151" }}>Mayor stock</option>
               </select>
 
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-brand">

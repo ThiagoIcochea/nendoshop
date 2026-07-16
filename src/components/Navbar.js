@@ -7,6 +7,8 @@ import {
   Mic,
   Search,
   ShoppingCart,
+  Sun,
+  Moon,
   User,
   X
 } from "lucide-react";
@@ -23,6 +25,23 @@ export default function Navbar() {
   const [isListening, setIsListening] = useState(false);
   const [voiceError, setVoiceError] = useState("");
   const [search, setSearch] = useState(localStorage.getItem("productSearch") || "");
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  });
+
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
 
   const isAdmin = Boolean(auth?.role === "admin" || auth?.isAdmin || auth?.user?.role === "admin");
 
@@ -154,37 +173,37 @@ export default function Navbar() {
         <div className="fixed inset-0 z-[100] md:hidden">
           <div className="absolute inset-0 bg-black/45" onClick={() => setMenuOpen(false)} />
 
-          <div className="absolute inset-y-0 left-0 z-[101] flex w-80 max-w-[85vw] flex-col overflow-hidden border-r border-gray-200 bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
+          <div className="absolute inset-y-0 left-0 z-[101] flex w-80 max-w-[85vw] flex-col overflow-hidden border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-2xl transition-colors">
+            <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-5 py-4">
               <div>
-                <p className="text-sm font-medium text-purple-600">NendoShop</p>
-                <h2 className="text-lg font-semibold text-gray-800">Menú</h2>
+                <p className="text-sm font-medium text-purple-600 dark:text-purple-400">NendoShop</p>
+                <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Menú</h2>
               </div>
               <button
                 onClick={() => setMenuOpen(false)}
-                className="rounded-full p-2 text-gray-600 hover:bg-gray-100"
+                className="rounded-full p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                 aria-label="Cerrar menú"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <nav className="flex flex-1 flex-col gap-2 p-5">
-              <Link to="/" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+            <nav className="flex flex-1 flex-col gap-2 p-5 bg-white dark:bg-gray-900 transition-colors">
+              <Link to="/" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-950/30 hover:text-purple-700 dark:hover:text-purple-300">
                 Inicio
               </Link>
-              <Link to="/about" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+              <Link to="/about" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-950/30 hover:text-purple-700 dark:hover:text-purple-300">
                 Nosotros
               </Link>
-              <Link to="/catalog" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+              <Link to="/catalog" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-950/30 hover:text-purple-700 dark:hover:text-purple-300">
                 Catálogo
               </Link>
               {auth && (
                 <>
-                  <Link to="/chat" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                  <Link to="/chat" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-950/30 hover:text-purple-700 dark:hover:text-purple-300">
                     Chat
                   </Link>
-                  <Link to="/pedidos" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700">
+                  <Link to="/pedidos" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-950/30 hover:text-purple-700 dark:hover:text-purple-300">
                     Mis pedidos
                   </Link>
                 </>
@@ -196,7 +215,7 @@ export default function Navbar() {
                     setMenuOpen(false);
                     navigate("/dashboard");
                   }}
-                  className="rounded-xl px-3 py-3 text-left text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700"
+                  className="rounded-xl px-3 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-950/30 hover:text-purple-700 dark:hover:text-purple-300"
                 >
                   Dashboard
                 </button>
@@ -208,21 +227,31 @@ export default function Navbar() {
                     setMenuOpen(false);
                     navigate("/api-comentarios");
                   }}
-                  className="rounded-xl px-3 py-3 text-left text-sm font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-700"
+                  className="rounded-xl px-3 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-950/30 hover:text-purple-700 dark:hover:text-purple-300"
                 >
                   Configuraciones
                 </button>
               )}
+
+              <button
+                onClick={toggleTheme}
+                className="mt-4 flex w-full items-center justify-between rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-950/30 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  {theme === "dark" ? <Sun className="h-4 w-4 text-amber-500" /> : <Moon className="h-4 w-4 text-purple-600" />}
+                  <span>Modo {theme === "dark" ? "Claro" : "Oscuro"}</span>
+                </div>
+              </button>
             </nav>
 
-            <div className="border-t border-gray-200 p-5 text-sm text-gray-500">
+            <div className="border-t border-gray-200 dark:border-gray-800 p-5 text-sm text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900 transition-colors">
               {auth ? (
-                <button onClick={handleLogout} className="flex items-center gap-2 text-red-500">
+                <button onClick={handleLogout} className="flex items-center gap-2 text-red-500 dark:text-red-400">
                   <LogOut className="h-4 w-4" />
                   Cerrar sesión
                 </button>
               ) : (
-                <Link to="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 text-purple-600">
+                <Link to="/login" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
                   <User className="h-4 w-4" />
                   Iniciar sesión
                 </Link>
@@ -237,13 +266,13 @@ export default function Navbar() {
   return (
     <>
       {mobileMenu}
-      <header className="sticky top-0 z-40 overflow-x-hidden border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
+      <header className="sticky top-0 z-40 overflow-x-hidden border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-900/95 shadow-sm backdrop-blur transition-colors duration-300">
         <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
           <div className="flex min-h-[56px] items-center justify-between gap-2 py-2 sm:h-20 sm:min-h-0 sm:py-0">
             <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
               <button
                 onClick={() => setMenuOpen((value) => !value)}
-                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-sm md:hidden"
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 shadow-sm md:hidden transition-colors"
                 aria-label="Abrir menú"
               >
                 <Menu className="h-5 w-5" />
@@ -253,38 +282,38 @@ export default function Navbar() {
                 <img
                   src={logo}
                   alt="Nendoshop Logo"
-                  className="h-10 w-10 rounded-full border border-gray-100 object-contain shadow-sm sm:h-12 sm:w-12"
+                  className="h-10 w-10 rounded-full border border-gray-100 dark:border-gray-800 object-contain shadow-sm sm:h-12 sm:w-12"
                 />
 
-                <span className="hidden text-lg font-bold tracking-tight text-gray-900 sm:block sm:text-xl">
+                <span className="hidden text-lg font-bold tracking-tight text-gray-900 dark:text-white sm:block sm:text-xl transition-colors">
                   Nendoshop
                 </span>
               </Link>
 
-              <nav className="hidden items-center gap-6 border-l border-gray-200 pl-6 md:flex">
-                <Link to="/" className="font-medium text-gray-600 hover:text-brand">
+              <nav className="hidden items-center gap-6 border-l border-gray-200 dark:border-gray-800 pl-6 md:flex">
+                <Link to="/" className="font-medium text-gray-600 dark:text-gray-300 hover:text-brand dark:hover:text-brand transition-colors">
                   Inicio
                 </Link>
-                <Link to="/about" className="font-medium text-gray-600 hover:text-brand">
+                <Link to="/about" className="font-medium text-gray-600 dark:text-gray-300 hover:text-brand dark:hover:text-brand transition-colors">
                   Nosotros
                 </Link>
-                <Link to="/catalog" className="font-medium text-gray-600 hover:text-brand">
+                <Link to="/catalog" className="font-medium text-gray-600 dark:text-gray-300 hover:text-brand dark:hover:text-brand transition-colors">
                   Catálogo
                 </Link>
 
                 {auth && (
                   <>
-                    <Link to="/chat" className="font-medium text-gray-600 hover:text-brand">
+                    <Link to="/chat" className="font-medium text-gray-600 dark:text-gray-300 hover:text-brand dark:hover:text-brand transition-colors">
                       Chat
                     </Link>
-                    <Link to="/pedidos" className="font-medium text-gray-600 hover:text-brand">
+                    <Link to="/pedidos" className="font-medium text-gray-600 dark:text-gray-300 hover:text-brand dark:hover:text-brand transition-colors">
                       Mis pedidos
                     </Link>
                   </>
                 )}
 
                 {isAdmin && (
-                  <button onClick={() => navigate("/dashboard")} className="font-medium text-gray-600 hover:text-brand">
+                  <button onClick={() => navigate("/dashboard")} className="font-medium text-gray-600 dark:text-gray-300 hover:text-brand dark:hover:text-brand transition-colors">
                     Dashboard
                   </button>
                 )}
@@ -292,24 +321,37 @@ export default function Navbar() {
             </div>
 
             <div className="flex flex-shrink-0 items-center justify-end gap-2 sm:gap-3">
-              <div className="hidden flex-1 items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-2 shadow-sm md:flex md:max-w-xl">
+              <div className="hidden flex-1 items-center gap-2 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 shadow-sm md:flex md:max-w-xl transition-colors">
                 <Search className="h-4 w-4 text-gray-400" />
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyDown={handleSearch}
                   placeholder="Buscar figuras, precios o productos"
-                  className="w-full border-0 bg-transparent py-1 text-sm text-gray-700 outline-none placeholder:text-gray-400"
+                  className="w-full border-0 bg-transparent py-1 text-sm text-gray-700 dark:text-gray-200 outline-none placeholder:text-gray-400"
                 />
                 <button
                   type="button"
                   onClick={handleVoiceSearch}
-                  className={`rounded-full p-1.5 ${isListening ? "bg-brand text-white" : "text-gray-500 hover:bg-gray-200"}`}
+                  className={`rounded-full p-1.5 transition-colors ${isListening ? "bg-brand text-white" : "text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"}`}
                   title="Buscar por voz"
                 >
                   <Mic className="h-4 w-4" />
                 </button>
               </div>
+
+              <button
+                onClick={toggleTheme}
+                className="flex h-10 w-10 items-center justify-center rounded-full text-brand hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                title={theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+                aria-label="Cambiar tema"
+              >
+                {theme === "dark" ? (
+                  <Sun className="h-5 w-5 text-amber-500" />
+                ) : (
+                  <Moon className="h-5 w-5 text-brand" />
+                )}
+              </button>
 
               {!auth ? (
                 <Link to="/login" className="flex items-center gap-2 text-brand">
@@ -340,7 +382,7 @@ export default function Navbar() {
 
               <button
                 onClick={() => navigate("/cart")}
-                className="relative flex h-10 w-10 items-center justify-center rounded-full text-brand hover:bg-gray-100"
+                className="relative flex h-10 w-10 items-center justify-center rounded-full text-brand hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               >
                 <ShoppingCart className="h-5 w-5" />
 
@@ -354,7 +396,7 @@ export default function Navbar() {
               {isAdmin && (
                 <Link
                   to="/api-comentarios"
-                  className="flex items-center gap-2 rounded-full p-2 text-gray-600 hover:bg-gray-100"
+                  className="flex items-center gap-2 rounded-full p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                   title="Configuraciones"
                   aria-label="Ir a configuraciones"
                 >

@@ -136,7 +136,7 @@ export default function Register() {
 
         <form
           onSubmit={handleRegister}
-          className="bg-white/95 p-4 sm:p-6 shadow-2xl w-full rounded-2xl border border-gray-200"
+          className="bg-white/95 dark:bg-gray-900/95 p-4 sm:p-6 shadow-2xl w-full rounded-2xl border border-gray-200 dark:border-gray-800"
         >
           <h2 className="text-xl mb-4 font-bold text-center">
             Registro

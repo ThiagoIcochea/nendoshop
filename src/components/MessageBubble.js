@@ -62,7 +62,7 @@ export default function MessageBubble({ user, text, time, isOwn, profileImg, dis
           >
             <span
               className={`text-sm font-semibold tracking-wide ${
-                isOwn ? "text-purple-300" : "text-purple-700"
+                isOwn ? "text-purple-300" : "text-purple-700 dark:text-purple-300"
               }`}
             >
               {nameLabel}
@@ -85,7 +85,7 @@ export default function MessageBubble({ user, text, time, isOwn, profileImg, dis
                     text-white
                   `
                   : `
-                    rounded-bl-md border border-purple-100 bg-white text-gray-800
+                    rounded-bl-md border border-purple-100 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200
                   `
               }
             `}
@@ -100,7 +100,7 @@ export default function MessageBubble({ user, text, time, isOwn, profileImg, dis
                 ${
                   isOwn
                     ? "right-[-6px] bg-purple-500"
-                    : "left-[-6px] border-l border-b border-purple-100 bg-white"
+                    : "left-[-6px] border-l border-b border-purple-100 dark:border-gray-700 bg-white dark:bg-gray-800"
                 }
               `}
             />

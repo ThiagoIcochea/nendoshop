@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import Swal from "sweetalert2";
 import ClaimModal from "./ClaimModal";
 import { BACKEND_URL } from "../../utils/config";
@@ -229,7 +230,7 @@ export default function PedidoCard({ order, onReturnSuccess }) {
         </div>
       </div>
 
-      {showDetail && (
+      {showDetail && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
@@ -270,7 +271,8 @@ export default function PedidoCard({ order, onReturnSuccess }) {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
